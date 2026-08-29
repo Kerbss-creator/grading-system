@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/announcement-admin.css" />
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/global.css">
+    <title>Announcements-Admin</title>
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+      <!-- LOGO -->
+
+      <div class="logo-section">
+        <div class="logo">
+          <img src="/IMAGES/forbesologo.png" alt="Forbes Academy Logo" />
+        </div>
+
+        <div class="school-name">
+          <h2>Forbes Academy</h2>
+          <span>Grading System</span>
+        </div>
+      </div>
+
+      <!-- NAVIGATION -->
+
+      <nav class="navigation">
+        <p class="nav-title">MAIN</p>
+
+        <!-- DASHBOARD -->
+
+        <a href="/html/dashboard-admin.html" class="nav-link">
+          <i class="fa-solid fa-gauge"></i>
+
+          <span>Dashboard</span>
+        </a>
+
+        <!-- USER MANAGEMENT -->
+
+        <div class="dropdown">
+          <div class="nav-link dropdown-toggle">
+            <i class="fa-solid fa-users"></i>
+
+            <a href="/html/user-management.html">
+              <span>User Management</span>
+            </a>
+
+            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+          </div>
+
+          <div class="dropdown-menu">
+            <!-- STUDENT MANAGEMENT -->
+
+            <a href="/html/student-management-admin.html" class="dropdown-link">
+              <i class="fa-solid fa-user-graduate"></i>
+
+              <span>Student Management</span>
+            </a>
+
+            <!-- TEACHER MANAGEMENT -->
+
+            <a href="/html/teacher-management-admin.html" class="dropdown-link">
+              <i class="fa-solid fa-chalkboard-user"></i>
+
+              <span>Teacher Management</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- SUBJECT MANAGEMENT -->
+
+        <a href="/html/subject-management-admin.html" class="nav-link">
+          <i class="fa-solid fa-book"></i>
+
+          <span>Subject Management</span>
+        </a>
+
+        <!-- GRADE LEVEL -->
+
+        <a href="/html/grade-level-admin.html" class="nav-link">
+          <i class="fa-solid fa-school"></i>
+
+          <span>Grade Level</span>
+        </a>
+
+        <!-- GRADE MANAGEMENT -->
+
+        <a href="/html/grade-management-admin.html" class="nav-link">
+          <i class="fa-solid fa-chart-column"></i>
+
+          <span>Grade Management</span>
+        </a>
+
+        <!-- GRADE APPROVAL -->
+
+        <a href="/html/grade-approval-admin.html" class="nav-link">
+          <i class="fa-solid fa-check-double"></i>
+
+          <span>Grade Approval</span>
+        </a>
+
+        <p class="nav-title">SYSTEM</p>
+
+        <!-- ANNOUNCEMENTS -->
+
+        <a href="/html/announcement-admin.html" class="nav-link active">
+          <i class="fa-solid fa-bullhorn"></i>
+
+          <span>Announcements</span>
+        </a>
+
+        <!-- SETTINGS -->
+
+        <a href="/html/settings-admin.html" class="nav-link">
+          <i class="fa-solid fa-gear"></i>
+
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- LOGOUT -->
+
+      <div class="logout-section">
+        <a href="/html/login.html" class="nav-link logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+     <!-- TOP HEADER -->
+      <header class="top-header">
+        <div>
+          <h1>Announcement</h1>
+          <p>Manage and publish important school updates, notices, and reminders.</p>
+        </div>
+        
+        <div class="header-right">
+          <!-- NOTIFICATION -->
+
+          <div class="notification-wrapper">
+            <button class="notification-btn" id="notificationBtn" type="button">
+              <i class="fa-regular fa-bell"></i>
+
+              <span class="notification-dot"></span>
+            </button>
+
+            <!-- NOTIFICATION PANEL -->
+
+            <div class="notification-panel" id="notificationPanel">
+              <!-- PANEL HEADER -->
+
+              <div class="notification-header">
+                <div>
+                  <h3>Notifications</h3>
+                  <span>0 unread</span>
+                </div>
+
+                <button
+                  class="notification-close"
+                  id="notificationClose"
+                  type="button"
+                >
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- EMPTY NOTIFICATION -->
+
+              <div class="empty-notification">
+                <div class="empty-notification-icon">
+                  <i class="fa-regular fa-bell-slash"></i>
+                </div>
+
+                <h4>No notifications yet</h4>
+
+                <p>You don't have any notifications at the moment.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ADMIN PROFILE -->
+
+          <div class="profile-wrapper">
+            <button class="profile" id="profileBtn" type="button">
+              <div class="profile-icon">
+                <i class="fa-solid fa-user"></i>
+              </div>
+
+              <div class="profile-info">
+                <strong>Administrator</strong>
+                <span>Admin</span>
+              </div>
+
+              <i class="fa-solid fa-chevron-down profile-arrow"></i>
+            </button>
+
+            <!-- PROFILE MENU -->
+
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-menu-header">
+                <div class="profile-menu-icon">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+                  <strong>Administrator</strong>
+                  <span>Admin Account</span>
+                </div>
+              </div>
+
+              <div class="profile-menu-divider"></div>
+
+              <a href="/html/settings-admin.html" class="profile-menu-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+              </a>
+
+              <button
+                type="button"
+                class="profile-menu-item logout-item"
+                id="logoutBtn"
+              >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ANNOUNCEMENT CONTAINER -->
+
+      <section class="announcement-container">
+        <div class="section-top">
+          <h2>Announcement List</h2>
+
+          <div class="section-actions">
+            <button type="button" class="see-all-btn" id="seeAllBtn">
+              See All
+            </button>
+
+            <button type="button" class="add-btn" id="addAnnouncementBtn">
+              <i class="fa-solid fa-plus"></i>
+              Create Announcement
+            </button>
+          </div>
+        </div>
+
+        <!-- FILTERS -->
+
+        <div class="announcement-filters">
+          <button type="button" class="filter-btn active" data-filter="all">
+            All
+          </button>
+
+          <button type="button" class="filter-btn" data-filter="teacher">
+            Teachers
+          </button>
+
+          <button type="button" class="filter-btn" data-filter="student">
+            Students
+          </button>
+        </div>
+
+        <!-- ANNOUNCEMENT LIST -->
+
+        <div class="announcement-list" id="announcementList">
+          <!-- ANNOUNCEMENT 1 -->
+
+          <div
+            class="announcement-card"
+            data-audience="all"
+            data-title="Welcome to the New School Year"
+            data-message="Welcome to Forbes Academy. We wish everyone a successful and productive school year."
+            data-date="August 27, 2026"
+          >
+            <div class="announcement-icon">
+              <i class="fa-solid fa-bullhorn"></i>
+            </div>
+
+            <div class="announcement-content">
+              <div class="announcement-heading">
+                <h3>Welcome to the New School Year</h3>
+
+                <span class="announcement-tag all"> All Users </span>
+              </div>
+
+              <p>
+                Welcome to Forbes Academy. We wish everyone a successful and
+                productive school year.
+              </p>
+            </div>
+
+            <div class="announcement-actions">
+              <button type="button" class="edit-btn" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+
+              <button type="button" class="delete-btn" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ANNOUNCEMENT 2 -->
+
+          <div
+            class="announcement-card"
+            data-audience="teacher"
+            data-title="Grade Submission Reminder"
+            data-message="Teachers are reminded to submit and finalize student grades before the deadline."
+            data-date="August 26, 2026"
+          >
+            <div class="announcement-icon">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+
+            <div class="announcement-content">
+              <div class="announcement-heading">
+                <h3>Grade Submission Reminder</h3>
+
+                <span class="announcement-tag teacher"> Teachers </span>
+              </div>
+
+              <p>
+                Teachers are reminded to submit and finalize student grades
+                before the deadline.
+              </p>
+            </div>
+
+            <div class="announcement-actions">
+              <button type="button" class="edit-btn" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+
+              <button type="button" class="delete-btn" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ANNOUNCEMENT 3 -->
+
+          <div
+            class="announcement-card"
+            data-audience="student"
+            data-title="Viewing of Final Grades"
+            data-message="Students may now view their latest approved grades through the student portal."
+            data-date="August 25, 2026"
+          >
+            <div class="announcement-icon">
+              <i class="fa-solid fa-user-graduate"></i>
+            </div>
+
+            <div class="announcement-content">
+              <div class="announcement-heading">
+                <h3>Viewing of Final Grades</h3>
+
+                <span class="announcement-tag student"> Students </span>
+              </div>
+
+              <p>
+                Students may now view their latest approved grades through the
+                student portal.
+              </p>
+            </div>
+
+            <div class="announcement-actions">
+              <button type="button" class="edit-btn" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+
+              <button type="button" class="delete-btn" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- CREATE / EDIT ANNOUNCEMENT MODAL -->
+
+    <div class="modal" id="announcementModal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div>
+            <h2 id="modalTitle">Create Announcement</h2>
+
+            <p>Create an announcement for users.</p>
+          </div>
+
+          <button type="button" id="closeAnnouncementModal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form id="announcementForm">
+          <div class="form-group">
+            <label for="announcementTitle"> Announcement Title </label>
+
+            <input
+              type="text"
+              id="announcementTitle"
+              placeholder="Enter announcement title"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="announcementAudience"> Audience </label>
+
+            <select id="announcementAudience" required>
+              <option value="">Select audience</option>
+
+              <option value="all">All Users</option>
+
+              <option value="teacher">Teachers</option>
+
+              <option value="student">Students</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="announcementMessage"> Announcement Message </label>
+
+            <textarea
+              id="announcementMessage"
+              placeholder="Write your announcement here..."
+              required
+            ></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" id="cancelAnnouncement">
+              Cancel
+            </button>
+
+            <button type="submit" class="save-btn">
+              <i class="fa-solid fa-check"></i>
+              Save Announcement
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- VIEW ANNOUNCEMENT MODAL -->
+
+    <div class="modal" id="viewModal">
+      <div class="modal-box view-box">
+        <div class="modal-header">
+          <div>
+            <h2>Announcement Details</h2>
+
+            <p>View announcement information.</p>
+          </div>
+
+          <button type="button" id="closeViewModal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="view-title">
+          <div class="large-view-icon">
+            <i class="fa-solid fa-bullhorn"></i>
+          </div>
+
+          <div>
+            <h2 id="viewTitle">Announcement Title</h2>
+
+            <p id="viewDate">August 27, 2026</p>
+          </div>
+        </div>
+
+        <div class="view-details">
+          <div>
+            <span>Audience</span>
+
+            <strong id="viewAudience"> All Users </strong>
+          </div>
+
+          <div>
+            <span>Date Published</span>
+
+            <strong id="viewDateDetails"> August 27, 2026 </strong>
+          </div>
+        </div>
+
+        <div class="message-box">
+          <span>Message</span>
+
+          <p id="viewMessage">Announcement message.</p>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" id="closeViewBtn">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+
+    <div class="modal" id="deleteModal">
+      <div class="modal-box delete-box">
+        <div class="modal-header">
+          <div>
+            <h2>Delete Announcement</h2>
+
+            <p>This action cannot be undone.</p>
+          </div>
+
+          <button type="button" id="closeDeleteModal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="delete-content">
+          <div class="delete-icon">
+            <i class="fa-solid fa-trash"></i>
+          </div>
+
+          <h3>Delete this announcement?</h3>
+
+          <p>
+            Are you sure you want to delete
+            <strong id="deleteAnnouncementTitle"> this announcement </strong>?
+          </p>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" id="cancelDelete">
+            Cancel
+          </button>
+
+          <button type="button" class="delete-confirm-btn" id="confirmDelete">
+            <i class="fa-solid fa-trash"></i>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+
+    <script src="/JS/announcement-admin.js"></script>
+    <script src="/JS/notification.js"></script>
+    <script src="/JS/profile.js"></script>
+  </body>
+</html>

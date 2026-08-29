@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Grade Level Management</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/grade-level-admin.css" />
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/global.css">
+  </head>
+
+  <body>
+    <!-- ======== SIDEBAR ======== -->
+    <aside class="sidebar">
+      <div class="logo-section">
+        <div class="logo">
+          <img src="/IMAGES/forbesologo.png" alt="Forbes Academy Logo" />
+        </div>
+
+        <div class="school-name">
+          <h2>Forbes Academy</h2>
+          <span>Grading System</span>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="navigation">
+        <p class="nav-title">MAIN</p>
+
+        <a href="/html/dashboard-admin.html" class="nav-link">
+          <i class="fa-solid fa-gauge"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- User Management -->
+        <div class="dropdown">
+          <div class="nav-link dropdown-toggle">
+            <i class="fa-solid fa-users"></i>
+
+            <a href="/html/user-management.html">
+              <span>User Management</span>
+            </a>
+
+            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+          </div>
+
+          <div class="dropdown-menu">
+            <a href="/html/student-management-admin.html" class="dropdown-link">
+              <i class="fa-solid fa-user-graduate"></i>
+              <span>Student Management</span>
+            </a>
+
+            <a href="/html/teacher-management-admin.html" class="dropdown-link">
+              <i class="fa-solid fa-chalkboard-user"></i>
+              <span>Teacher Management</span>
+            </a>
+          </div>
+        </div>
+
+        <a href="/html/subject-management-admin.html" class="nav-link">
+          <i class="fa-solid fa-book"></i>
+          <span>Subject Management</span>
+        </a>
+
+        <a href="/html/grade-level-admin.html" class="nav-link active">
+          <i class="fa-solid fa-school"></i>
+          <span>Grade Level</span>
+        </a>
+
+        <a href="/html/grade-management-admin.html" class="nav-link">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Grade Management</span>
+        </a>
+
+        <a href="/html/grade-approval-admin.html" class="nav-link">
+          <i class="fa-solid fa-check-double"></i>
+          <span>Grade Approval</span>
+        </a>
+
+        <p class="nav-title">SYSTEM</p>
+
+        <a href="/html/announcement-admin.html" class="nav-link">
+          <i class="fa-solid fa-bullhorn"></i>
+          <span>Announcements</span>
+        </a>
+
+        <a href="/html/settings-admin.html" class="nav-link">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Logout -->
+      <div class="logout-section">
+        <a href="/html/login.html" class="nav-link logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ======== MAIN CONTENT ======== -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1>Grade Level Management</h1>
+          <p>Manage grade levels, sections, and assigned advisers.</p>
+        </div>
+
+        <button class="add-grade-btn" id="addGradeBtn">
+          <i class="fa-solid fa-plus"></i>
+          Add Grade Level
+        </button>
+      </div>
+
+      <!-- ======== SUMMARY ======== -->
+      <div class="summary-container">
+        <div class="summary-card">
+          <div class="summary-icon">
+            <i class="fa-solid fa-school"></i>
+          </div>
+
+          <div>
+            <span>Total Grade Levels</span>
+            <h2 id="totalGrades">4</h2>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+
+          <div>
+            <span>Total Sections</span>
+            <h2 id="totalSections">16</h2>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon">
+            <i class="fa-solid fa-user-graduate"></i>
+          </div>
+
+          <div>
+            <span>Total Students</span>
+            <h2 id="totalStudents">668</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== GRADE LEVELS ======== -->
+      <div class="section-header">
+        <div>
+          <h2>Grade Levels</h2>
+          <p>Select a grade level to manage its sections.</p>
+        </div>
+      </div>
+
+      <!-- Grade Cards -->
+      <div class="grade-grid" id="gradeGrid">
+        <!-- Grade 7 -->
+        <div class="grade-card" data-grade="Grade 7">
+          <div class="grade-card-top">
+            <div class="grade-icon">
+              <span>7</span>
+            </div>
+
+            <span class="grade-status active">Active</span>
+          </div>
+
+          <div class="grade-info">
+            <h2>Grade 7</h2>
+            <p>Junior High School</p>
+          </div>
+
+          <div class="grade-details">
+            <div class="detail-item">
+              <i class="fa-solid fa-layer-group"></i>
+
+              <div>
+                <span>Sections</span>
+                <strong class="section-count">4</strong>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <i class="fa-solid fa-user-graduate"></i>
+
+              <div>
+                <span>Students</span>
+                <strong class="student-count">168</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="grade-footer">
+            <button class="view-btn">
+              <i class="fa-solid fa-eye"></i>
+              View
+            </button>
+
+            <button class="edit-btn">
+              <i class="fa-solid fa-pen"></i>
+              Edit
+            </button>
+
+            <button class="delete-btn">
+              <i class="fa-solid fa-trash"></i>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Grade 8 -->
+        <div class="grade-card" data-grade="Grade 8">
+          <div class="grade-card-top">
+            <div class="grade-icon">
+              <span>8</span>
+            </div>
+
+            <span class="grade-status active">Active</span>
+          </div>
+
+          <div class="grade-info">
+            <h2>Grade 8</h2>
+            <p>Junior High School</p>
+          </div>
+
+          <div class="grade-details">
+            <div class="detail-item">
+              <i class="fa-solid fa-layer-group"></i>
+
+              <div>
+                <span>Sections</span>
+                <strong class="section-count">4</strong>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <i class="fa-solid fa-user-graduate"></i>
+
+              <div>
+                <span>Students</span>
+                <strong class="student-count">167</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="grade-footer">
+            <button class="view-btn">
+              <i class="fa-solid fa-eye"></i>
+              View
+            </button>
+
+            <button class="edit-btn">
+              <i class="fa-solid fa-pen"></i>
+              Edit
+            </button>
+
+            <button class="delete-btn">
+              <i class="fa-solid fa-trash"></i>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Grade 9 -->
+        <div class="grade-card" data-grade="Grade 9">
+          <div class="grade-card-top">
+            <div class="grade-icon">
+              <span>9</span>
+            </div>
+
+            <span class="grade-status active">Active</span>
+          </div>
+
+          <div class="grade-info">
+            <h2>Grade 9</h2>
+            <p>Junior High School</p>
+          </div>
+
+          <div class="grade-details">
+            <div class="detail-item">
+              <i class="fa-solid fa-layer-group"></i>
+
+              <div>
+                <span>Sections</span>
+                <strong class="section-count">4</strong>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <i class="fa-solid fa-user-graduate"></i>
+
+              <div>
+                <span>Students</span>
+                <strong class="student-count">166</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="grade-footer">
+            <button class="view-btn">
+              <i class="fa-solid fa-eye"></i>
+              View
+            </button>
+
+            <button class="edit-btn">
+              <i class="fa-solid fa-pen"></i>
+              Edit
+            </button>
+
+            <button class="delete-btn">
+              <i class="fa-solid fa-trash"></i>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Grade 10 -->
+        <div class="grade-card" data-grade="Grade 10">
+          <div class="grade-card-top">
+            <div class="grade-icon">
+              <span>10</span>
+            </div>
+
+            <span class="grade-status active">Active</span>
+          </div>
+
+          <div class="grade-info">
+            <h2>Grade 10</h2>
+            <p>Junior High School</p>
+          </div>
+
+          <div class="grade-details">
+            <div class="detail-item">
+              <i class="fa-solid fa-layer-group"></i>
+
+              <div>
+                <span>Sections</span>
+                <strong class="section-count">4</strong>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <i class="fa-solid fa-user-graduate"></i>
+
+              <div>
+                <span>Students</span>
+                <strong class="student-count">167</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="grade-footer">
+            <button class="view-btn">
+              <i class="fa-solid fa-eye"></i>
+              View
+            </button>
+
+            <button class="edit-btn">
+              <i class="fa-solid fa-pen"></i>
+              Edit
+            </button>
+
+            <button class="delete-btn">
+              <i class="fa-solid fa-trash"></i>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ================ ADD / EDIT MODAL ================ -->
+    <div class="modal-overlay" id="gradeModal">
+      <div class="grade-modal">
+        <div class="modal-header">
+          <div>
+            <h2 id="modalTitle">Add Grade Level</h2>
+            <p id="modalDescription">Create a new grade level.</p>
+          </div>
+
+          <button class="close-modal" id="closeGradeModal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="input-group">
+            <label for="gradeLevel">Grade Level</label>
+
+            <select id="gradeLevel">
+              <option value="">Select Grade Level</option>
+              <option value="Grade 7">Grade 7</option>
+              <option value="Grade 8">Grade 8</option>
+              <option value="Grade 9">Grade 9</option>
+              <option value="Grade 10">Grade 10</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="gradeStatus">Status</label>
+
+            <select id="gradeStatus">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel-btn" id="cancelGrade">Cancel</button>
+
+          <button class="save-btn" id="saveGrade">
+            <i class="fa-solid fa-check"></i>
+            <span id="saveButtonText">Save Grade Level</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== VIEW MODAL ======================== -->
+    <div class="modal-overlay" id="viewModal">
+      <div class="grade-modal view-modal">
+        <div class="modal-header">
+          <div>
+            <h2 id="viewGradeTitle">Grade 7</h2>
+            <p>Grade level information</p>
+          </div>
+
+          <button class="close-modal" id="closeViewModal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="view-body">
+          <div class="view-item">
+            <span>Grade Level</span>
+            <strong id="viewGradeName">Grade 7</strong>
+          </div>
+
+          <div class="view-item">
+            <span>School Level</span>
+            <strong>Junior High School</strong>
+          </div>
+
+          <div class="view-item">
+            <span>Number of Sections</span>
+            <strong id="viewSectionCount">4</strong>
+          </div>
+
+          <div class="view-item">
+            <span>Total Students</span>
+            <strong id="viewStudentCount">168</strong>
+          </div>
+
+          <div class="view-item">
+            <span>Status</span>
+            <strong id="viewStatus" class="view-active">Active</strong>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel-btn" id="closeViewButton">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/grade-level-admin.js"></script>
+  </body>
+</html>

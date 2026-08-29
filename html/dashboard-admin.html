@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forbes Academy Dashboard</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo-section">
+        <div class="logo">
+          <img src="/IMAGES/forbesologo.png" alt="Forbes Academy Logo" />
+        </div>
+
+        <div class="school-name">
+          <h2>Forbes Academy</h2>
+          <span>Grading System</span>
+        </div>
+      </div>
+
+      <!-- NAVIGATION -->
+      <nav class="navigation">
+        <p class="nav-title">MAIN</p>
+
+        <!-- Dashboard -->
+        <a href="#" class="nav-link active">
+          <i class="fa-solid fa-gauge"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- USER MANAGEMENT DROPDOWN -->
+
+        <div class="dropdown">
+          <div class="nav-link dropdown-toggle">
+            <i class="fa-solid fa-users"></i>
+
+            <a href="/html/user-management.html">
+              <span>User Management</span>
+            </a>
+
+            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+          </div>
+
+          <!-- Student Management -->
+          <div class="dropdown-menu">
+            <a href="/html/student-management-admin.html" class="dropdown-link">
+              <i class="fa-solid fa-user-graduate"></i>
+              <span>Student Management</span>
+            </a>
+
+            <!-- Teacher Management -->
+            <a href="/html/teacher-management-admin.html" class="dropdown-link">
+              <i class="fa-solid fa-chalkboard-user"></i>
+              <span>Teacher Management</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Subject Management -->
+        <a href="/html/subject-management-admin.html" class="nav-link">
+          <i class="fa-solid fa-book"></i>
+          <span>Subject Management</span>
+        </a>
+
+        <!-- Grade Level -->
+        <a href="/html/grade-level-admin.html" class="nav-link">
+          <i class="fa-solid fa-school"></i>
+          <span>Grade Level</span>
+        </a>
+
+        <!-- Grade Management -->
+        <a href="/html/subject-management-admin.html" class="nav-link">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Grade Management</span>
+        </a>
+
+        <!-- Grade Approval -->
+        <a href="/html/grade-approval-admin.html" class="nav-link">
+          <i class="fa-solid fa-check-double"></i>
+          <span>Grade Approval</span>
+        </a>
+
+        <p class="nav-title">SYSTEM</p>
+
+        <!-- Announcements -->
+        <a href="/html/announcement-admin.html" class="nav-link">
+          <i class="fa-solid fa-bullhorn"></i>
+          <span>Announcements</span>
+        </a>
+
+        <!-- Settings -->
+        <a href="/html/settings-admin.html" class="nav-link">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- LOGOUT -->
+      <div class="logout-section">
+        <a href="/html/login.html" class="nav-link logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Welcome back, Administrator!</p>
+        </div>
+
+        <div class="header-right">
+          <!-- NOTIFICATION -->
+
+          <div class="notification-wrapper">
+            <button class="notification-btn" id="notificationBtn" type="button">
+              <i class="fa-regular fa-bell"></i>
+
+              <span class="notification-dot"></span>
+            </button>
+
+            <!-- NOTIFICATION PANEL -->
+
+            <div class="notification-panel" id="notificationPanel">
+              <!-- PANEL HEADER -->
+
+              <div class="notification-header">
+                <div>
+                  <h3>Notifications</h3>
+                  <span>0 unread</span>
+                </div>
+
+                <button
+                  class="notification-close"
+                  id="notificationClose"
+                  type="button"
+                >
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- EMPTY NOTIFICATION -->
+
+              <div class="empty-notification">
+                <div class="empty-notification-icon">
+                  <i class="fa-regular fa-bell-slash"></i>
+                </div>
+
+                <h4>No notifications yet</h4>
+
+                <p>You don't have any notifications at the moment.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ADMIN PROFILE -->
+
+          <div class="profile-wrapper">
+            <button class="profile" id="profileBtn" type="button">
+              <div class="profile-icon">
+                <i class="fa-solid fa-user"></i>
+              </div>
+
+              <div class="profile-info">
+                <strong>Administrator</strong>
+                <span>Admin</span>
+              </div>
+
+              <i class="fa-solid fa-chevron-down profile-arrow"></i>
+            </button>
+
+            <!-- PROFILE MENU -->
+
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-menu-header">
+                <div class="profile-menu-icon">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+                  <strong>Administrator</strong>
+                  <span>Admin Account</span>
+                </div>
+              </div>
+
+              <div class="profile-menu-divider"></div>
+
+              <a href="/html/settings-admin.html" class="profile-menu-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+              </a>
+
+              <button
+                type="button"
+                class="profile-menu-item logout-item"
+                id="logoutBtn"
+              >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- DASHBOARD CONTAINER -->
+      <section class="dashboard-container">
+        <!-- WELCOME CARD -->
+        <div class="welcome-card">
+          <div class="welcome-text">
+            <span>FORBES ACADEMY</span>
+
+            <h2>Welcome to the Grading System!</h2>
+
+            <p>
+              Manage students, teachers, subjects, classes, and academic records
+              in one place.
+            </p>
+          </div>
+
+          <div class="welcome-icon">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+        </div>
+
+        <!-- STATISTICS -->
+        <div class="section-header">
+          <h2>Overview</h2>
+          <span>Academic Year 2026-2027</span>
+        </div>
+
+        <div class="stats-grid">
+          <!-- STUDENTS -->
+          <div class="stat-card">
+            <div class="stat-icon student">
+              <i class="fa-solid fa-user-graduate"></i>
+            </div>
+
+            <div class="stat-info">
+              <span>Total Students</span>
+              <h3>668</h3>
+              <small>
+                <i class="fa-solid fa-arrow-up"></i>
+                Active students
+              </small>
+            </div>
+          </div>
+
+          <!-- TEACHERS -->
+          <div class="stat-card">
+            <div class="stat-icon teacher">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+
+            <div class="stat-info">
+              <span>Total Teachers</span>
+              <h3>42</h3>
+              <small>
+                <i class="fa-solid fa-check"></i>
+                Active teachers
+              </small>
+            </div>
+          </div>
+
+          <!-- CLASSES -->
+          <div class="stat-card">
+            <div class="stat-icon class">
+              <i class="fa-solid fa-school"></i>
+            </div>
+
+            <div class="stat-info">
+              <span>Total Classes</span>
+              <h3>24</h3>
+              <small>
+                <i class="fa-solid fa-layer-group"></i>
+                Grade 7-10
+              </small>
+            </div>
+          </div>
+
+          <!-- SUBJECTS -->
+          <div class="stat-card">
+            <div class="stat-icon subject">
+              <i class="fa-solid fa-book"></i>
+            </div>
+
+            <div class="stat-info">
+              <span>Total Subjects</span>
+              <h3>12</h3>
+              <small>
+                <i class="fa-solid fa-book-open"></i>
+                Registered subjects
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOWER CONTENT -->
+        <div class="content-grid">
+          <!-- RECENT GRADE ACTIVITY -->
+          <div class="content-card">
+            <div class="card-header">
+              <div>
+                <h2>Recent Grade Activity</h2>
+                <p>Latest grade records submitted</p>
+              </div>
+
+              <button class="view-btn">View All</button>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Final Grade</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="student-name">
+                        <div class="student-avatar">JD</div>
+                        Juan Dela Cruz
+                      </div>
+                    </td>
+
+                    <td>Mathematics</td>
+
+                    <td>
+                      <strong>92</strong>
+                    </td>
+
+                    <td>
+                      <span class="status passed"> Passed </span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="student-name">
+                        <div class="student-avatar">AS</div>
+                        Ana Santos
+                      </div>
+                    </td>
+
+                    <td>Science</td>
+
+                    <td>
+                      <strong>89</strong>
+                    </td>
+
+                    <td>
+                      <span class="status passed"> Passed </span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="student-name">
+                        <div class="student-avatar">MR</div>
+                        Mark Reyes
+                      </div>
+                    </td>
+
+                    <td>English</td>
+
+                    <td>
+                      <strong>84</strong>
+                    </td>
+
+                    <td>
+                      <span class="status passed"> Passed </span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="student-name">
+                        <div class="student-avatar">LC</div>
+                        Lisa Cruz
+                      </div>
+                    </td>
+
+                    <td>Filipino</td>
+
+                    <td>
+                      <strong>76</strong>
+                    </td>
+
+                    <td>
+                      <span class="status passed"> Passed </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ANNOUNCEMENTS -->
+          <div class="content-card announcements">
+            <div class="card-header">
+              <div>
+                <h2>Announcements</h2>
+                <p>Latest school announcements</p>
+              </div>
+
+              <button class="view-btn">View All</button>
+            </div>
+
+            <div class="announcement-list">
+              <div class="announcement-item">
+                <div class="announcement-icon">
+                  <i class="fa-solid fa-bullhorn"></i>
+                </div>
+
+                <div class="announcement-info">
+                  <h3>Grade Submission</h3>
+
+                  <p>Teachers are reminded to submit final grades.</p>
+
+                  <span>Today</span>
+                </div>
+              </div>
+
+              <div class="announcement-item">
+                <div class="announcement-icon">
+                  <i class="fa-solid fa-calendar"></i>
+                </div>
+
+                <div class="announcement-info">
+                  <h3>Quarterly Evaluation</h3>
+
+                  <p>Quarterly evaluation will begin next week.</p>
+
+                  <span>Yesterday</span>
+                </div>
+              </div>
+
+              <div class="announcement-item">
+                <div class="announcement-icon">
+                  <i class="fa-solid fa-circle-info"></i>
+                </div>
+
+                <div class="announcement-info">
+                  <h3>System Update</h3>
+
+                  <p>The grading system has been updated.</p>
+
+                  <span>August 22, 2026</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/JS/dashboards.js"></script>
+    <script src="/JS/notification.js"></script>
+    <script src="/JS/profile.js"></script>
+  </body>
+</html>
