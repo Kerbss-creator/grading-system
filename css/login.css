@@ -168,8 +168,6 @@ input:focus {
   text-decoration: none;
 }
 
-
-
 .login-btn {
   width: 100%;
   padding: 14px;
@@ -192,29 +190,4 @@ input:focus {
 .forgot:hover{
   color: #036f35;
   text-decoration: underline;
-}
-
-body {
-  animation: Transformation 0.7;
-}
-@keyframes Transformation {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.fade-out {
-  animation: FadeIn 0.8s ease forwards;
-}
-
-@keyframes FadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }

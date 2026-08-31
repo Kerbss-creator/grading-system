@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const notificationPanel = document.getElementById("notificationPanel");
 
+  const logoutBtn = document.getElementById("logoutBtn");
+
   if (!profileBtn || !profileWrapper) {
     console.log("Profile elements not found.");
     return;
@@ -42,3 +44,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", function () {
+      window.location.href = "login.html";
+    });
+  }
