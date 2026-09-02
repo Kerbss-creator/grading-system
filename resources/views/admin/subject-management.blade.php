@@ -1,4 +1,3 @@
-```blade
 @extends('layouts.admin')
 
 @section('title', 'Subject Management')
