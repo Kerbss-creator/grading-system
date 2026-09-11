@@ -55,7 +55,7 @@ document.addEventListener("keydown", (event) => {
 
 const studentSearch = document.getElementById("studentSearch");
 const gradeFilter = document.getElementById("gradeFilter");
-const sectionFilter = document.getElementById("sectionFilter");
+const sectionFilter = document.getElementById("genderFilter");
 const studentTableBody = document.getElementById("studentTableBody");
 
 // FILTER STUDENTS

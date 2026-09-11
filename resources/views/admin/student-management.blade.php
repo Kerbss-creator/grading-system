@@ -1,4 +1,3 @@
-
 @extends('layouts.admin')
 
 @section('title', 'Student Management')
@@ -64,10 +63,10 @@
 
         <select class="filter-select" id="sectionFilter">
 
-          <option value="all">All Sections</option>
-          <option value="A">Section A</option>
-          <option value="B">Section B</option>
-          <option value="C">Section C</option>
+          <option value="all">All Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+
 
         </select>
 
@@ -88,9 +87,9 @@
             <th>Student ID</th>
             <th>Student Name</th>
             <th>Grade Level</th>
-            <th>Section</th>
+            <th>Sex</th>
             <th>School Year</th>
-            <th>Status</th>
+            <th>Gmail</th>
             <th>Action</th>
           </tr>
 
@@ -109,13 +108,13 @@
 
             <td>Grade 7</td>
 
-            <td>A</td>
+            <td>Male</td>
 
             <td>2026-2027</td>
 
             <td>
               <span class="status active">
-                Active
+                lezogoooo@gmail.com
               </span>
             </td>
 
@@ -160,13 +159,13 @@
 
             <td>Grade 8</td>
 
-            <td>B</td>
+            <td>Female</td>
 
             <td>2026-2027</td>
 
             <td>
               <span class="status active">
-                Active
+                lezogoooo@gmail.com
               </span>
             </td>
 
@@ -211,13 +210,13 @@
 
             <td>Grade 9</td>
 
-            <td>A</td>
+            <td>Male</td>
 
             <td>2026-2027</td>
 
             <td>
-              <span class="status inactive">
-                Inactive
+              <span class="status active">
+                lezogoooo@gmail.com
               </span>
             </td>
 
@@ -548,6 +547,195 @@
 
   </div>
 
+  <!-- VIEW STUDENT MODAL -->
+  <div class="modal-overlay" id="viewStudentModal">
+    <div class="student-modal view-modal">
+
+      <div class="modal-header">
+        <div>
+          <h2>Student Information</h2>
+          <p>View student record details.</p>
+        </div>
+
+        <button class="modal-close" id="closeViewModal" type="button" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="student-info">
+
+          <div class="info-group">
+            <span>Student ID</span>
+            <strong id="viewStudentId">-</strong>
+          </div>
+
+          <div class="info-group">
+            <span>Student Name</span>
+            <strong id="viewStudentName">-</strong>
+          </div>
+
+          <div class="info-group">
+            <span>Grade Level</span>
+            <strong id="viewGradeLevel">-</strong>
+          </div>
+
+          <div class="info-group">
+            <span>Sex</span>
+            <strong id="viewSex">-</strong>
+          </div>
+
+          <div class="info-group">
+            <span>School Year</span>
+            <strong id="viewSchoolYear">-</strong>
+          </div>
+
+          <div class="info-group">
+            <span>Gmail</span>
+            <strong id="viewGmail">-</strong>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="cancel-btn" id="closeViewModalBtn">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- EDIT STUDENT MODAL -->
+  <div class="modal-overlay" id="editStudentModal">
+    <div class="student-modal">
+
+      <div class="modal-header">
+        <div>
+          <h2>Edit Student</h2>
+          <p>Update student record information.</p>
+        </div>
+
+        <button class="modal-close" id="closeEditModal" type="button" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label for="editStudentId">Student ID</label>
+          <input type="text" id="editStudentId">
+        </div>
+
+        <div class="form-group">
+          <label for="editStudentName">Student Name</label>
+          <input type="text" id="editStudentName">
+        </div>
+
+        <div class="form-row">
+
+          <div class="form-group">
+            <label for="editGradeLevel">Grade Level</label>
+
+            <select id="editGradeLevel">
+              <option value="Grade 7">Grade 7</option>
+              <option value="Grade 8">Grade 8</option>
+              <option value="Grade 9">Grade 9</option>
+              <option value="Grade 10">Grade 10</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editSex">Sex</label>
+
+            <select id="editSex">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label for="editSchoolYear">School Year</label>
+
+          <select id="editSchoolYear">
+            <option value="2026-2027">2026-2027</option>
+            <option value="2027-2028">2027-2028</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editGmail">Gmail</label>
+          <input type="email" id="editGmail">
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="cancel-btn" id="cancelEditModal">
+          Cancel
+        </button>
+
+        <button type="button" class="save-student-btn" id="saveEditStudent">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Save Changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- DELETE STUDENT MODAL -->
+  <div class="modal-overlay" id="deleteStudentModal">
+    <div class="student-modal delete-modal">
+
+      <div class="modal-header">
+        <div>
+          <h2>Delete Student</h2>
+          <p>Remove student record.</p>
+        </div>
+
+        <button class="modal-close" id="closeDeleteModal" type="button" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="delete-body">
+
+        <div class="delete-icon">
+          <i class="fa-solid fa-trash"></i>
+        </div>
+
+        <h3>Delete this student?</h3>
+
+        <p>
+          Are you sure you want to delete
+          <strong id="deleteStudentName">this student</strong>?
+          This action cannot be undone.
+        </p>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button type="button" class="cancel-btn" id="cancelDeleteModal">
+          Cancel
+        </button>
+
+        <button type="button" class="delete-confirm-btn" id="confirmDeleteStudent">
+          <i class="fa-solid fa-trash"></i>
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+  </div>
 @endsection
 
 
@@ -556,4 +744,3 @@
   <script src="{{ asset('js/student-management.js') }}"></script>
 
 @endsection
-```

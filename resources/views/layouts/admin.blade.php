@@ -1,4 +1,4 @@
-```blade
+
 <!doctype html>
 <html lang="en">
 

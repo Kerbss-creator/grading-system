@@ -24,7 +24,7 @@ a {
   color: inherit;
 }
 
-/* ==========TOP HEADER ========*/
+/* TOP HEADER */
 .top-header {
   display: flex;
   align-items: center;
@@ -51,7 +51,7 @@ a {
   gap: 22px;
 }
 
-/* ============= NOTIFICATION ==============  */
+/*  NOTIFICATION   */
 .notification-btn {
   position: relative;
   width: 42px;

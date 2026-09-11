@@ -160,7 +160,7 @@
 
           </div>
 
-          <button class="view-btn">
+          <button class="view-btn" id="viewAllGradesBtn">
             View All
           </button>
 
@@ -317,6 +317,103 @@
       </div>
 
 
+      <!-- GRADE ACTIVITY MODAL -->
+      <div class="modal-overlay" id="gradeActivityModal">
+
+        <div class="modal-box">
+
+          <div class="modal-header">
+
+            <div>
+              <h2>Recent Grade Activity</h2>
+              <p>Full list of latest grade records</p>
+            </div>
+
+            <button class="modal-close" id="closeGradeModal">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+          </div>
+
+          <div class="modal-body">
+
+            <div class="table-container">
+
+              <table>
+
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Final Grade</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  <tr>
+                    <td>
+                      <div class="student-name">
+                        <div class="student-avatar">JD</div>
+                        Juan Dela Cruz
+                      </div>
+                    </td>
+                    <td>Mathematics</td>
+                    <td><strong>92</strong></td>
+                    <td><span class="status passed">Passed</span></td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="student-name">
+                        <div class="student-avatar">AS</div>
+                        Ana Santos
+                      </div>
+                    </td>
+                    <td>Science</td>
+                    <td><strong>89</strong></td>
+                    <td><span class="status passed">Passed</span></td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="student-name">
+                        <div class="student-avatar">MR</div>
+                        Mark Reyes
+                      </div>
+                    </td>
+                    <td>English</td>
+                    <td><strong>84</strong></td>
+                    <td><span class="status passed">Passed</span></td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="student-name">
+                        <div class="student-avatar">LC</div>
+                        Lisa Cruz
+                      </div>
+                    </td>
+                    <td>Filipino</td>
+                    <td><strong>76</strong></td>
+                    <td><span class="status passed">Passed</span></td>
+                  </tr>
+
+                  {{-- Add more rows here, or loop over a $recentGrades collection from your controller --}}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
       <!-- ANNOUNCEMENTS -->
       <div class="content-card announcements">
 
@@ -330,7 +427,7 @@
 
           </div>
 
-          <button class="view-btn">
+          <button class="view-btn" id="viewAllAnnouncementsBtn">
             View All
           </button>
 
@@ -397,6 +494,71 @@
               </p>
 
               <span>August 22, 2026</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ANNOUNCEMENT MODAL -->
+      <div class="modal-overlay" id="announcementModal">
+
+        <div class="modal-box">
+
+          <div class="modal-header">
+
+            <div>
+              <h2>Announcements</h2>
+              <p>Full list of school announcements</p>
+            </div>
+
+            <button class="modal-close" id="closeAnnouncementModal">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+          </div>
+
+          <div class="modal-body">
+
+            <div class="announcement-list">
+
+              <div class="announcement-item">
+                <div class="announcement-icon">
+                  <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div class="announcement-info">
+                  <h3>Grade Submission</h3>
+                  <p>Teachers are reminded to submit final grades.</p>
+                  <span>Today</span>
+                </div>
+              </div>
+
+              <div class="announcement-item">
+                <div class="announcement-icon">
+                  <i class="fa-solid fa-calendar"></i>
+                </div>
+                <div class="announcement-info">
+                  <h3>Quarterly Evaluation</h3>
+                  <p>Quarterly evaluation will begin next week.</p>
+                  <span>Yesterday</span>
+                </div>
+              </div>
+
+              <div class="announcement-item">
+                <div class="announcement-icon">
+                  <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <div class="announcement-info">
+                  <h3>System Update</h3>
+                  <p>The grading system has been updated.</p>
+                  <span>August 22, 2026</span>
+                </div>
+              </div>
+
+              {{-- Add more items here, or loop over an $announcements collection from your controller --}}
 
             </div>
 

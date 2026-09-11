@@ -181,13 +181,14 @@
 }
 
 .card-header h2 {
-  font-size: 15px;
+  font-size: 18px;
+  color:#155624;
 }
 
 .card-header p {
   margin-top: 2px;
   color: #999;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .view-btn {
@@ -229,7 +230,7 @@ td {
   padding: 12px 20px;
   border-top: 1px solid #f1f1f1;
   color: #555;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* STUDENT */
@@ -303,7 +304,7 @@ td {
 
 .announcement-info p {
   color: #888;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -312,6 +313,91 @@ td {
   margin-top: 5px;
   color: #aaa;
   font-size: 8px;
+}
+
+/* MODAL */
+/* MODAL OVERLAY */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+/* MODAL BOX */
+.modal-box {
+  width: 100%;
+  max-width: 650px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  background: white;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: modalPop 0.2s ease;
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  font-size: 15px;
+  color: #155624;
+}
+
+.modal-header p {
+  margin-top: 2px;
+  color: #999;
+  font-size: 10px;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: #f4f4f4;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #e7f5ec;
+  color: #036f35;
+}
+
+.modal-body {
+  padding: 10px 0 15px;
+  overflow-y: auto;
 }
 
 /* RESPONSIVE - TABLET / SMALL DESKTOP */

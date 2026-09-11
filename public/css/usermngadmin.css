@@ -120,7 +120,8 @@
 
 .page-intro h2 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
+  color:#155624;
 }
 
 .page-intro p {
@@ -211,6 +212,7 @@
 
 .card-header h2 {
   font-size: 18px;
+  color: #155624;
 }
 
 .card-header p {
@@ -609,6 +611,11 @@ td {
   transform: translateY(-2px);
 }
 
+.role-option[data-role="admin"] {
+  grid-column: 1 / -1;
+  width: 50%;
+  justify-self: center;
+}
 /* FORM */
 
 .user-form {

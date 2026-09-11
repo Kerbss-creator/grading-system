@@ -430,7 +430,7 @@
           </button>
 
 
-          <!-- Admin -->
+          {{-- <!-- Admin --> --}}
 
           <button class="role-option" data-role="admin" type="button">
             <i class="fa-solid fa-user-shield"></i>
@@ -624,7 +624,7 @@
       </form>
 
     </div>
-    ```
+   
 
   </div>
 

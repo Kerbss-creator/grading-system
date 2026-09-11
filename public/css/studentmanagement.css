@@ -527,6 +527,118 @@
 }
 
 
+/* VIEW STUDENT */
+
+.view-modal {
+  width: 500px;
+}
+
+.student-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fafcfb;
+}
+
+.info-group span {
+  color: #888;
+  font-size: 11px;
+}
+
+.info-group strong {
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* DELETE MODAL */
+
+.delete-modal {
+  width: 430px;
+}
+
+.delete-body {
+  padding: 30px 25px;
+  text-align: center;
+}
+
+.delete-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: #ffeded;
+  color: #d32f2f;
+  font-size: 20px;
+}
+
+.delete-body h3 {
+  margin: 0 0 7px;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.delete-body p {
+  margin: 0;
+  color: #777;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.delete-body strong {
+  color: #333;
+}
+
+
+/* DELETE BUTTON */
+
+.delete-confirm-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 17px;
+  border: none;
+  border-radius: 7px;
+  background: #d32f2f;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.delete-confirm-btn:hover {
+  background: #b71c1c;
+}
+
+
+/* RESPONSIVE VIEW MODAL */
+
+@media (max-width: 600px) {
+
+  .student-info {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+
+
 /* ANIMATION */
 
 @keyframes modalShow {
