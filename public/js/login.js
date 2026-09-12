@@ -1,13 +1,23 @@
+// LOGIN
 
-// LOGGINGIN
 const loginBtn = document.getElementById("loginBtn");
+const loginLoader = document.getElementById("loginLoader");
 
-loginBtn.addEventListener("click", function () {
+if (loginBtn) {
+    loginBtn.addEventListener("click", function () {
 
-    document.body.classList.add("fade-out");
+        // Show loading screen
+        if (loginLoader) {
+            loginLoader.classList.add("show");
+        }
 
-    setTimeout(function () {
-        window.location.href = "dashboard-admin.html";
-    }, 700);
+        // Prevent clicking again
+        loginBtn.disabled = true;
 
-});
+        // Go to Laravel dashboard
+        setTimeout(function () {
+            window.location.href = "/admin/dashboard";
+        }, 800);
+
+    });
+}

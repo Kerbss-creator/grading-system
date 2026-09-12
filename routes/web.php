@@ -2,6 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 
+// LOGIN
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+// RESET PASSWORD
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('password.request');
+
 // Dashboard
 Route::get('/admin/dashboard', function () {
     return view('admin.dashboard-admin');
@@ -52,7 +62,3 @@ Route::get('/admin/settings', function () {
     return view('admin.settings');
 });
 
-// Login
-Route::get('/login', function () {
-    return view('auth.login');
-});
