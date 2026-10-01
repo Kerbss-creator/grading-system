@@ -1,4 +1,4 @@
-// ADMIN PROFILE
+// ADMIN & TEACHER PROFILE
 
 document.addEventListener("DOMContentLoaded", function () {
   const profileBtn = document.getElementById("profileBtn");

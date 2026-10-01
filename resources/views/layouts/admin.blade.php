@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 
@@ -29,7 +28,7 @@
 
 <body>
 
-    <!-- SIDEBAR -->
+    {{-- SIDEBAR --}}
     <aside class="sidebar">
 
         <!-- LOGO -->
@@ -54,7 +53,7 @@
 
 
             <!-- DASHBOARD -->
-            <a href="/admin/dashboard" class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+            <a href="{{ url('/admin/dashboard') }}" class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
 
                 <i class="fa-solid fa-gauge"></i>
 
@@ -67,19 +66,19 @@
             <div
                 class="dropdown {{ request()->is('admin/students*') || request()->is('admin/teachers*') ? 'active' : '' }}">
 
-                
-                    <a href="/admin/users"
-                        class="nav-link dropdown
+
+                <a href="/admin/users"
+                    class="nav-link dropdown
                     {{ request()->is('admin/users*') || request()->is('admin/students*') || request()->is('admin/teachers*') ? 'active' : '' }}">
 
-                        <i class="fa-solid fa-users"></i>
+                    <i class="fa-solid fa-users"></i>
 
-                        <span>User Management</span>
+                    <span>User Management</span>
 
-                        <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                    <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
 
-                    </a>
-                
+                </a>
+
 
 
                 <!-- USER MANAGEMENT SUBMENU -->
@@ -111,14 +110,20 @@
             </div>
 
 
+            <p class="nav-title">ACADEMIC MANAGEMENT</p>
             <!-- SUBJECT MANAGEMENT -->
             <a href="/admin/subjects" class="nav-link {{ request()->is('admin/subjects*') ? 'active' : '' }}">
+
+
+
+
 
                 <i class="fa-solid fa-book"></i>
 
                 <span>Subject Management</span>
 
             </a>
+
 
 
             <!-- GRADE LEVEL -->
@@ -331,6 +336,16 @@
                             <i class="fa-solid fa-gear"></i>
 
                             <span>Settings</span>
+
+                        </a>
+
+                        <a href="/teacher/profile" class="profile-menu-item">
+
+                            <i class="fa-solid fa-user"></i>
+
+                            <span>
+                                My Profile
+                            </span>
 
                         </a>
 

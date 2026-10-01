@@ -7,7 +7,7 @@
 @section('header-description', 'Review and approve submitted student grades.')
 
 @section('page-css')
-  <link rel="stylesheet" href="{{ asset('css/grade-approval-admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/grade-approval-admin.css') }}">
 @endsection
 
 @section('content')

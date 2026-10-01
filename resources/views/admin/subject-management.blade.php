@@ -7,7 +7,7 @@
 @section('header-description', 'Manage subjects and subject information.')
 
 @section('page-css')
-  <link rel="stylesheet" href="{{ asset('css/subject-management-admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/subject-management-admin.css') }}">
 @endsection
 
 @section('content')

@@ -6,7 +6,7 @@
 @section('header-description', 'Manage student and teacher accounts.')
 
 @section('page-css')
-  <link rel="stylesheet" href="{{ asset('css/usermngadmin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/usermngadmin.css') }}">
 @endsection
 
 @section('content')

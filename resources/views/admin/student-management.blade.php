@@ -7,7 +7,7 @@
 @section('header-description', 'Manage student records, information, and accounts.')
 
 @section('page-css')
-  <link rel="stylesheet" href="{{ asset('css/studentmanagement.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/studentmanagement.css') }}">
 @endsection
 
 @section('content')

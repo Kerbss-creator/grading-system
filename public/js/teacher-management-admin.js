@@ -76,8 +76,9 @@ function filterTeachers() {
     if (matchesSearch && matchesSubject && matchesStatus) {
       row.style.display = "";
     } else {
-      row.style.display = "none";
+      row.style.display = "none";   
     }
+
   });
 }
 
@@ -88,4 +89,4 @@ teacherSearch.addEventListener("input", filterTeachers);
 subjectFilter.addEventListener("change", filterTeachers);
 
 // Status Filter
-statusFilter.addEventListener("change", filterTeachers);
+statusFilter.addEventListener("change", filterTeachers);''

@@ -8,7 +8,7 @@
 @section('header-description', 'Manage teacher records, information, and accounts.')
 
 @section('page-css')
-  <link rel="stylesheet" href="{{ asset('css/teacher-management-admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/teacher-management-admin.css') }}">
 @endsection
 
 @section('content')

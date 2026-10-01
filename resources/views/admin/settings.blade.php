@@ -8,7 +8,7 @@
 
 @section('page-css')
 
-  <link rel="stylesheet" href="{{ asset('css/settings-admin.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/admin/settings-admin.css') }}">
 @endsection
 
 @section('content')

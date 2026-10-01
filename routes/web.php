@@ -62,3 +62,6 @@ Route::get('/admin/settings', function () {
     return view('admin.settings');
 });
 
+Route::get('/dashboard-teacher', function () {
+    return view('teacher.teacher-dashboard');
+})->name('dashboard.teacher');

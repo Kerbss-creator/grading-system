@@ -1,13 +1,13 @@
 /* SIDEBAR */
 .sidebar {
-  position: fixed;
+ position: fixed;
   top: 0;
   left: 0;
   width: 75px;
   height: 100vh;
   padding: 25px 10px;
   background: #036f35;
-  color: white;
+  color: white; 
   display: flex;
   flex-direction: column;
   overflow: hidden;

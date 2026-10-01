@@ -1,0 +1,560 @@
+
+/* SIDEBAR */
+
+.teacher-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 75px;
+  height: 100vh;
+  padding: 25px 10px;
+  background: #036f35;
+  color: white; 
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+  transition: width 0.3s ease;
+}
+
+.teacher-sidebar:hover {
+  width: 280px;
+}
+
+/* SIDEBAR SCROLLBAR */
+
+.teacher-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.teacher-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.teacher-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+}
+
+.teacher-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+
+/* LOGO SECTION */
+
+.teacher-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 65px;
+  margin-bottom: 15px;
+}
+
+.teacher-logo {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.teacher-logo img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  max-width: none;
+  object-fit: contain;
+}
+
+
+/* SCHOOL NAME */
+
+.teacher-school-name {
+  min-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.teacher-sidebar:hover .teacher-school-name {
+  opacity: 1;
+}
+
+.teacher-school-name h2 {
+  margin: 0 0 5px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.teacher-school-name span {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+/* NAVIGATION */
+
+.teacher-navigation {
+  flex: 1;
+
+}
+
+.teacher-nav-title {
+  margin: 18px 14px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.teacher-sidebar:hover .teacher-nav-title {
+  opacity: 0.55;
+}
+
+
+/* NAVIGATION LINKS */
+
+.teacher-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 15px;
+  margin: 4px 0;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: 0.25s ease;
+}
+
+.teacher-nav-link i {
+  min-width: 20px;
+  text-align: center;
+  font-size: 15px;
+}
+
+.teacher-nav-link span {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.teacher-sidebar:hover .teacher-nav-link span {
+  opacity: 1;
+}
+
+.teacher-nav-link:hover {
+  background: rgba(255, 255, 255, 0.13);
+  color: white;
+  transform: translateX(4px);
+}
+
+.teacher-nav-link.active,
+.teacher-nav-link.active:hover {
+  background: white;
+  color: #036f35;
+  transform: translateX(0);
+}
+
+
+/* LOGOUT */
+
+.teacher-logout-section {
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.teacher-logout {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.teacher-logout:hover {
+  background: rgba(255, 255, 255, 0.13);
+  color: white;
+  transform: translateX(4px);
+}
+
+
+/* MAIN CONTENT */
+
+.teacher-main-content {
+  margin-left: 75px;
+  padding: 25px 35px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+
+/* TOP HEADER */
+
+.teacher-top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.teacher-header-title h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #036f35;
+  margin-bottom: 5px;
+}
+
+.teacher-header-title p {
+  margin-top: 3px;
+  color: #888;
+  font-size: 13px;
+}
+
+.teacher-header-right {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+
+/* NOTIFICATION */
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  background: white;
+  color: #555;
+  font-size: 17px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.notification-btn:hover {
+  color: #036f35;
+  transform: translateY(-2px);
+}
+
+.notification-dot {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e53935;
+}
+
+
+/* NOTIFICATION PANEL */
+
+.notification-panel {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 350px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  display: none;
+  z-index: 9999;
+}
+
+.notification-panel.show {
+  display: block;
+}
+
+
+/* NOTIFICATION HEADER */
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+.notification-header span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: #888;
+}
+
+
+/* CLOSE BUTTON */
+
+.notification-close {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #777;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.notification-close:hover {
+  background: #f2f2f2;
+  color: #333;
+}
+
+
+/* EMPTY NOTIFICATION */
+
+.empty-notification {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 45px 25px;
+}
+
+.empty-notification-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: #f1f6f3;
+  color: #036f35;
+  font-size: 20px;
+}
+
+.empty-notification h4 {
+  margin: 0 0 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.empty-notification p {
+  margin: 0;
+  max-width: 230px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #999;
+}
+
+
+/* TEACHER PROFILE */
+
+.profile-wrapper {
+  position: relative;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: 0.2s ease;
+}
+
+.profile:hover {
+  background: #f5f7f6;
+}
+
+.profile-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #036f35;
+  color: white;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.profile-info strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+}
+
+.profile-info span {
+  color: #888;
+  font-size: 11px;
+}
+
+.profile-arrow {
+  margin-left: 4px;
+  font-size: 10px;
+  color: #888;
+  transition: transform 0.2s ease;
+}
+
+.profile-wrapper.active .profile-arrow {
+  transform: rotate(180deg);
+}
+
+
+/* PROFILE MENU */
+
+.profile-menu {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 230px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 11px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0.2s ease;
+  z-index: 9999;
+}
+
+.profile-wrapper.active .profile-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+
+/* PROFILE MENU HEADER */
+
+.profile-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+}
+
+.profile-menu-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e8f5ed;
+  color: #036f35;
+  font-size: 14px;
+}
+
+.profile-menu-header div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-menu-header strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.profile-menu-header span {
+  margin-top: 2px;
+  font-size: 10px;
+  color: #999;
+}
+
+
+/* DIVIDER */
+
+.profile-menu-divider {
+  height: 1px;
+  background: #eee;
+}
+
+
+/* PROFILE MENU ITEMS */
+
+.profile-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 15px;
+  border: none;
+  background: white;
+  color: #555;
+  text-decoration: none;
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.profile-menu-item i {
+  width: 16px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.profile-menu-item:hover {
+  background: #f6f9f7;
+  color: #036f35;
+}
+
+
+/* LOGOUT */
+
+.profile-menu-item.logout-item {
+  color: #d32f2f;
+}
+
+.profile-menu-item.logout-item:hover {
+  background: #fff1f1;
+  color: #c62828;
+}
+
+
+/* PAGE LOAD ANIMATION */
+
+.teacher-main-content {
+  animation: pageFadeIn 0.8s ease;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
