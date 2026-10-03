@@ -48,7 +48,7 @@
                 <p>Login to access the grading system</p>
 
 
-                <form action="#" method="POST">
+                <form action="{{ route('login') }}" method="POST" id="loginForm">
 
                     @csrf
 

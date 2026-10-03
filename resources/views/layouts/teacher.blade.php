@@ -165,6 +165,17 @@
             </p>
 
 
+            <!-- MY PROFILE -->
+
+            <a href="/teacher/profile" class="teacher-nav-link
+               {{ request()->is('teacher/profile*') ? 'active' : '' }}">
+
+                <i class="fa-solid fa-user"></i>
+
+                <span>My Profile</span>
+
+            </a>
+
             <!-- ANNOUNCEMENTS -->
 
             <a href="/teacher/announcements" class="teacher-nav-link
@@ -176,18 +187,6 @@
 
             </a>
 
-
-
-            <!-- MY PROFILE -->
-
-            <a href="/teacher/profile" class="teacher-nav-link
-               {{ request()->is('teacher/profile*') ? 'active' : '' }}">
-
-                <i class="fa-solid fa-user"></i>
-
-                <span>My Profile</span>
-
-            </a>
 
 
 

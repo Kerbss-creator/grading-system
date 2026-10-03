@@ -1,11 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+
+// Route::get('/login', [AuthController::class,'login']);
 
 // LOGIN
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login.submit');
+
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');
 
 // RESET PASSWORD
 Route::get('/forgot-password', function () {
@@ -15,7 +23,7 @@ Route::get('/forgot-password', function () {
 // Dashboard
 Route::get('/admin/dashboard', function () {
     return view('admin.dashboard-admin');
-});
+})->name('admin.dashboard');
 
 // User Management
 Route::get('/admin/users', function () {
