@@ -248,7 +248,7 @@
 
                             <h3>Mathematics</h3>
 
-                            <span>Grade 8 - B</span>
+                            <span>Grade 8 - A</span>
 
                         </div>
 

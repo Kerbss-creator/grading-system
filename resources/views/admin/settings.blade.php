@@ -703,6 +703,6 @@
 
 @section('page-js')
 
-  <script src="{{ asset('js/settings-admin.js') }}"></script>
+  <script src="{{ asset('js/admin/settings-admin.js') }}"></script>
 
 @endsection

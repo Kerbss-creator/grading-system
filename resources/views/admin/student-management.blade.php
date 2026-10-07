@@ -741,6 +741,6 @@
 
 @section('page-js')
 
-  <script src="{{ asset('js/student-management.js') }}"></script>
+  <script src="{{ asset('js/admin/student-management.js') }}"></script>
 
 @endsection

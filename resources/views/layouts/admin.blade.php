@@ -159,6 +159,17 @@
 
             <p class="nav-title">SYSTEM</p>
 
+            <!-- MY PROFILE -->
+
+            <a href="/admin/profile" class="nav-link
+               {{ request()->is('admin/profile*') ? 'active' : '' }}">
+
+                <i class="fa-solid fa-user"></i>
+
+                <span>My Profile</span>
+
+            </a>
+
 
             <!-- ANNOUNCEMENTS -->
             <a href="/admin/announcement" class="nav-link {{ request()->is('admin/announcement*') ? 'active' : '' }}">

@@ -1,3 +1,16 @@
+/* MAIN CONTENT */
+
+.teacher-main-content {
+    min-height: 100vh;
+    margin-left: 75px;
+    padding: 25px 35px;
+    transition: margin-left 0.3s ease;
+}
+
+.teacher-sidebar:hover ~ .teacher-main-content {
+    margin-left: 280px;
+}
+
 
 /* SIDEBAR */
 
