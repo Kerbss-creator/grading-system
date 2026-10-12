@@ -632,6 +632,6 @@
 
 @section('page-js')
 
-  <script src="{{ asset('js/user-management.js') }}"></script>
+  <script src="{{ asset('js/admin/user-management.js') }}"></script>
 
 @endsection

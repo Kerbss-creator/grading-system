@@ -70,6 +70,44 @@ Route::get('/admin/settings', function () {
     return view('admin.settings');
 });
 
+
+// TEACHERS
+
+// Dashboard
 Route::get('/dashboard-teacher', function () {
     return view('teacher.teacher-dashboard');
 })->name('dashboard.teacher');
+
+// Teacher Classes
+Route::get('/teacher/classes', function () {
+    return view('teacher.classes');
+});
+
+// Teacher Grade Management
+Route::get('/teacher/grades', function () {
+    return view('teacher.grade-management');
+});
+
+// Teacher Grade Submission
+Route::get('/teacher/grade-submission', function () {
+    return view('teacher.grade-submission');
+});
+
+// Teacher Subjects
+Route::get('/teacher/subjects', function () {
+    return view('teacher.subjects');
+});
+
+// Teacher Profile
+Route::get('/teacher/profile', function () {
+    return view('teacher.profile');
+});
+// Teacher Announcement
+Route::get('/teacher/announcements', function () {
+    return view('teacher.announcements');
+})->name('teacher.announcements');  
+
+// Teacher Settings
+Route::get('/teacher/settings', function () {
+    return view('teacher.settings');
+})->name('teacher.settings');

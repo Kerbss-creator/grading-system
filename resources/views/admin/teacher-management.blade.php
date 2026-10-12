@@ -489,6 +489,6 @@
 
 @section('page-js')
 
-  <script src="{{ asset('js/teacher-management-admin.js') }}"></script>
+  <script src="{{ asset('js/admin/teacher-management-admin.js') }}"></script>
 
 @endsection

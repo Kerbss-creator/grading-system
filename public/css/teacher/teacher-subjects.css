@@ -1,0 +1,376 @@
+/* SUBJECTS CONTAINER */
+
+.subjects-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+
+/* PAGE HEADER */
+
+.subjects-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+.header-text h1 {
+    margin: 0 0 7px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.header-text p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* SELECTION CARD */
+.selection-card {
+    width: 100%;
+    padding: 18px;
+    background: #ffffff;
+    border: 1px solid #e8ecea;
+    border-radius: 15px;
+    display: grid;
+    grid-template-columns: 1.2fr 1.2fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 20px;
+}
+
+
+.selection-group {
+    min-width: 0;
+}
+
+
+.selection-group label {
+    display: block;
+    color: #5f6f68;
+    font-size: 11px;
+    font-weight: 500;
+    margin: 0 0 7px 3px;
+}
+
+
+.select-wrapper {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 13px;
+    background: #ffffff;
+    border: 1px solid #dfe6e2;
+    border-radius: 9px;
+}
+
+
+.select-wrapper i {
+    color: #087a42;
+    font-size: 14px;
+}
+
+
+.select-wrapper select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #27352f;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+
+/* SUBJECT SUMMARY */
+
+.subject-summary {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    min-width: 210px;
+    gap: 14px;
+    padding: 14px 20px;
+    margin-bottom: 25px;
+    background: #ffffff;
+    border: 1px solid #edf0ee;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.summary-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 43px;
+    border-radius: 10px;
+    background: rgba(3, 111, 53, 0.1);
+    color: #036f35;
+    font-size: 18px;
+}
+
+.summary-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-info span {
+    font-size: 11px;
+    color: #7a817d;
+}
+
+.summary-info strong {
+    margin-top: 1px;
+    font-size: 21px;
+    font-weight: 700;
+    color: #036f35;
+}
+
+
+/* SUBJECT GRID */
+
+.subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+/* SUBJECT CARD */
+
+.subject-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 310px;
+    background: #ffffff;
+    border: 1px solid #edf0ee;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.subject-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+
+/* CARD TOP */
+
+.subject-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px 5px;
+}
+
+.subject-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 19px;
+}
+
+.subject-icon.mathematics {
+    background: #036f35;
+}
+
+.subject-icon.science {
+    background: #2878a8;
+}
+
+.subject-icon.english {
+    background: #7a5aa6;
+}
+
+.subject-icon.ap {
+    background: #b4772c;
+}
+
+.subject-code {
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #f2f6f3;
+    color: #036f35;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* CARD CONTENT */
+
+.subject-content {
+    flex: 1;
+    padding: 12px 22px 20px;
+}
+
+.subject-content h2 {
+    margin: 0 0 7px;
+    color: #202622;
+    font-size: 20px;
+    font-weight: 650;
+}
+
+.subject-level {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    color: #747b77;
+    font-size: 12px;
+}
+
+.subject-level i {
+    color: #036f35;
+}
+
+
+/* SUBJECT DETAILS */
+
+.subject-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #edf0ee;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.detail-item > i {
+    margin-top: 2px;
+    color: #036f35;
+    font-size: 14px;
+}
+
+.detail-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-item span {
+    margin-bottom: 2px;
+    color: #8a918d;
+    font-size: 10px;
+}
+
+.detail-item strong {
+    color: #303733;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* CARD FOOTER */
+
+.subject-card-footer {
+    padding: 15px 22px;
+    border-top: 1px solid #edf0ee;
+    background: #fafcfb;
+}
+
+.subject-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 13px;
+    border-radius: 8px;
+    background: #036f35;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.subject-btn:hover {
+    background: #0D5C2D;
+}
+
+.subject-btn i {
+    font-size: 11px;
+    transition: transform 0.2s ease;
+}
+
+.subject-btn:hover i {
+    transform: translateX(3px);
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
+    .subjects-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .header-filters {
+        width: 100%;
+    }
+
+    .filter-group {
+        flex: 1;
+    }
+
+    .filter-group select {
+        width: 100%;
+    }
+
+    .subjects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .subjects-header {
+        gap: 18px;
+    }
+
+    .header-filters {
+        flex-direction: column;
+    }
+
+    .subject-summary {
+        width: 100%;
+    }
+
+    .subject-details {
+        grid-template-columns: 1fr;
+    }
+
+    .subject-card-top {
+        padding: 18px 18px 5px;
+    }
+
+    .subject-content {
+        padding: 12px 18px 18px;
+    }
+
+    .subject-card-footer {
+        padding: 13px 18px;
+    }
+}

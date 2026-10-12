@@ -617,6 +617,6 @@
 
 @section('page-js')
 
-  <script src="{{ asset('js/grade-level-admin.js') }}"></script>
+  <script src="{{ asset('js/admin/grade-level-admin.js') }}"></script>
 
 @endsection

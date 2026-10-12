@@ -12,26 +12,18 @@
 
 
     <!-- GOOGLE FONT -->
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 
     <!-- FONT AWESOME -->
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-
     <!-- GLOBAL CSS -->
-
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
 
-
     <!-- TEACHER SIDEBAR CSS -->
-
     <link rel="stylesheet" href="{{ asset('css/teacher/teacher-sidebar.css') }}">
 
 
@@ -45,9 +37,7 @@
 <body>
 
 
-    {{-- =====================================================
-    TEACHER SIDEBAR
-    ====================================================== --}}
+    {{-- TEACHER SIDEBAR--}}
 
     <aside class="teacher-sidebar">
 
@@ -225,10 +215,7 @@
 
 
 
-    <!-- =====================================================
-         MAIN CONTENT
-    ====================================================== -->
-
+   {{-- MAIN CONTENT --}}
     <main class="teacher-main-content">
 
 

@@ -850,6 +850,6 @@
 
 @section('page-js')
 
-  <script src="{{ asset('js/grade-approval-admin.js') }}"></script>
+  <script src="{{ asset('js/admin/grade-approval-admin.js') }}"></script>
 
 @endsection

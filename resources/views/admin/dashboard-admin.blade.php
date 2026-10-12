@@ -629,5 +629,5 @@
 
 
 @section('page-js')
-  <script src="{{ asset('js/dashboards.js') }}"></script>
+  <script src="{{ asset('js/admin/dashboards.js') }}"></script>
 @endsection

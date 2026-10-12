@@ -508,6 +508,6 @@
 
 @section('page-js')
 
-  <script src="{{ asset('js/subject-management-admin.js') }}"></script>
+  <script src="{{ asset('js/admin/subject-management-admin.js') }}"></script>
 
 @endsection
