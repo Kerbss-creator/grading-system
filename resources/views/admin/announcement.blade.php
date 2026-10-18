@@ -57,23 +57,7 @@
         data-date="August 27, 2026">
 
         <div class="announcement-icon">
-          <i class="fa-solid fa-circle-info"></i>
-        </div>
-
-        <div class="announcement-content">
-
-          <div class="announcement-heading">
-
-            <h3>Welcome to the New School Year</h3>
-
-            <span class="announcement-tag all">
-              All Users
-            </span>
-
-          </div>
-
-          <p>
-            Welcome to Forbes Academy. We wish everyone a successful
+LW            Welcome to Forbes Academy. We wish everyone a successful
             and productive school year.
           </p>
 

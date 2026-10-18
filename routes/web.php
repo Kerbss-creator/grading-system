@@ -111,3 +111,45 @@ Route::get('/teacher/announcements', function () {
 Route::get('/teacher/settings', function () {
     return view('teacher.settings');
 })->name('teacher.settings');
+
+// ADVISER
+
+Route::get('/adviser/dashboard', function () {
+    return view('adviser.dashboard');
+})->name('adviser.dashboard');
+
+// ADVISER CLASSES PAGE
+Route::get('adviser/classes', function () {
+    return view('adviser.classes');
+})->name('classes');
+
+// MY STUDENTS
+Route::get('adviser/students', function () {
+    return view('adviser.students');
+})->name('students');
+
+// ACADEMIC RECORDS
+Route::get('/adviser/academic-records', function () {
+       return view('adviser.academic-records');
+   })->name('adviser.academic-records');
+
+
+// GRADE SUBMISSION HISTORY
+Route::get('/adviser/grade-review', function () {
+    return view('adviser.grade-review');
+})->name('adviser.grade-review');
+
+// ANNOUNCEMENT
+Route::get('/adviser/announcements', function () {
+    return view('adviser.announcements');
+})->name('teacher.announcements');  
+
+// ADVISER PROFILE
+Route::get('/adviser/profile', function () {
+    return view('adviser.profile');
+});
+
+// ADVISER SETTINGS
+Route::get('/adviser/settings', function () {
+    return view('adviser.settings');
+});

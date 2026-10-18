@@ -1,0 +1,694 @@
+/* ADVISER CLASSES PAGE */
+
+.adviser-classes-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding-bottom: 30px;
+    color: #26352c;
+    font-family: "Poppins", sans-serif;
+}
+
+/* CLASS PROFILE */
+
+.adviser-class-profile {
+    background: #ffffff;
+    border: 1px solid #e7eee9;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.025);
+}
+
+.class-profile-top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.class-profile-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f5ec;
+    color: #036f35;
+    border-radius: 14px;
+    font-size: 27px;
+    flex-shrink: 0;
+}
+
+.class-profile-info {
+    flex: 1;
+    min-width: 180px;
+}
+
+.class-profile-label {
+    display: block;
+    color: #036f35;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.class-profile-info h2 {
+    font-size: 23px;
+    font-weight: 600;
+    color: #203b2a;
+    margin: 0 0 5px;
+}
+
+.class-profile-info p {
+    font-size: 13px;
+    color: #7b887f;
+    margin: 0;
+}
+
+.class-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    border-radius: 30px;
+    background: #eaf7ee;
+    color: #197342;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    background: #269653;
+    border-radius: 50%;
+}
+
+.class-profile-divider {
+    height: 1px;
+    background: #edf1ee;
+    margin: 25px 0;
+}
+
+.class-details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 25px;
+}
+
+.class-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.detail-icon {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f7f3;
+    color: #036f35;
+    border-radius: 11px;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.detail-label {
+    display: block;
+    font-size: 11px;
+    color: #859087;
+    margin-bottom: 4px;
+}
+
+.class-detail-item h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #34463a;
+    margin: 0;
+}
+
+/* SUMMARY CARDS */
+
+.class-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.class-summary-card {
+    background: #ffffff;
+    border: 1px solid #e7eee9;
+    border-radius: 15px;
+    padding: 23px;
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.class-summary-card:hover {
+    box-shadow: 0 7px 22px rgba(3, 111, 53, 0.07);
+    transform: translateY(-2px);
+}
+
+.summary-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 17px;
+}
+
+.summary-icon {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 18px;
+}
+
+.students-icon {
+    background: #e8f5ec;
+    color: #036f35;
+}
+
+.pending-icon {
+    background: #fff3df;
+    color: #b77916;
+}
+
+.summary-caption {
+    font-size: 11px;
+    color: #879188;
+}
+
+.class-summary-card h3 {
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 600;
+    color: #243d2d;
+    margin: 0 0 5px;
+}
+
+.class-summary-card > p {
+    font-size: 13px;
+    color: #758178;
+    margin: 0 0 17px;
+}
+
+.summary-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #036f35;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: gap 0.2s ease;
+}
+
+.summary-card-link:hover {
+    color: #024b24;
+    gap: 12px;
+}
+
+/* GENERAL PANELS */
+
+.adviser-panel {
+    background: #ffffff;
+    border: 1px solid #e7eee9;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 24px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.02);
+}
+
+.panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.panel-heading h3 {
+    color: #263c2d;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 5px;
+}
+
+.panel-heading p {
+    color: #879188;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* CLASS QUICK ACTIONS */
+
+.class-quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.class-action-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px;
+    border: 1px solid #edf1ee;
+    border-radius: 12px;
+    text-decoration: none;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.class-action-item:hover {
+    background: #f6fbf7;
+    border-color: #cfe6d6;
+}
+
+.class-action-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f5ec;
+    color: #036f35;
+    border-radius: 11px;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.review-action-icon {
+    background: #fff3df;
+    color: #a66c12;
+}
+
+.class-action-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 0;
+}
+
+.class-action-text strong {
+    color: #34463a;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.class-action-text small {
+    color: #89938c;
+    font-size: 11px;
+}
+
+.action-arrow {
+    color: #9ba69e;
+    font-size: 13px;
+    transition: transform 0.2s ease;
+}
+
+.class-action-item:hover .action-arrow {
+    color: #036f35;
+    transform: translateX(3px);
+}
+
+/* GRADE REVIEW HEADER */
+
+.grade-review-heading {
+    margin-bottom: 20px;
+}
+
+.view-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #036f35;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.view-all-link:hover {
+    color: #024b24;
+}
+
+/* SEARCH AND FILTER */
+
+.grade-review-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.grade-search-box,
+.grade-filter-box {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 13px;
+    border: 1px solid #e3eae5;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #89958c;
+}
+
+.grade-search-box {
+    flex: 1;
+    min-width: 0;
+}
+
+.grade-search-box input {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #34463a;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.grade-search-box input::placeholder {
+    color: #a0aaa3;
+}
+
+.grade-search-box:focus-within,
+.grade-filter-box:focus-within {
+    border-color: #80bb94;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.06);
+}
+
+.grade-filter-box {
+    flex-shrink: 0;
+}
+
+.grade-filter-box select {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #526157;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* GRADE REVIEW TABLE */
+
+.grade-review-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.grade-review-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.grade-review-table thead {
+    background: #f7faf8;
+}
+
+.grade-review-table th {
+    padding: 14px 13px;
+    color: #7a887e;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    border-bottom: 1px solid #e9efeb;
+}
+
+.grade-review-table td {
+    padding: 16px 13px;
+    color: #56645a;
+    font-size: 11px;
+    border-bottom: 1px solid #eff3f0;
+    white-space: nowrap;
+}
+
+.grade-review-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.grade-review-table tbody tr:not(#gradeReviewEmpty):hover {
+    background: #fbfdfb;
+}
+
+.subject-cell {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.subject-icon {
+    width: 37px;
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f5ec;
+    color: #036f35;
+    border-radius: 9px;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.science-icon {
+    background: #edf1ff;
+    color: #5367b5;
+}
+
+.subject-cell div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.subject-cell strong {
+    color: #34463a;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.subject-cell small {
+    color: #939e96;
+    font-size: 10px;
+}
+
+/* GRADE STATUS BADGES */
+
+.grade-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.grade-status > span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-pending {
+    background: #fff4df;
+    color: #a96c0c;
+}
+
+.status-pending > span {
+    background: #d99420;
+}
+
+.status-reviewed {
+    background: #e8f5ec;
+    color: #197342;
+}
+
+.status-reviewed > span {
+    background: #269653;
+}
+
+/* REVIEW ACTION */
+
+.review-action-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 13px;
+    border: 1px solid #cfe6d6;
+    border-radius: 7px;
+    background: #f4faf6;
+    color: #036f35;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.review-action-link:hover {
+    background: #e4f3e9;
+}
+
+/* EMPTY SEARCH RESULTS */
+
+.empty-review-message {
+    padding: 35px 15px !important;
+    text-align: center;
+    white-space: normal !important;
+}
+
+.empty-review-message i {
+    color: #a5b1a8;
+    font-size: 25px;
+    margin-bottom: 8px;
+}
+
+.empty-review-message p {
+    color: #89958c;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* TABLE FOOTER */
+
+.grade-review-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-top: 16px;
+    margin-top: 5px;
+    border-top: 1px solid #eff3f0;
+}
+
+.grade-review-footer span {
+    color: #89958c;
+    font-size: 11px;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 900px) {
+    .class-details-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .class-detail-item:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .grade-review-table {
+        min-width: 760px;
+    }
+}
+
+@media (max-width: 600px) {
+    .adviser-classes-page {
+        padding-bottom: 20px;
+    }
+
+    .adviser-class-profile,
+    .adviser-panel {
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .class-profile-top {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .class-profile-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 21px;
+    }
+
+    .class-profile-info h2 {
+        font-size: 18px;
+    }
+
+    .class-status {
+        margin-left: 60px;
+        font-size: 11px;
+    }
+
+    .class-details-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .class-detail-item:last-child {
+        grid-column: auto;
+    }
+
+    .class-summary-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .class-summary-card {
+        padding: 19px;
+    }
+
+    .panel-heading {
+        align-items: flex-start;
+    }
+
+    .class-action-item {
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .class-action-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+    }
+
+    .class-action-text strong {
+        font-size: 12px;
+    }
+
+    .class-action-text small {
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .grade-review-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .grade-search-box,
+    .grade-filter-box {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .grade-filter-box select {
+        flex: 1;
+    }
+
+    .grade-review-heading {
+        flex-wrap: wrap;
+    }
+}

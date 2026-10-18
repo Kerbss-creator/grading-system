@@ -1,0 +1,637 @@
+/* GRADE REVIEW PAGE */
+.grade-review-page {
+    width: 100%;
+    color: #26352c;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+}
+
+/* SUMMARY CARDS */
+.review-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e8eee9;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(20, 60, 35, 0.04);
+}
+
+.summary-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 9px;
+    font-size: 18px;
+}
+
+.pending-icon {
+    color: #bd8218;
+    background: #fff4d9;
+}
+
+.approved-icon {
+    color: #168348;
+    background: #e4f6eb;
+}
+
+.returned-icon {
+    color: #c65353;
+    background: #ffebeb;
+}
+
+.summary-info p {
+    margin: 0 0 5px;
+    color: #7b887f;
+    font-size: 11px;
+}
+
+.summary-info h3 {
+    margin: 0;
+    color: #183c28;
+    font-size: 23px;
+    font-weight: 600;
+}
+
+/* MAIN REVIEW CONTAINER */
+.review-container {
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #e8eee9;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(20, 60, 35, 0.04);
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.review-header h2 {
+    margin: 0 0 7px;
+    color: #183c28;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.review-header p {
+    margin: 0;
+    color: #7b887f;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+/* ASSIGNED GRADE LEVEL */
+.assigned-grade-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    min-width: 205px;
+    padding: 12px 15px;
+    background: #edf7f0;
+    border: 1px solid #d4e9da;
+    border-radius: 9px;
+}
+
+.assigned-grade-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    color: #036f35;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.assigned-grade-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.assigned-grade-info span {
+    color: #6d7e72;
+    font-size: 10px;
+}
+
+.assigned-grade-info strong {
+    color: #036f35;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.assigned-grade-info small {
+    color: #7b887f;
+    font-size: 10px;
+}
+
+/* TABS */
+.review-tabs {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e8eee9;
+}
+
+.review-tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 2px;
+    color: #7b887f;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    white-space: nowrap;
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.review-tab:hover,
+.review-tab.active {
+    color: #036f35;
+}
+
+.review-tab.active {
+    border-bottom-color: #036f35;
+    font-weight: 600;
+}
+
+.tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    color: #036f35;
+    background: #e8f5ec;
+    border-radius: 20px;
+    font-size: 10px;
+}
+
+/* FILTERS */
+.review-filters {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.review-search {
+    position: relative;
+    width: min(100%, 330px);
+}
+
+.review-search i {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    color: #8b978e;
+    font-size: 12px;
+    transform: translateY(-50%);
+}
+
+.review-search input,
+.filter-group select {
+    width: 100%;
+    height: 39px;
+    padding: 0 12px;
+    color: #33483a;
+    background: #fff;
+    border: 1px solid #dfe7e1;
+    border-radius: 7px;
+    outline: none;
+    font-family: inherit;
+    font-size: 11px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.review-search input {
+    padding-left: 36px;
+}
+
+.review-search input:focus,
+.filter-group select:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.08);
+}
+
+.review-search input::placeholder {
+    color: #9aa59d;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 165px;
+}
+
+.filter-group label {
+    color: #617067;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.filter-group select {
+    cursor: pointer;
+}
+
+/* TABLE */
+.review-table-wrapper {
+    width: 100%;
+}
+
+.table-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.table-heading h3 {
+    margin: 0;
+    color: #243d2c;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.table-heading span {
+    color: #87928a;
+    font-size: 10px;
+}
+
+.review-table-wrapper {
+    overflow-x: auto;
+}
+
+.review-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.review-table thead {
+    background: #f6f9f6;
+}
+
+.review-table th {
+    padding: 13px 12px;
+    color: #6e7c72;
+    border-bottom: 1px solid #e7eee8;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.review-table td {
+    padding: 14px 12px;
+    color: #536258;
+    border-bottom: 1px solid #edf1ed;
+    font-size: 10px;
+}
+
+.review-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.review-table tbody tr:hover:not(.empty-row) {
+    background: #fbfdfb;
+}
+
+.subject-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.subject-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    flex-shrink: 0;
+    color: #036f35;
+    background: #e9f6ed;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.science-icon {
+    color: #5273bc;
+    background: #edf1ff;
+}
+
+.english-icon {
+    color: #9b6a21;
+    background: #fff3df;
+}
+
+.filipino-icon {
+    color: #8759b5;
+    background: #f3ebfc;
+}
+
+.subject-cell div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.subject-cell strong {
+    color: #304436;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.subject-cell small {
+    color: #919b93;
+    font-size: 9px;
+}
+
+/* STATUS BADGES */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 500;
+}
+
+.status-pending {
+    color: #a77512;
+    background: #fff4d8;
+}
+
+.status-approved {
+    color: #168348;
+    background: #e4f6eb;
+}
+
+.status-returned {
+    color: #bd4545;
+    background: #ffebeb;
+}
+
+/* ACTION BUTTON */
+.view-review-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 11px;
+    color: #036f35;
+    background: #edf7f0;
+    border: 1px solid #d4e9da;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.view-review-btn:hover {
+    background: #dcefe2;
+}
+
+.empty-row td {
+    padding: 28px 12px;
+    color: #8a958d;
+    text-align: center;
+}
+
+/* REVIEW DETAILS MODAL */
+.review-modal[hidden],
+.review-table-wrapper[hidden],
+.empty-row[hidden] {
+    display: none !important;
+}
+
+.review-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.review-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(16, 36, 23, 0.48);
+}
+
+.review-modal-content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 480px);
+    overflow: hidden;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+    animation: reviewModalIn 0.2s ease;
+}
+
+@keyframes reviewModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 22px;
+    border-bottom: 1px solid #edf1ed;
+}
+
+.modal-header h3 {
+    margin: 0 0 6px;
+    color: #183c28;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.modal-header p {
+    margin: 0;
+    color: #7b887f;
+    font-size: 10px;
+}
+
+.modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: #69766d;
+    background: #f4f7f4;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.modal-body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    padding: 22px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.detail-item span {
+    color: #839087;
+    font-size: 10px;
+}
+
+.detail-item strong {
+    color: #304436;
+    font-size: 11px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 22px;
+    background: #fafcfa;
+    border-top: 1px solid #edf1ed;
+}
+
+.modal-done-btn {
+    padding: 9px 20px;
+    color: #fff;
+    background: #036f35;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.modal-done-btn:hover {
+    background: #0d5c2d;
+}
+
+
+/* MODAL VISIBILITY */
+.review-modal {
+    display: none;
+}
+
+.review-modal.is-open {
+    display: flex;
+}
+
+
+/* RESPONSIVE LAYOUT */
+@media (max-width: 1000px) {
+    .review-summary {
+        gap: 12px;
+    }
+
+    .summary-card {
+        padding: 15px;
+    }
+
+    .review-container {
+        padding: 18px;
+    }
+
+    .review-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 700px) {
+    .review-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .review-header {
+        gap: 16px;
+    }
+
+    .assigned-grade-box {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .review-tabs {
+        gap: 16px;
+    }
+
+    .review-tab {
+        font-size: 10px;
+    }
+
+    .review-filters {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .review-search,
+    .filter-group {
+        width: 100%;
+    }
+
+    .review-container {
+        padding: 14px;
+    }
+
+    .modal-body {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}

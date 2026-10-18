@@ -154,6 +154,16 @@
                 SYSTEM
             </p>
 
+            <!-- ANNOUNCEMENTS -->
+
+            <a href="/teacher/announcements" class="teacher-nav-link
+               {{ request()->is('teacher/announcements*') ? 'active' : '' }}">
+
+                <i class="fa-solid fa-bullhorn"></i>
+
+                <span>Announcements</span>
+
+            </a>
 
             <!-- MY PROFILE -->
 
@@ -166,20 +176,7 @@
 
             </a>
 
-            <!-- ANNOUNCEMENTS -->
-
-            <a href="/teacher/announcements" class="teacher-nav-link
-               {{ request()->is('teacher/announcements*') ? 'active' : '' }}">
-
-                <i class="fa-solid fa-bullhorn"></i>
-
-                <span>Announcements</span>
-
-            </a>
-
-
-
-
+        
             <!-- SETTINGS -->
 
             <a href="/teacher/settings" class="teacher-nav-link

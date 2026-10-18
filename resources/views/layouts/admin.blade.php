@@ -53,7 +53,8 @@
 
 
             <!-- DASHBOARD -->
-            <a href="{{ url('/admin/dashboard') }}" class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+            <a href="{{ url('/admin/dashboard') }}"
+                class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
 
                 <i class="fa-solid fa-gauge"></i>
 
@@ -113,10 +114,6 @@
             <p class="nav-title">ACADEMIC MANAGEMENT</p>
             <!-- SUBJECT MANAGEMENT -->
             <a href="/admin/subjects" class="nav-link {{ request()->is('admin/subjects*') ? 'active' : '' }}">
-
-
-
-
 
                 <i class="fa-solid fa-book"></i>
 

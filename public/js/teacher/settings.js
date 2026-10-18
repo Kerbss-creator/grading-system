@@ -1,30 +1,34 @@
+
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Save settings button
+    // Teacher settings form
+    const settingsForm = document.getElementById("teacherSettingsForm");
     const saveSettings = document.getElementById("saveSettings");
 
-    if (saveSettings) {
-
+    // Save settings
+    if (settingsForm && saveSettings) {
         saveSettings.addEventListener("click", function () {
 
-            alert("Settings saved successfully.");
+            if (!settingsForm.reportValidity()) {
+                return;
+            }
+
+            
+            alert("BACKEND YUDIPUTA");
 
         });
-
     }
 
+    // Change password
+    const changePasswordBtn = document.getElementById("changePasswordBtn");
 
-    // Change password button
-    const changePassword = document.querySelector(".change-password-btn");
+    if (changePasswordBtn) {
+        changePasswordBtn.addEventListener("click", function () {
 
-    if (changePassword) {
-
-        changePassword.addEventListener("click", function () {
-
-            alert("Change password feature will be available soon.");
+            // Connect this button to the secure password-change feature.
+            alert("The password-change feature needs to be connected to Laravel.");
 
         });
-
     }
 
 });
