@@ -57,7 +57,7 @@
         data-date="August 27, 2026">
 
         <div class="announcement-icon">
-LW            Welcome to Forbes Academy. We wish everyone a successful
+           Welcome to Forbes Academy. We wish everyone a successful
             and productive school year.
           </p>
 

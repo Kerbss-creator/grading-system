@@ -1,0 +1,698 @@
+/* Student Profile */
+
+.student-profile-container {
+    width: 100%;
+    padding: 5px 0 30px;
+    font-family: "Poppins", sans-serif;
+    color: #35413a;
+}
+
+.student-profile-container *,
+.student-modal-overlay * {
+    box-sizing: border-box;
+}
+
+/* Profile Header */
+
+.student-profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px 26px;
+    margin-bottom: 20px;
+    background: #fff;
+    border: 1px solid #e7ebe8;
+    border-radius: 12px;
+}
+
+.student-profile-identity {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    gap: 18px;
+}
+
+.student-profile-avatar {
+    width: 76px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #e8f4ed;
+    color: #036f35;
+    font-size: 23px;
+    font-weight: 600;
+}
+
+.student-profile-heading {
+    flex: 1;
+    min-width: 0;
+}
+
+.student-profile-heading h2 {
+    margin: 0 0 3px;
+    color: #1d2b24;
+    font-size: 20px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.student-profile-heading > p {
+    margin: 0 0 7px;
+    color: #777f7a;
+    font-size: 13px;
+}
+
+.student-profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 15px;
+    margin-bottom: 7px;
+}
+
+.student-profile-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #626e66;
+    font-size: 11px;
+}
+
+.student-profile-meta i {
+    color: #036f35;
+}
+
+.student-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #267a4b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.student-status i {
+    font-size: 7px;
+}
+
+/* Profile Buttons */
+
+.student-profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-shrink: 0;
+}
+
+.student-profile-btn {
+    min-height: 38px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 7px;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.student-profile-btn.primary {
+    border: 1px solid #036f35;
+    background: #036f35;
+    color: #fff;
+}
+
+.student-profile-btn.primary:hover {
+    background: #0d5c2d;
+}
+
+.student-profile-btn.outline {
+    border: 1px solid #d9e0dc;
+    background: #fff;
+    color: #3f4944;
+}
+
+.student-profile-btn.outline:hover {
+    background: #f5f8f6;
+    border-color: #cbd5cf;
+}
+
+/* Profile Information Grid */
+
+.student-profile-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: start;
+    gap: 20px;
+}
+
+.student-profile-card {
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e7ebe8;
+    border-radius: 12px;
+}
+
+/* Information Card Header */
+
+.student-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 22px;
+    border-bottom: 1px solid #edf0ee;
+}
+
+.student-card-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: #e8f4ed;
+    color: #036f35;
+    font-size: 15px;
+}
+
+.student-card-heading h3 {
+    margin: 0 0 2px;
+    color: #26332c;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.student-card-heading p {
+    margin: 0;
+    color: #8a928d;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* Information Items */
+
+.student-info-list {
+    padding: 7px 22px 12px;
+}
+
+.student-info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #f0f2f1;
+}
+
+.student-info-item:last-child {
+    border-bottom: none;
+}
+
+.student-info-item > i {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #f1f6f3;
+    color: #036f35;
+    font-size: 13px;
+}
+
+.student-info-item > div {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    gap: 4px;
+}
+
+.student-info-item > div > span:first-child {
+    color: #929994;
+    font-size: 11px;
+}
+
+.student-info-item strong {
+    display: block;
+    color: #35413a;
+    font-size: 12px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+.student-status-pill {
+    display: inline-block;
+    width: fit-content;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: #e8f4ed;
+    color: #28794c;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Residential Address */
+
+.student-address-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 22px 12px;
+}
+
+.student-address-content > i {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #f1f6f3;
+    color: #036f35;
+    font-size: 14px;
+}
+
+.student-address-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.student-address-text p {
+    margin: 3px 0 12px;
+    color: #35413a;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.student-address-text small {
+    display: block;
+    color: #8a928d;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.address-request-btn {
+    margin: 0 22px 20px 68px;
+}
+
+/* Modal Overlay */
+
+.student-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(26, 35, 30, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+.student-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.student-modal {
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    transform: translateY(5px);
+    transition: transform 0.2s ease;
+}
+
+.student-modal-overlay.active .student-modal {
+    transform: translateY(0);
+}
+
+.student-modal.password-modal {
+    max-width: 470px;
+}
+
+/* Modal Header */
+
+.student-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 21px 23px;
+    border-bottom: 1px solid #edf0ee;
+}
+
+.student-modal-header h3 {
+    margin: 0 0 3px;
+    color: #26332c;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.student-modal-header p {
+    margin: 0;
+    color: #8a928d;
+    font-size: 11px;
+}
+
+.student-modal-close {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 6px;
+    background: #f4f6f5;
+    color: #727a75;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.student-modal-close:hover {
+    background: #e9eeeb;
+    color: #26332c;
+}
+
+/* Modal Forms */
+
+#editProfileForm,
+#changePasswordForm {
+    padding: 21px 23px 23px;
+}
+
+.student-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.student-form-group {
+    min-width: 0;
+    margin-bottom: 16px;
+}
+
+.student-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #4a554f;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.student-form-group input {
+    width: 100%;
+    height: 38px;
+    padding: 0 11px;
+    box-sizing: border-box;
+    border: 1px solid #dce2de;
+    border-radius: 7px;
+    outline: none;
+    background: #fff;
+    color: #37423c;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    transition: 0.2s ease;
+}
+
+.student-form-group input:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 2px rgba(3, 111, 53, 0.08);
+}
+
+.student-form-group input:disabled {
+    background: #f5f7f6;
+    color: #8a928d;
+    cursor: not-allowed;
+}
+
+/* Password Visibility Toggle */
+
+.student-password-input {
+    position: relative;
+}
+
+.student-password-input input {
+    padding-right: 40px;
+}
+
+.toggle-student-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    color: #8a928d;
+    cursor: pointer;
+}
+
+.toggle-student-password:hover {
+    color: #036f35;
+}
+
+/* Form Notes */
+
+.student-form-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 2px 0 20px;
+    padding: 10px 11px;
+    border-radius: 7px;
+    background: #f3f8f5;
+    color: #69746e;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.student-form-note i {
+    margin-top: 2px;
+    flex-shrink: 0;
+    color: #036f35;
+}
+
+/* Modal Action Buttons */
+
+.student-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 3px;
+}
+
+.student-modal-btn {
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 7px;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.student-modal-btn.cancel {
+    border: 1px solid #dce2de;
+    background: #fff;
+    color: #68716c;
+}
+
+.student-modal-btn.cancel:hover {
+    background: #f5f7f6;
+}
+
+.student-modal-btn.save {
+    border: 1px solid #036f35;
+    background: #036f35;
+    color: #fff;
+}
+
+.student-modal-btn.save:hover {
+    background: #0d5c2d;
+}
+
+/* Toast Message */
+
+.student-profile-toast {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    z-index: 10000;
+    max-width: calc(100vw - 40px);
+    padding: 13px 18px;
+    border-radius: 8px;
+    background: #0d5c2d;
+    color: #fff;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    line-height: 1.7;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: 0.2s ease;
+}
+
+.student-profile-toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Responsive Layout */
+
+@media (max-width: 1000px) {
+    .student-profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .student-profile-hero {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .student-profile-actions {
+        width: 100%;
+        margin-left: 94px;
+    }
+}
+
+@media (max-width: 700px) {
+    .student-profile-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .student-profile-identity {
+        width: 100%;
+    }
+
+    .student-profile-actions {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .student-profile-btn {
+        flex: 1;
+    }
+
+    .student-profile-meta {
+        flex-direction: column;
+    }
+
+    .student-form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .student-profile-hero {
+        padding: 20px;
+    }
+
+    .student-profile-identity {
+        align-items: flex-start;
+        gap: 13px;
+    }
+
+    .student-profile-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 19px;
+    }
+
+    .student-profile-heading h2 {
+        font-size: 17px;
+    }
+
+    .student-profile-actions {
+        flex-direction: column;
+    }
+
+    .student-profile-btn {
+        width: 100%;
+    }
+
+    .student-card-heading {
+        padding: 17px;
+    }
+
+    .student-info-list {
+        padding: 7px 17px 12px;
+    }
+
+    .student-address-content {
+        padding: 18px 17px 12px;
+    }
+
+    .address-request-btn {
+        margin: 0 17px 18px;
+    }
+
+    .student-modal {
+        max-height: 85vh;
+    }
+
+    .student-modal-header {
+        padding: 18px;
+    }
+
+    #editProfileForm,
+    #changePasswordForm {
+        padding: 18px;
+    }
+
+    .student-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .student-modal-btn {
+        width: 100%;
+        min-height: 38px;
+    }
+
+    .student-profile-toast {
+        right: 15px;
+        bottom: 15px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .student-profile-btn,
+    .student-modal-overlay,
+    .student-modal,
+    .student-profile-toast {
+        transition: none;
+    }
+}

@@ -79,11 +79,10 @@
 
             <!-- DASHBOARD -->
 
-            <a href="{{ url('/dashboard-teacher') }}"
-                class="teacher-nav-link {{ request()->is('dashboard-teacher') ? 'active' : '' }}">
+            <a href="{{ route('teacher.dashboard') }}"
+                class="teacher-nav-link {{ request()->is('teacher/dashboard') ? 'active' : '' }}">
 
                 <i class="fa-solid fa-gauge"></i>
-
                 <span>My Dashboard</span>
 
             </a>
@@ -176,7 +175,7 @@
 
             </a>
 
-        
+
             <!-- SETTINGS -->
 
             <a href="/teacher/settings" class="teacher-nav-link
@@ -212,7 +211,7 @@
 
 
 
-   {{-- MAIN CONTENT --}}
+    {{-- MAIN CONTENT --}}
     <main class="teacher-main-content">
 
 

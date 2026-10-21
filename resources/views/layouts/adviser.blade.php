@@ -216,7 +216,6 @@
             </a>
 
             {{-- SETTINGS --}}
-
             <a href="{{ url('/adviser/settings') }}"
                 class="adviser-nav-link {{ request()->is('adviser/settings*') ? 'active' : '' }}">
 
@@ -229,7 +228,6 @@
         </nav>
 
         {{-- LOGOUT --}}
-
         <div class="adviser-logout-section">
 
             <a href="{{ url('/login') }}" class="adviser-nav-link adviser-logout">
@@ -245,17 +243,13 @@
     </aside>
 
     {{-- MAIN CONTENT --}}
-
     <main class="adviser-main-content">
 
         {{-- TOP HEADER --}}
-
         <header class="adviser-top-header">
 
             {{-- HEADER TITLE --}}
-
             <div class="adviser-header-title">
-
                 <h1>
                     @yield('header', 'My Dashboard')
                 </h1>
@@ -267,11 +261,9 @@
             </div>
 
             {{-- HEADER RIGHT --}}
-
             <div class="adviser-header-right">
 
                 {{-- NOTIFICATIONS --}}
-
                 <div class="notification-wrapper">
 
                     <button class="notification-btn" id="notificationBtn" type="button">

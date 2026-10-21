@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StudentController;
 
 // Route::get('/login', [AuthController::class,'login']);
 
@@ -20,10 +22,11 @@ Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->name('password.request');
 
+// ADMIN ROUTE
+
 // Dashboard
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard-admin');
-})->name('admin.dashboard');
+Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
+    ->name('admin.dashboard');
 
 // User Management
 Route::get('/admin/users', function () {
@@ -31,9 +34,8 @@ Route::get('/admin/users', function () {
 });
 
 // Student Management
-Route::get('/admin/students', function () {
-    return view('admin.student-management');
-});
+Route::get('/admin/students', [StudentController::class, 'index'])
+    ->name('admin.students');
 
 // Teacher Management
 Route::get('/admin/teachers', function () {
@@ -71,12 +73,11 @@ Route::get('/admin/settings', function () {
 });
 
 
-// TEACHERS
+// TEACHERS ROUTE
 
 // Dashboard
-Route::get('/dashboard-teacher', function () {
-    return view('teacher.teacher-dashboard');
-})->name('dashboard.teacher');
+Route::get('/teacher/dashboard', [DashboardController::class, 'teacher'])
+    ->name('teacher.dashboard');
 
 // Teacher Classes
 Route::get('/teacher/classes', function () {
@@ -105,7 +106,7 @@ Route::get('/teacher/profile', function () {
 // Teacher Announcement
 Route::get('/teacher/announcements', function () {
     return view('teacher.announcements');
-})->name('teacher.announcements');  
+})->name('teacher.announcements');
 
 // Teacher Settings
 Route::get('/teacher/settings', function () {
@@ -114,9 +115,8 @@ Route::get('/teacher/settings', function () {
 
 // ADVISER
 
-Route::get('/adviser/dashboard', function () {
-    return view('adviser.dashboard');
-})->name('adviser.dashboard');
+Route::get('/adviser/dashboard', [DashboardController::class, 'adviser'])
+    ->name('adviser.dashboard');
 
 // ADVISER CLASSES PAGE
 Route::get('adviser/classes', function () {
@@ -130,8 +130,8 @@ Route::get('adviser/students', function () {
 
 // ACADEMIC RECORDS
 Route::get('/adviser/academic-records', function () {
-       return view('adviser.academic-records');
-   })->name('adviser.academic-records');
+    return view('adviser.academic-records');
+})->name('adviser.academic-records');
 
 
 // GRADE SUBMISSION HISTORY
@@ -142,7 +142,7 @@ Route::get('/adviser/grade-review', function () {
 // ANNOUNCEMENT
 Route::get('/adviser/announcements', function () {
     return view('adviser.announcements');
-})->name('teacher.announcements');  
+})->name('teacher.announcements');
 
 // ADVISER PROFILE
 Route::get('/adviser/profile', function () {
@@ -153,3 +153,21 @@ Route::get('/adviser/profile', function () {
 Route::get('/adviser/settings', function () {
     return view('adviser.settings');
 });
+
+// STUDENTS ROUTE
+
+// STUDENT DASHBOARD
+Route::get('/student/dashboard', [DashboardController::class, 'student'])
+    ->name('student.dashboard');
+    
+// STUDENT GRADES ROUTE
+Route::view('/student/grades', 'student.grades')
+    ->name('student.grades');
+
+// STUDENT ANNOUNCEMENT 
+Route::view('/student/announcements', 'student.announcements')
+    ->name('student.announcements');
+
+// STUDENT PROFILE 
+Route::view('/student/profile', 'student.profile')
+    ->name('student.profile');

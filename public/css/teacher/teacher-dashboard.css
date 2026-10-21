@@ -1,29 +1,4 @@
-/* =========================
-   MAIN CONTENT
-========================= */
 
-.teacher-main-content {
-    min-height: 100vh;
-    margin-left: 75px;
-    padding: 25px 35px;
-    transition: margin-left 0.3s ease;
-}
-
-.teacher-sidebar:hover ~ .teacher-main-content {
-    margin-left: 280px;
-}
-
-/* =========================
-   DASHBOARD CONTAINER
-========================= */
-
-.dashboard-container {
-    min-height: calc(100vh - 120px);
-    padding: 25px;
-    border-radius: 18px;
-    background: #ffffff;
-    box-shadow: 0 3px 20px rgba(0, 0, 0, 0.04);
-}
 
 /* =========================
    WELCOME CARD
