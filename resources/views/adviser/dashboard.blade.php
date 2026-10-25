@@ -25,7 +25,7 @@
             <div class="welcome-text">
                 <span>FORBES ACADEMY</span>
 
-                <h2>Welcome to the Grading System!</h2>
+                <h2>Welcome {{ Auth::user()->username ?? 'User' }} to the Grading System!</h2>
 
                 <p>
                     Manage students, teachers, subjects, classes, and academic

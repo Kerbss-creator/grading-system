@@ -171,10 +171,83 @@
     font-size: 12px;
     line-height: 1.5;
 }
+
+/* FIX LONG ANNOUNCEMENT TEXT OVERLAPPING */
+
+.announcement-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+}
+
+.announcement-content {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+}
+
+.announcement-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 15px;
+}
+
+.announcement-top h3 {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.announcement-date {
+    flex-shrink: 0;
+}
+
+.announcement-content > p {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.7;
+}
+
+.announcement-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+    .announcement-card {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .announcement-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .announcement-date {
+        white-space: normal;
+    }
+}
+
 /* ANNOUNCEMENT CARD HOVER */
 
 .announcement-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .announcement-card:hover {

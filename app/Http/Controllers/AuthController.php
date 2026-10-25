@@ -24,6 +24,10 @@ class AuthController extends Controller
                 return redirect()->route('admin.dashboard');
             }
 
+            if ($user->role === 'adviser') {
+                return redirect()->route('adviser.dashboard');
+            }
+
             if ($user->role === 'teacher') {
                 return redirect()->route('teacher.dashboard');
             }
@@ -56,4 +60,3 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 }
-

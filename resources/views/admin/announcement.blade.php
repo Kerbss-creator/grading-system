@@ -6,13 +6,16 @@
 
 @section('page-css')
   <link rel="stylesheet" href="{{ asset('css/admin/announcement-admin.css') }}">
+
+
+
 @endsection
 
 @section('content')
 
   <section class="announcement-container">
 
-    <!-- PAGE TOP -->
+    {{-- PAGE TOP --}}
     <div class="section-top">
 
       <div>
@@ -20,165 +23,62 @@
       </div>
 
       <div class="section-actions">
-
-      
         <button type="button" class="add-btn" id="addAnnouncementBtn">
           <i class="fa-solid fa-plus"></i>
           Create Announcement
         </button>
-
       </div>
 
     </div>
 
-    <!-- FILTERS -->
+    {{-- FILTERS --}}
     <div class="announcement-filters">
 
       <button type="button" class="filter-btn active" data-filter="all">
         All
       </button>
 
-      <button type="button" class="filter-btn" data-filter="teacher">
+      <button type="button" class="filter-btn" data-filter="advisers">
+        Advisers
+      </button>
+
+      <button type="button" class="filter-btn" data-filter="teachers">
         Teachers
       </button>
 
-      <button type="button" class="filter-btn" data-filter="student">
+      <button type="button" class="filter-btn" data-filter="students">
         Students
       </button>
 
     </div>
 
-    <!-- ANNOUNCEMENT LIST -->
+    {{-- ANNOUNCEMENT LIST --}}
     <div class="announcement-list" id="announcementList">
 
-      <!-- ANNOUNCEMENT 1 -->
-      <div class="announcement-card" data-audience="all" data-title="Welcome to the New School Year"
-        data-message="Welcome to Forbes Academy. We wish everyone a successful and productive school year."
-        data-date="August 27, 2026">
+      {{-- DEFAULT EMPTY STATE --}}
+      <div class="announcement-empty-state" id="announcementEmptyState">
 
-        <div class="announcement-icon">
-           Welcome to Forbes Academy. We wish everyone a successful
-            and productive school year.
-          </p>
-
+        <div class="empty-state-icon">
+          <i class="fa-solid fa-bullhorn"></i>
         </div>
 
-        <div class="announcement-actions">
+        <h3>No Announcement Yet</h3>
 
-          <button type="button" class="view-btn" title="View">
-            <i class="fa-solid fa-eye"></i>
-          </button>
-
-          <button type="button" class="edit-btn" title="Edit">
-            <i class="fa-solid fa-pen"></i>
-          </button>
-
-          <button type="button" class="delete-btn" title="Delete">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-
-        </div>
+        <p>
+          There are no announcements yet.
+          Create your first announcement to share
+          important school updates.
+        </p>
 
       </div>
 
-      <!-- ANNOUNCEMENT 2 -->
-      <div class="announcement-card" data-audience="teacher" data-title="Grade Submission Reminder"
-        data-message="Teachers are reminded to submit and finalize student grades before the deadline."
-        data-date="August 26, 2026">
-
-        <div class="announcement-icon">
-          <i class="fa-solid fa-calendar-check"></i>
-        </div>
-
-        <div class="announcement-content">
-
-          <div class="announcement-heading">
-
-            <h3>Grade Submission Reminder</h3>
-
-            <span class="announcement-tag teacher">
-              Teachers
-            </span>
-
-          </div>
-
-          <p>
-            Teachers are reminded to submit and finalize student
-            grades before the deadline.
-          </p>
-
-        </div>
-
-        <div class="announcement-actions">
-
-          <button type="button" class="view-btn" title="View">
-            <i class="fa-solid fa-eye"></i>
-          </button>
-
-          <button type="button" class="edit-btn" title="Edit">
-            <i class="fa-solid fa-pen"></i>
-          </button>
-
-          <button type="button" class="delete-btn" title="Delete">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-
-        </div>
-
-      </div>
-
-      <!-- ANNOUNCEMENT 3 -->
-      <div class="announcement-card" data-audience="student" data-title="Viewing of Final Grades"
-        data-message="Students may now view their latest approved grades through the student portal."
-        data-date="August 25, 2026">
-
-        <div class="announcement-icon">
-          <i class="fa-solid fa-user-graduate"></i>
-        </div>
-
-        <div class="announcement-content">
-
-          <div class="announcement-heading">
-
-            <h3>Viewing of Final Grades</h3>
-
-            <span class="announcement-tag student">
-              Students
-            </span>
-
-          </div>
-
-          <p>
-            Students may now view their latest approved grades
-            through the student portal.
-          </p>
-
-        </div>
-
-        <div class="announcement-actions">
-
-          <button type="button" class="view-btn" title="View">
-            <i class="fa-solid fa-eye"></i>
-          </button>
-
-          <button type="button" class="edit-btn" title="Edit">
-            <i class="fa-solid fa-pen"></i>
-          </button>
-
-          <button type="button" class="delete-btn" title="Delete">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-
-        </div>
-
-      </div>
+      {{-- Announcement cards will be added here by JavaScript --}}
 
     </div>
 
   </section>
 
-
-  <!-- CREATE / EDIT MODAL -->
+  {{-- CREATE / EDIT MODAL --}}
   <div class="modal" id="announcementModal">
 
     <div class="modal-box">
@@ -196,54 +96,39 @@
 
       </div>
 
-      <form id="announcementForm">
+      <form id="announcementForm" action="{{ route('admin.announcement.store') }}" method="POST">
+
+        @csrf
 
         <div class="form-group">
-
           <label for="announcementTitle">
             Announcement Title
           </label>
 
-          <input type="text" id="announcementTitle" placeholder="Enter announcement title" required>
-
+          <input type="text" id="announcementTitle" name="title" placeholder="Enter announcement title" required>
         </div>
 
         <div class="form-group">
-
           <label for="announcementAudience">
             Audience
           </label>
 
-          <select id="announcementAudience" required>
-
-            <option value="">
-              Select audience
-            </option>
-
-            <option value="all">
-              All Users
-            </option>
-
-            <option value="teacher">
-              Teachers
-            </option>
-
-            <option value="student">
-              Students
-            </option>
-
+          <select id="announcementAudience" name="audience" required>
+            <option value="">Select audience</option>
+            <option value="all">All Users</option>
+            <option value="advisers">Advisers</option>
+            <option value="teachers">Teachers</option>
+            <option value="students">Students</option>
           </select>
-
         </div>
 
         <div class="form-group">
-
           <label for="announcementMessage">
             Announcement Message
           </label>
 
-          <textarea id="announcementMessage" placeholder="Write your announcement here..." required></textarea>
-
+          <textarea id="announcementMessage" name="message" placeholder="Write your announcement here..."
+            required></textarea>
         </div>
 
         <div class="modal-actions">
@@ -265,8 +150,7 @@
 
   </div>
 
-
-  <!-- VIEW MODAL -->
+  {{-- VIEW MODAL --}}
   <div class="modal" id="viewModal">
 
     <div class="modal-box view-box">
@@ -291,15 +175,8 @@
         </div>
 
         <div>
-
-          <h2 id="viewTitle">
-            Announcement Title
-          </h2>
-
-          <p id="viewDate">
-            August 27, 2026
-          </p>
-
+          <h2 id="viewTitle">Announcement Title</h2>
+          <p id="viewDate">Announcement date</p>
         </div>
 
       </div>
@@ -308,44 +185,32 @@
 
         <div>
           <span>Audience</span>
-          <strong id="viewAudience">
-            All Users
-          </strong>
+          <strong id="viewAudience">All Users</strong>
         </div>
 
         <div>
           <span>Date Published</span>
-          <strong id="viewDateDetails">
-            August 27, 2026
-          </strong>
+          <strong id="viewDateDetails">Announcement date</strong>
         </div>
 
       </div>
 
       <div class="message-box">
-
         <span>Message</span>
-
-        <p id="viewMessage">
-          Announcement message.
-        </p>
-
+        <p id="viewMessage">Announcement message.</p>
       </div>
 
       <div class="modal-actions">
-
         <button type="button" class="cancel-btn" id="closeViewBtn">
           Close
         </button>
-
       </div>
 
     </div>
 
   </div>
 
-
-  <!-- DELETE MODAL -->
+  {{-- DELETE MODAL --}}
   <div class="modal" id="deleteModal">
 
     <div class="modal-box delete-box">
@@ -369,9 +234,7 @@
           <i class="fa-solid fa-trash"></i>
         </div>
 
-        <h3>
-          Delete this announcement?
-        </h3>
+        <h3>Delete this announcement?</h3>
 
         <p>
           Are you sure you want to delete
@@ -399,9 +262,35 @@
 
   </div>
 
+
+  {{-- SUCCESS MODAL --}}
+  <div class="success-modal-overlay" id="successModal">
+
+    <div class="success-modal">
+
+      <div class="success-modal-icon">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+
+      <h2 id="successModalTitle">Successfully Added!</h2>
+
+      <p id="successModalMessage">
+        Your announcement has been added successfully.
+      </p>
+
+      <button type="button" id="successModalButton">
+        OK, Got it
+      </button>
+    </div>
+  </div>
+
+
 @endsection
 
-
 @section('page-js')
+  <script>
+    window.savedAnnouncements = @json($announcements);
+  </script>
+
   <script src="{{ asset('js/admin/announcement-admin.js') }}"></script>
 @endsection

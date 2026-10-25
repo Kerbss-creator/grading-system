@@ -63,52 +63,64 @@
             </a>
 
 
-            <!-- USER MANAGEMENT -->
+
+
+            {{-- USERS DROPDOWN --}}
             <div
-                class="dropdown {{ request()->is('admin/students*') || request()->is('admin/teachers*') ? 'active' : '' }}">
+                class="dropdown {{ request()->is('admin/users*') || request()->is('admin/admins*') || request()->is('admin/advisers*') || request()->is('admin/teachers*') || request()->is('admin/students*') ? 'active' : '' }}">
 
-
-                <a href="/admin/users"
-                    class="nav-link dropdown
-                    {{ request()->is('admin/users*') || request()->is('admin/students*') || request()->is('admin/teachers*') ? 'active' : '' }}">
+                {{-- USERS MAIN MENU --}}
+                <a href="#" class="nav-link dropdown-toggle">
 
                     <i class="fa-solid fa-users"></i>
 
-                    <span>User Management</span>
+                    <span>Users</span>
 
                     <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
 
                 </a>
 
-
-
-                <!-- USER MANAGEMENT SUBMENU -->
+                {{-- USERS SUBMENU --}}
                 <div class="dropdown-menu">
 
-                    <!-- STUDENT MANAGEMENT -->
-                    <a href="/admin/students"
-                        class="dropdown-link {{ request()->is('admin/students*') ? 'active' : '' }}">
-
-                        <i class="fa-solid fa-user-graduate"></i>
-
-                        <span>Student Management</span>
-
+                    {{-- USER MANAGEMENT --}}
+                    <a href="/admin/users" class="dropdown-link {{ request()->is('admin/users*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>User Management</span>
                     </a>
 
+                    {{-- ADMIN --}}
+                    <a href="/admin/admins" class="dropdown-link {{ request()->is('admin/admins*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>Admin</span>
+                    </a>
 
-                    <!-- TEACHER MANAGEMENT -->
+                    {{-- ADVISERS --}}
+                    <a href="/admin/advisers"
+                        class="dropdown-link {{ request()->is('admin/advisers*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <span>Advisers</span>
+                    </a>
+
+                    {{-- TEACHERS --}}
                     <a href="/admin/teachers"
                         class="dropdown-link {{ request()->is('admin/teachers*') ? 'active' : '' }}">
-
                         <i class="fa-solid fa-chalkboard-user"></i>
+                        <span>Teachers</span>
+                    </a>
 
-                        <span>Teacher Management</span>
-
+                    {{-- STUDENTS --}}
+                    <a href="/admin/students"
+                        class="dropdown-link {{ request()->is('admin/students*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        <span>Students</span>
                     </a>
 
                 </div>
 
             </div>
+
+
 
 
             <p class="nav-title">ACADEMIC MANAGEMENT</p>

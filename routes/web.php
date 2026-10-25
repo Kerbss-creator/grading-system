@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\AnnouncementController;
+use App\Models\Announcement;
 
 // Route::get('/login', [AuthController::class,'login']);
 
@@ -63,9 +65,30 @@ Route::get('/admin/grade-approval', function () {
 });
 
 // Announcements
-Route::get('/admin/announcement', function () {
-    return view('admin.announcement');
-});
+
+// Admin Announcements
+Route::get('/admin/announcement', [
+    AnnouncementController::class,
+    'index'
+])->name('admin.announcement');
+
+//POST ANNOUNCEMENT
+Route::post('/admin/announcement', [
+    AnnouncementController::class,
+    'store'
+])->name('admin.announcement.store');
+
+// UPDATE ANNOUNCEMENT
+Route::put('/admin/announcement/{id}', [
+    AnnouncementController::class,
+    'update'
+])->name('admin.announcement.update');
+
+//DELETE ANNOUNCEMENT
+Route::delete('/admin/announcement/{id}', [
+    AnnouncementController::class,
+    'destroy'
+])->name('admin.announcement.destroy');
 
 // Settings
 Route::get('/admin/settings', function () {
@@ -103,10 +126,19 @@ Route::get('/teacher/subjects', function () {
 Route::get('/teacher/profile', function () {
     return view('teacher.profile');
 });
+
 // Teacher Announcement
 Route::get('/teacher/announcements', function () {
-    return view('teacher.announcements');
+    $announcements = \App\Models\Announcement::whereIn('audience', [
+        'all',
+        'teachers',
+    ])
+        ->latest()
+        ->get();
+
+    return view('teacher.announcements', compact('announcements'));
 })->name('teacher.announcements');
+
 
 // Teacher Settings
 Route::get('/teacher/settings', function () {
@@ -141,8 +173,15 @@ Route::get('/adviser/grade-review', function () {
 
 // ANNOUNCEMENT
 Route::get('/adviser/announcements', function () {
-    return view('adviser.announcements');
-})->name('teacher.announcements');
+    $announcements = \App\Models\Announcement::whereIn('audience', [
+        'all',
+        'advisers',
+    ])
+        ->latest()
+        ->get();
+
+    return view('adviser.announcements', compact('announcements'));
+})->name('adviser.announcements');
 
 // ADVISER PROFILE
 Route::get('/adviser/profile', function () {
@@ -159,14 +198,24 @@ Route::get('/adviser/settings', function () {
 // STUDENT DASHBOARD
 Route::get('/student/dashboard', [DashboardController::class, 'student'])
     ->name('student.dashboard');
-    
+
 // STUDENT GRADES ROUTE
 Route::view('/student/grades', 'student.grades')
     ->name('student.grades');
 
 // STUDENT ANNOUNCEMENT 
-Route::view('/student/announcements', 'student.announcements')
-    ->name('student.announcements');
+
+Route::get('/student/announcements', function () {
+    $announcements = \App\Models\Announcement::whereIn('audience', [
+        'all',
+        'students',
+    ])
+        ->latest()
+        ->get();
+
+    return view('student.announcements', compact('announcements'));
+})->name('student.announcements');
+
 
 // STUDENT PROFILE 
 Route::view('/student/profile', 'student.profile')
