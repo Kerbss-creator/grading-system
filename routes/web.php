@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AnnouncementController;
 use App\Models\Announcement;
 
@@ -36,13 +38,24 @@ Route::get('/admin/users', function () {
 });
 
 // Student Management
-Route::get('/admin/students', [StudentController::class, 'index'])
-    ->name('admin.students');
+// STUDENT MANAGEMENT
+
+// student management 
+Route::get('/admin/students', function () {
+    $students = DB::table('students')->get();
+
+    return view('admin.student-management', compact('students'));
+});
+
+// Save a new student
+Route::post('/admin/students', [StudentController::class, 'store'])
+    ->name('admin.students.store');
+    
 
 // Teacher Management
-Route::get('/admin/teachers', function () {
-    return view('admin.teacher-management');
-});
+// Teacher Management
+Route::get('/admin/teachers', [TeacherController::class, 'index'])
+    ->name('admin.teachers');
 
 // Subject Management
 Route::get('/admin/subjects', function () {

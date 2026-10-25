@@ -38,11 +38,11 @@
         All
       </button>
 
-      <button type="button" class="filter-btn" data-filter="advisers">
+      <button type="button" class="filter-btn" data-filter="adviser">
         Advisers
       </button>
 
-      <button type="button" class="filter-btn" data-filter="teachers">
+      <button type="button" class="filter-btn" data-filter="teacher">
         Teachers
       </button>
 
@@ -113,12 +113,28 @@
             Audience
           </label>
 
-          <select id="announcementAudience" name="audience" required>
-            <option value="">Select audience</option>
-            <option value="all">All Users</option>
-            <option value="advisers">Advisers</option>
-            <option value="teachers">Teachers</option>
-            <option value="students">Students</option>
+          <select id="announcementAudience" required>
+
+            <option value="">
+              Select audience
+            </option>
+
+            <option value="all">
+              All Users
+            </option>
+
+            <option value="adviser">
+              Advisers
+            </option>
+
+            <option value="teacher">
+              Teachers
+            </option>
+
+            <option value="student">
+              Students
+            </option>
+
           </select>
         </div>
 
