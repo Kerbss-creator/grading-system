@@ -431,12 +431,13 @@
 
 .announcement-info h3 {
     margin-bottom: 3px;
-    font-size: 11px;
+    font-size: 13px;
+    
 }
 
 .announcement-info p {
     color: #888;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.5;
 }
 
@@ -444,7 +445,7 @@
     display: block;
     margin-top: 5px;
     color: #aaa;
-    font-size: 8px;
+    font-size: 10px;
 }
 
 /* MODAL */

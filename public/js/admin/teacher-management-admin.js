@@ -1,410 +1,559 @@
+console.log("TEACHER MANAGEMENT JS LOADED");
 
-console.log("STUDENT MANAGEMENT JS LOADED");
-const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-console.log("CSRF token found:", Boolean(csrfToken));
+const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    ?.getAttribute("content");
 
-// ==========================================
-// MODAL LOGIC (Add Teacher)
-// ==========================================
 const teacherModal = document.getElementById("teacherModal");
-const addTeacherBtn = document.getElementById("addTeacherBtn");
-const closeTeacherModal = document.getElementById("closeTeacherModal");
-const cancelTeacherModal = document.getElementById("cancelTeacherModal");
-const saveTeacherBtn = document.getElementById("saveTeacherBtn");
-
-function openTeacherModal() { 
-  if (teacherModal) teacherModal.classList.add("show"); 
-}
-
-function closeTeacherModalFn() { 
-  if (teacherModal) teacherModal.classList.remove("show"); 
-}
-
-if (addTeacherBtn) addTeacherBtn.addEventListener("click", openTeacherModal);
-if (closeTeacherModal) closeTeacherModal.addEventListener("click", closeTeacherModalFn);
-if (cancelTeacherModal) cancelTeacherModal.addEventListener("click", closeTeacherModalFn);
-
-if (teacherModal) {
-  teacherModal.addEventListener("click", (event) => {
-    if (event.target === teacherModal) closeTeacherModalFn();
-  });
-}
-
-// ==========================================
-// EDIT MODAL CLOSE/CANCEL
-// ==========================================
-const closeEditModal = document.getElementById("closeEditModal");
-const cancelEditModal = document.getElementById("cancelEditModal");
 const editTeacherModal = document.getElementById("editTeacherModal");
-
-if (closeEditModal) {
-  closeEditModal.addEventListener("click", () => {
-    editTeacherModal.classList.remove("show");
-  });
-}
-
-if (cancelEditModal) {
-  cancelEditModal.addEventListener("click", () => {
-    editTeacherModal.classList.remove("show");
-  });
-}
-
-if (editTeacherModal) {
-  editTeacherModal.addEventListener("click", (event) => {
-    if (event.target === editTeacherModal) {
-      editTeacherModal.classList.remove("show");
-    }
-  });
-}
-
-// ==========================================
-// DELETE MODAL CLOSE/CANCEL
-// ==========================================
-const closeDeleteModal = document.getElementById("closeDeleteModal");
-const cancelDeleteModal = document.getElementById("cancelDeleteModal");
+const viewTeacherModal = document.getElementById("viewTeacherModal");
 const deleteTeacherModal = document.getElementById("deleteTeacherModal");
 
-if (closeDeleteModal) {
-  closeDeleteModal.addEventListener("click", () => {
-    deleteTeacherModal.classList.remove("show");
-  });
-}
-
-if (cancelDeleteModal) {
-  cancelDeleteModal.addEventListener("click", () => {
-    deleteTeacherModal.classList.remove("show");
-  });
-}
-
-if (deleteTeacherModal) {
-  deleteTeacherModal.addEventListener("click", (event) => {
-    if (event.target === deleteTeacherModal) {
-      deleteTeacherModal.classList.remove("show");
-    }
-  });
-}
-
-// ==========================================
-// VIEW MODAL CLOSE/CANCEL
-// ==========================================
-const closeViewModal = document.getElementById("closeViewModal");
-const closeViewModalBtn = document.getElementById("closeViewModalBtn");
-const viewTeacherModal = document.getElementById("viewTeacherModal");
-
-if (closeViewModal) {
-  closeViewModal.addEventListener("click", () => {
-    viewTeacherModal.classList.remove("show");
-  });
-}
-
-if (closeViewModalBtn) {
-  closeViewModalBtn.addEventListener("click", () => {
-    viewTeacherModal.classList.remove("show");
-  });
-}
-
-if (viewTeacherModal) {
-  viewTeacherModal.addEventListener("click", (event) => {
-    if (event.target === viewTeacherModal) {
-      viewTeacherModal.classList.remove("show");
-    }
-  });
-}
-
-// ==========================================
-// GLOBAL ESCAPE KEY
-// ==========================================
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeTeacherModalFn();
-    if (editTeacherModal) editTeacherModal.classList.remove("show");
-    if (deleteTeacherModal) deleteTeacherModal.classList.remove("show");
-    if (viewTeacherModal) viewTeacherModal.classList.remove("show");
-  }
-});
-
-// ==========================================
-// ADD TEACHER
-// ==========================================
-if (saveTeacherBtn) {
-  saveTeacherBtn.addEventListener("click", async function (e) {
-    e.preventDefault();
-
-    const formData = {
-      teacher_id: document.getElementById("teacherId").value.trim(),
-      first_name: document.getElementById("teacherFirstName").value.trim(),
-      middle_name: document.getElementById("teacherMiddleName").value.trim(),
-      last_name: document.getElementById("teacherLastName").value.trim(),
-      email: document.getElementById("teacherEmail").value.trim(),
-      subject: document.getElementById("teacherSubject").value,
-      school_year: document.getElementById("teacherSchoolYear").value,
-      status: document.getElementById("teacherStatus").value,
-    };
-
-    try {
-      const response = await fetch("/admin/teachers", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json", 
-          "X-CSRF-TOKEN": csrfToken, 
-          "Accept": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        // ✅ CHANGED: alert() to showModal() with 'success' type
-        showModal(data.message || "Teacher added successfully!", 'success');
-        closeTeacherModalFn();
-        // Clear form
-        document.getElementById("teacherId").value = "";
-        document.getElementById("teacherFirstName").value = "";
-        document.getElementById("teacherMiddleName").value = "";
-        document.getElementById("teacherLastName").value = "";
-        document.getElementById("teacherEmail").value = "";
-        document.getElementById("teacherSubject").value = "";
-        document.getElementById("teacherSchoolYear").value = "";
-        document.getElementById("teacherStatus").value = "active";
-        
-        // ✅ CHANGED: Delay reload so user can see the modal
-        setTimeout(() => { window.location.reload(); }, 1500);
-      } else {
-        let errorMsg = "Error saving teacher:\n";
-        if (data.errors) {
-          for (const field in data.errors) {
-            const fieldName = field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-            errorMsg += `- ${fieldName}: ${data.errors[field][0]}\n`;
-          }
-        } else {
-          errorMsg += data.message || "Check required fields.";
-        }
-        // ✅ CHANGED: alert() to showModal() with 'error' type
-        showModal(errorMsg, 'error');
-        console.error("Validation errors:", data.errors);
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);
-      // ✅ CHANGED: alert() to showModal() with 'error' type
-      showModal("An unexpected error occurred while saving.", 'error');
-    }
-  }); 
-}
-
-// ==========================================
-// VIEW TEACHER
-// ==========================================
-window.viewTeacher = function (id) {
-  const row = document.querySelector(`tr[data-id="${id}"]`);
-  if (!row) return;
-
-  const setId = document.getElementById("viewTeacherId");
-  const setName = document.getElementById("viewTeacherName");
-  const setEmail = document.getElementById("viewEmail");
-  const setSubject = document.getElementById("viewSubject");
-  const setYear = document.getElementById("viewSchoolYear");
-  const setStatus = document.getElementById("viewStatus");
-
-  if (setId) setId.textContent = row.dataset.teacherId || "-";
-  if (setName) setName.textContent = `${row.dataset.firstName || ""} ${row.dataset.middleName || ""} ${row.dataset.lastName || ""}`.trim() || "-";
-  if (setEmail) setEmail.textContent = row.dataset.email || "-";
-  if (setSubject) setSubject.textContent = row.dataset.subject || "-";
-  if (setYear) setYear.textContent = row.dataset.schoolYear || "-";
-  if (setStatus) setStatus.textContent = (row.dataset.status || "-").charAt(0).toUpperCase() + (row.dataset.status || "").slice(1);
-
-  if (viewTeacherModal) viewTeacherModal.classList.add("show");
-};
-
-// ==========================================
-// EDIT TEACHER
-// ==========================================
-window.editTeacher = function (id) {
-  const row = document.querySelector(`tr[data-id="${id}"]`);
-  if (!row) return;
-
-  const setId = document.getElementById("editTeacherId");
-  const setName = document.getElementById("editTeacherName");
-  const setEmail = document.getElementById("editEmail");
-  const setSubject = document.getElementById("editSubject");
-  const setYear = document.getElementById("editSchoolYear");
-
-  if (setId) setId.value = row.dataset.teacherId || "";
-  if (setName) setName.value = `${row.dataset.firstName || ""} ${row.dataset.middleName || ""} ${row.dataset.lastName || ""}`.trim();
-  if (setEmail) setEmail.value = row.dataset.email || "";
-  if (setSubject) setSubject.value = row.dataset.subject || "";
-  if (setYear) setYear.value = row.dataset.schoolYear || "";
-
-  if (editTeacherModal) editTeacherModal.classList.add("show");
-
-  const saveEditBtn = document.getElementById("saveEditTeacher");
-  if (saveEditBtn) {
-    const newBtn = saveEditBtn.cloneNode(true);
-    saveEditBtn.parentNode.replaceChild(newBtn, saveEditBtn);
-
-    newBtn.addEventListener("click", async function () {
-      const fullName = document.getElementById("editTeacherName").value.split(" ");
-      const updateData = {
-        teacher_id: document.getElementById("editTeacherId").value.trim(),
-        first_name: fullName[0] || "",
-        middle_name: fullName.length > 2 ? fullName.slice(1, -1).join(" ") : "",
-        last_name: fullName[fullName.length - 1] || "",
-        email: document.getElementById("editEmail").value.trim(),
-        subject: document.getElementById("editSubject").value,
-        school_year: document.getElementById("editSchoolYear").value,
-        status: "active",
-        _method: "PUT",
-      };
-
-      try {
-        const response = await fetch(`/admin/teachers/${id}`, {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json", 
-            "X-CSRF-TOKEN": csrfToken, 
-            "Accept": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-          },
-          body: JSON.stringify(updateData),
-        });
-
-        const data = await response.json();
-        if (response.ok && data.success) {
-          // ✅ CHANGED: alert() to showModal() with 'success' type
-          showModal(data.message || "Teacher updated successfully!", 'success');
-          if (editTeacherModal) editTeacherModal.classList.remove("show");
-          
-          // ✅ CHANGED: Delay reload so user can see the modal
-          setTimeout(() => { window.location.reload(); }, 1500);
-        } else {
-          let errorMsg = "Error updating teacher:\n";
-          if (data.errors) {
-            for (const field in data.errors) {
-              errorMsg += `- ${field}: ${data.errors[field][0]}\n`;
-            }
-          }
-          // ✅ CHANGED: alert() to showModal() with 'error' type
-          showModal(errorMsg, 'error');
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
-        // ✅ CHANGED: alert() to showModal() with 'error' type
-        showModal("An unexpected error occurred while updating.", 'error');
-      }
-    });
-  }
-};
-
-// ==========================================
-// DELETE TEACHER
-// ==========================================
-window.deleteTeacher = function (id) {
-  const row = document.querySelector(`tr[data-id="${id}"]`);
-  if (!row) return;
-
-  const teacherName = `${row.dataset.firstName || ""} ${row.dataset.lastName || ""}`.trim();
-  document.getElementById("deleteTeacherName").textContent = teacherName || "this teacher";
-  if (deleteTeacherModal) deleteTeacherModal.classList.add("show");
-
-  const confirmDeleteBtn = document.getElementById("confirmDeleteTeacher");
-  if (confirmDeleteBtn) {
-    const newConfirmBtn = confirmDeleteBtn.cloneNode(true);
-    confirmDeleteBtn.parentNode.replaceChild(newConfirmBtn, confirmDeleteBtn);
-
-    newConfirmBtn.addEventListener("click", async function () {
-      try {
-        const response = await fetch(`/admin/teachers/${id}`, {
-          method: "DELETE",
-          headers: { 
-            "X-CSRF-TOKEN": csrfToken, 
-            "Accept": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-          },
-        });
-
-        const data = await response.json();
-        if (response.ok && data.success) {
-          // ✅ CHANGED: alert() to showModal() with 'success' type
-          showModal(data.message || "Teacher deleted successfully!", 'success');
-          if (deleteTeacherModal) deleteTeacherModal.classList.remove("show");
-          
-          // ✅ CHANGED: Delay reload so user can see the modal
-          setTimeout(() => { window.location.reload(); }, 1500);
-        } else {
-          // ✅ CHANGED: alert() to showModal() with 'error' type
-          showModal("Error deleting teacher.", 'error');
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
-        // ✅ CHANGED: alert() to showModal() with 'error' type
-        showModal("An unexpected error occurred while deleting.", 'error');
-      }
-    });
-  }
-};
-
-// ==========================================
-// HIDE / UNHIDE (Toggle Status)
-// ==========================================
-window.toggleStatus = async function (id) {
-  try {
-    const response = await fetch(`/admin/teachers/${id}/toggle-status`, {
-      method: "PATCH",
-      headers: { 
-        "X-CSRF-TOKEN": csrfToken, 
-        "Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest"
-      },
-    });
-
-    const data = await response.json();
-    if (response.ok && data.success) {
-      // ✅ CHANGED: alert() to showModal() with 'success' type
-      showModal(`Teacher is now ${data.status}.`, 'success');
-      
-      // ✅ CHANGED: Delay reload so user can see the modal
-      setTimeout(() => { window.location.reload(); }, 1500);
-    } else {
-      // ✅ CHANGED: alert() to showModal() with 'error' type
-      showModal("Error updating status.", 'error');
-    }
-  } catch (error) {
-    console.error("Fetch error:", error);
-    // ✅ CHANGED: alert() to showModal() with 'error' type
-    showModal("An unexpected error occurred while updating status.", 'error');
-  }
-};
-
-// ==========================================
-// SEARCH AND FILTERS
-// ==========================================
+const teacherTableBody = document.getElementById("teacherTableBody");
 const teacherSearch = document.getElementById("teacherSearch");
 const subjectFilter = document.getElementById("subjectFilter");
-const statusFilter = document.getElementById("statusFilter"); 
-const teacherTableBody = document.getElementById("teacherTableBody");
+const statusFilter = document.getElementById("statusFilter");
 
-function filterTeachers() {
-  const searchValue = teacherSearch ? teacherSearch.value.toLowerCase().trim() : "";
-  const selectedSubject = subjectFilter ? subjectFilter.value : "all";
-  const selectedStatus = statusFilter ? statusFilter.value : "all";
+const addTeacherBtn = document.getElementById("addTeacherBtn");
+const saveTeacherBtn = document.getElementById("saveTeacherBtn");
 
-  const rows = teacherTableBody ? teacherTableBody.querySelectorAll("tr") : [];
+let editingTeacherId = null;
+let deletingTeacherId = null;
 
-  rows.forEach((row) => {
-    const teacherId = (row.dataset.teacherId || "").toLowerCase();
-    const teacherName = `${row.dataset.firstName || ""} ${row.dataset.lastName || ""}`.toLowerCase();
-    const rowSubject = row.dataset.subject || "";
-    const rowStatus = row.dataset.status || "";
+/* NOTIFICATIONS */
 
-    const matchesSearch = searchValue === "" || teacherId.includes(searchValue) || teacherName.includes(searchValue);
-    const matchesSubject = selectedSubject === "all" || rowSubject === selectedSubject;
-    const matchesStatus = selectedStatus === "all" || rowStatus === selectedStatus;
-
-    row.style.display = (matchesSearch && matchesSubject && matchesStatus) ? "" : "none";
-  });
+function notifyUser(message, type = "info") {
+    if (typeof window.showModal === "function") {
+        window.showModal(message, type);
+    } else {
+        window.alert(message);
+    }
 }
 
-if (teacherSearch) teacherSearch.addEventListener("input", filterTeachers);
-if (subjectFilter) subjectFilter.addEventListener("change", filterTeachers);
-if (statusFilter) statusFilter.addEventListener("change", filterTeachers);``
+/* MODAL HELPERS */
+
+function openModal(modal) {
+    if (modal) {
+        modal.classList.add("show");
+        document.body.style.overflow = "hidden";
+    }
+}
+
+function closeModal(modal) {
+    if (modal) {
+        modal.classList.remove("show");
+    }
+
+    const anyModalOpen = document.querySelector(".modal-overlay.show");
+
+    if (!anyModalOpen) {
+        document.body.style.overflow = "";
+    }
+}
+
+function closeAllModals() {
+    [
+        teacherModal,
+        editTeacherModal,
+        viewTeacherModal,
+        deleteTeacherModal,
+    ].forEach(closeModal);
+}
+
+async function sendRequest(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            ...(csrfToken ? { "X-CSRF-TOKEN": csrfToken } : {}),
+            ...(options.headers || {}),
+        },
+    });
+
+    let data;
+
+    try {
+        data = await response.json();
+    } catch {
+        throw new Error(
+            `The server returned an unexpected response (${response.status}).`,
+        );
+    }
+
+    if (!response.ok) {
+        const errors = data.errors
+            ? Object.values(data.errors).flat().join("\n")
+            : "";
+
+        throw new Error(
+            errors || data.message || `Request failed (${response.status}).`,
+        );
+    }
+
+    return data;
+}
+
+function getValue(id) {
+    return document.getElementById(id)?.value.trim() ?? "";
+}
+
+function setValue(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.value = value ?? "";
+    }
+}
+
+function getTeacherRow(id) {
+    return document.querySelector(
+        `#teacherTableBody tr[data-id="${CSS.escape(String(id))}"]`,
+    );
+}
+
+function getTeacherFullName(row) {
+    return [row.dataset.firstName, row.dataset.middleName, row.dataset.lastName]
+        .filter(Boolean)
+        .join(" ");
+}
+
+function formatStatus(status) {
+    const value = String(status || "");
+
+    return value ? value.charAt(0).toUpperCase() + value.slice(1) : "-";
+}
+
+/* ADD TEACHER MODAL */
+
+function resetAddTeacherForm() {
+    [
+        "teacherId",
+        "teacherFirstName",
+        "teacherMiddleName",
+        "teacherLastName",
+        "teacherEmail",
+        "teacherSubject",
+        "teacherSchoolYear",
+    ].forEach((id) => setValue(id, ""));
+
+    setValue("teacherStatus", "active");
+}
+
+if (addTeacherBtn) {
+    addTeacherBtn.addEventListener("click", () => {
+        resetAddTeacherForm();
+        openModal(teacherModal);
+    });
+}
+
+document
+    .getElementById("closeTeacherModal")
+    ?.addEventListener("click", () => closeModal(teacherModal));
+
+document
+    .getElementById("cancelTeacherModal")
+    ?.addEventListener("click", () => closeModal(teacherModal));
+
+if (teacherModal) {
+    teacherModal.addEventListener("click", (event) => {
+        if (event.target === teacherModal) {
+            closeModal(teacherModal);
+        }
+    });
+}
+
+/* SAVE NEW TEACHER */
+
+if (saveTeacherBtn) {
+    saveTeacherBtn.addEventListener("click", async () => {
+        const formData = {
+            teacher_id: getValue("teacherId"),
+            first_name: getValue("teacherFirstName"),
+            middle_name: getValue("teacherMiddleName"),
+            last_name: getValue("teacherLastName"),
+            email: getValue("teacherEmail"),
+            subject: getValue("teacherSubject"),
+            school_year: getValue("teacherSchoolYear"),
+            status: getValue("teacherStatus"),
+        };
+
+        const requiredFields = [
+            ["teacher_id", "Teacher ID"],
+            ["first_name", "First name"],
+            ["last_name", "Last name"],
+            ["email", "Email address"],
+            ["subject", "Subject"],
+            ["school_year", "School year"],
+        ];
+
+        for (const [field, label] of requiredFields) {
+            if (!formData[field]) {
+                notifyUser(`${label} is required.`, "warning");
+                return;
+            }
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            notifyUser("Please enter a valid email address.", "warning");
+            return;
+        }
+
+        saveTeacherBtn.disabled = true;
+
+        try {
+            const data = await sendRequest("/admin/teachers", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            closeModal(teacherModal);
+            notifyUser(
+                data.message || "Teacher added successfully!",
+                "success",
+            );
+
+            setTimeout(() => window.location.reload(), 1200);
+        } catch (error) {
+            console.error("Add teacher error:", error);
+            notifyUser(error.message || "Unable to add teacher.", "error");
+        } finally {
+            saveTeacherBtn.disabled = false;
+        }
+    });
+}
+
+/* CLOSE EDIT MODAL */
+
+document
+    .getElementById("closeEditModal")
+    ?.addEventListener("click", () => closeModal(editTeacherModal));
+
+document
+    .getElementById("cancelEditModal")
+    ?.addEventListener("click", () => closeModal(editTeacherModal));
+
+if (editTeacherModal) {
+    editTeacherModal.addEventListener("click", (event) => {
+        if (event.target === editTeacherModal) {
+            closeModal(editTeacherModal);
+        }
+    });
+}
+
+/* VIEW TEACHER */
+
+window.viewTeacher = function (id) {
+    const row = getTeacherRow(id);
+
+    if (!row) {
+        notifyUser("Teacher record not found.", "error");
+        return;
+    }
+
+    setValue("viewTeacherId", row.dataset.teacherId);
+    const nameElement = document.getElementById("viewTeacherName");
+    const emailElement = document.getElementById("viewEmail");
+    const subjectElement = document.getElementById("viewSubject");
+    const yearElement = document.getElementById("viewSchoolYear");
+    const statusElement = document.getElementById("viewStatus");
+
+    if (nameElement) nameElement.textContent = getTeacherFullName(row) || "-";
+    if (emailElement) emailElement.textContent = row.dataset.email || "-";
+    if (subjectElement) subjectElement.textContent = row.dataset.subject || "-";
+    if (yearElement) yearElement.textContent = row.dataset.schoolYear || "-";
+    if (statusElement)
+        statusElement.textContent = formatStatus(row.dataset.status);
+
+    openModal(viewTeacherModal);
+};
+
+document
+    .getElementById("closeViewModal")
+    ?.addEventListener("click", () => closeModal(viewTeacherModal));
+
+document
+    .getElementById("closeViewModalBtn")
+    ?.addEventListener("click", () => closeModal(viewTeacherModal));
+
+if (viewTeacherModal) {
+    viewTeacherModal.addEventListener("click", (event) => {
+        if (event.target === viewTeacherModal) {
+            closeModal(viewTeacherModal);
+        }
+    });
+}
+
+/* EDIT TEACHER */
+
+window.editTeacher = function (id) {
+    const row = getTeacherRow(id);
+
+    if (!row) {
+        notifyUser("Teacher record not found.", "error");
+        return;
+    }
+
+    editingTeacherId = id;
+
+    setValue("editTeacherId", row.dataset.teacherId);
+    setValue("editTeacherName", getTeacherFullName(row));
+    setValue("editEmail", row.dataset.email);
+    setValue("editSubject", row.dataset.subject);
+    setValue("editSchoolYear", row.dataset.schoolYear);
+
+    openModal(editTeacherModal);
+};
+
+const saveEditBtn = document.getElementById("saveEditTeacher");
+
+if (saveEditBtn) {
+    saveEditBtn.addEventListener("click", async () => {
+        if (editingTeacherId === null) return;
+
+        const fullName = getValue("editTeacherName")
+            .split(/\s+/)
+            .filter(Boolean);
+
+        if (fullName.length < 2) {
+            notifyUser("Please enter the teacher's full name.", "warning");
+            return;
+        }
+
+        const updateData = {
+            teacher_id: getValue("editTeacherId"),
+            first_name: fullName[0],
+            middle_name:
+                fullName.length > 2 ? fullName.slice(1, -1).join(" ") : "",
+            last_name: fullName[fullName.length - 1],
+            email: getValue("editEmail"),
+            subject: getValue("editSubject"),
+            school_year: getValue("editSchoolYear"),
+            _method: "PUT",
+        };
+
+        if (
+            !updateData.teacher_id ||
+            !updateData.email ||
+            !updateData.subject ||
+            !updateData.school_year
+        ) {
+            notifyUser("Please complete all required fields.", "warning");
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
+            notifyUser("Please enter a valid email address.", "warning");
+            return;
+        }
+
+        saveEditBtn.disabled = true;
+
+        try {
+            const data = await sendRequest(
+                `/admin/teachers/${editingTeacherId}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updateData),
+                },
+            );
+
+            closeModal(editTeacherModal);
+            notifyUser(
+                data.message || "Teacher updated successfully!",
+                "success",
+            );
+
+            setTimeout(() => window.location.reload(), 1200);
+        } catch (error) {
+            console.error("Update teacher error:", error);
+            notifyUser(error.message || "Unable to update teacher.", "error");
+        } finally {
+            saveEditBtn.disabled = false;
+        }
+    });
+}
+
+/* CLOSE DELETE MODAL */
+
+document
+    .getElementById("closeDeleteModal")
+    ?.addEventListener("click", () => closeModal(deleteTeacherModal));
+
+document
+    .getElementById("cancelDeleteModal")
+    ?.addEventListener("click", () => closeModal(deleteTeacherModal));
+
+if (deleteTeacherModal) {
+    deleteTeacherModal.addEventListener("click", (event) => {
+        if (event.target === deleteTeacherModal) {
+            closeModal(deleteTeacherModal);
+        }
+    });
+}
+
+/* DELETE TEACHER */
+
+window.deleteTeacher = function (id) {
+    const row = getTeacherRow(id);
+
+    if (!row) {
+        notifyUser("Teacher record not found.", "error");
+        return;
+    }
+
+    deletingTeacherId = id;
+
+    const nameElement = document.getElementById("deleteTeacherName");
+
+    if (nameElement) {
+        nameElement.textContent = getTeacherFullName(row) || "this teacher";
+    }
+
+    openModal(deleteTeacherModal);
+};
+
+const confirmDeleteBtn = document.getElementById("confirmDeleteTeacher");
+
+if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener("click", async () => {
+        if (deletingTeacherId === null) return;
+
+        confirmDeleteBtn.disabled = true;
+
+        try {
+            const data = await sendRequest(
+                `/admin/teachers/${deletingTeacherId}`,
+                {
+                    method: "DELETE",
+                },
+            );
+
+            closeModal(deleteTeacherModal);
+            notifyUser(
+                data.message || "Teacher deleted successfully!",
+                "success",
+            );
+
+            setTimeout(() => window.location.reload(), 1200);
+        } catch (error) {
+            console.error("Delete teacher error:", error);
+            notifyUser(error.message || "Unable to delete teacher.", "error");
+        } finally {
+            confirmDeleteBtn.disabled = false;
+        }
+    });
+}
+
+/* TOGGLE TEACHER STATUS */
+
+window.toggleStatus = async function (id) {
+    const row = getTeacherRow(id);
+
+    if (!row) {
+        notifyUser("Teacher record not found.", "error");
+        return;
+    }
+
+    try {
+        const data = await sendRequest(`/admin/teachers/${id}/toggle-status`, {
+            method: "PATCH",
+        });
+
+        notifyUser(
+            data.message ||
+                `Teacher status updated to ${data.status || "updated"}.`,
+            "success",
+        );
+
+        setTimeout(() => window.location.reload(), 1200);
+    } catch (error) {
+        console.error("Toggle teacher status error:", error);
+        notifyUser(
+            error.message || "Unable to update teacher status.",
+            "error",
+        );
+    }
+};
+
+/* SEARCH AND FILTERS */
+
+function filterTeachers() {
+    const searchValue = teacherSearch?.value.toLowerCase().trim() || "";
+    const selectedSubject = subjectFilter?.value || "";
+    const selectedStatus = statusFilter?.value || "";
+
+    const rows = teacherTableBody
+        ? teacherTableBody.querySelectorAll("tr[data-id]")
+        : [];
+
+    let visibleCount = 0;
+
+    rows.forEach((row) => {
+        const teacherId = (row.dataset.teacherId || "").toLowerCase();
+        const teacherName = getTeacherFullName(row).toLowerCase();
+        const email = (row.dataset.email || "").toLowerCase();
+        const subject = row.dataset.subject || "";
+        const status = (row.dataset.status || "").toLowerCase();
+
+        const matchesSearch =
+            !searchValue ||
+            teacherId.includes(searchValue) ||
+            teacherName.includes(searchValue) ||
+            email.includes(searchValue);
+
+        const matchesSubject = !selectedSubject || subject === selectedSubject;
+
+        const matchesStatus =
+            !selectedStatus || status === selectedStatus.toLowerCase();
+
+        const visible = matchesSearch && matchesSubject && matchesStatus;
+
+        row.style.display = visible ? "" : "none";
+
+        if (visible) visibleCount++;
+    });
+
+    const emptyRow = teacherTableBody?.querySelector(".teacher-empty-row");
+
+    if (emptyRow) {
+        emptyRow.style.display = rows.length === 0 ? "" : "none";
+    }
+
+    let noResultsRow = teacherTableBody?.querySelector(".teacher-no-results");
+
+    if (teacherTableBody && rows.length > 0 && visibleCount === 0) {
+        if (!noResultsRow) {
+            noResultsRow = document.createElement("tr");
+            noResultsRow.className = "teacher-no-results";
+            noResultsRow.innerHTML = `
+                <td colspan="7" class="teacher-no-results-cell">
+                    No matching teacher records found.
+                </td>
+            `;
+            teacherTableBody.appendChild(noResultsRow);
+        }
+
+        noResultsRow.style.display = "";
+    } else if (noResultsRow) {
+        noResultsRow.style.display = "none";
+    }
+}
+
+teacherSearch?.addEventListener("input", filterTeachers);
+subjectFilter?.addEventListener("change", filterTeachers);
+statusFilter?.addEventListener("change", filterTeachers);
+
+/* CLOSE MODALS WITH ESCAPE */
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        closeAllModals();
+    }
+});

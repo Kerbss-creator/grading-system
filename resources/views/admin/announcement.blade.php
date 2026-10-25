@@ -108,35 +108,25 @@
           <input type="text" id="announcementTitle" name="title" placeholder="Enter announcement title" required>
         </div>
 
+
         <div class="form-group">
           <label for="announcementAudience">
             Audience
           </label>
 
-          <select id="announcementAudience" required>
+          <select id="announcementAudience" name="audience" required>
+            <option value="">Select audience</option>
 
-            <option value="">
-              Select audience
-            </option>
+            <option value="all">All Users</option>
 
-            <option value="all">
-              All Users
-            </option>
+            <option value="advisers">Advisers</option>
 
-            <option value="adviser">
-              Advisers
-            </option>
+            <option value="teachers">Teachers</option>
 
-            <option value="teacher">
-              Teachers
-            </option>
-
-            <option value="student">
-              Students
-            </option>
-
+            <option value="students">Students</option>
           </select>
         </div>
+
 
         <div class="form-group">
           <label for="announcementMessage">

@@ -53,9 +53,18 @@ Route::post('/admin/students', [StudentController::class, 'store'])
     
 
 // Teacher Management
-// Teacher Management
 Route::get('/admin/teachers', [TeacherController::class, 'index'])
     ->name('admin.teachers');
+
+// Adviser Management
+Route::get('/admin/advisers', function () {
+    return view('admin.adviser-management');
+})->name('admin.advisers');
+
+// Admin Management
+Route::get('/admin/admins', function () {
+    return view('admin.admin-management');
+})->name('admin.management');
 
 // Subject Management
 Route::get('/admin/subjects', function () {

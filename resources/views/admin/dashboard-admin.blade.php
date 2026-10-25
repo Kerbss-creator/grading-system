@@ -429,85 +429,118 @@
       </div>
 
 
-      <!-- ANNOUNCEMENTS -->
+
+      {{-- ANNOUNCEMENTS --}}
       <div class="content-card announcements">
 
         <div class="card-header">
-
           <div>
-
             <h2>Announcements</h2>
-
             <p>Latest school announcements</p>
-
           </div>
 
           <button class="view-btn" id="viewAllAnnouncementsBtn">
             View All
           </button>
-
         </div>
-
 
         <div class="announcement-list">
 
-          <div class="announcement-item">
+          @forelse ($latestAnnouncements as $announcement)
 
-            <div class="announcement-icon">
-              <i class="fa-solid fa-bullhorn"></i>
+                <div class="announcement-item">
+
+                  <div class="announcement-icon">
+                    <i class="fa-solid fa-bullhorn"></i>
+                  </div>
+
+                  <div class="announcement-info">
+
+                    <h3>{{ $announcement->title }}</h3>
+
+                    <p>{{ $announcement->message }}</p>
+
+                    <span>
+                      {{ $announcement->created_at
+            ->timezone(config('app.timezone'))
+            ->diffForHumans() }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+          @empty
+
+            <div class="announcement-empty">
+              <i class="fa-regular fa-bell"></i>
+              <p>No announcements yet.</p>
             </div>
 
-            <div class="announcement-info">
+          @endforelse
 
-              <h3>Grade Submission</h3>
+        </div>
 
-              <p>
-                Teachers are reminded to submit their final grades.
-              </p>
+      </div>
 
-              <span>Today</span>
 
+
+
+
+      {{-- ANNOUNCEMENT MODAL --}}
+      <div class="modal-overlay" id="announcementModal">
+
+        <div class="modal-box">
+
+          <div class="modal-header">
+
+            <div>
+              <h2>Announcements</h2>
+              <p>Full list of school announcements</p>
             </div>
+
+            <button class="modal-close" id="closeAnnouncementModal" type="button">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
 
           </div>
 
+          <div class="modal-body">
 
-          <div class="announcement-item">
+            <div class="announcement-list">
 
-            <div class="announcement-icon">
-              <i class="fa-solid fa-calendar"></i>
-            </div>
+              @forelse ($allAnnouncements as $announcement)
 
-            <div class="announcement-info">
+                        <div class="announcement-item">
 
-              <h3>Quarterly Evaluation</h3>
+                          <div class="announcement-icon">
+                            <i class="fa-solid fa-bullhorn"></i>
+                          </div>
 
-              <p>
-                Quarterly evaluation will begin next week.
-              </p>
+                          <div class="announcement-info">
 
-              <span>Yesterday</span>
+                            <h3>{{ $announcement->title }}</h3>
 
-            </div>
+                            <p>{{ $announcement->message }}</p>
 
-          </div>
+                            <span>
+                              {{ $announcement->created_at
+                ->timezone(config('app.timezone'))
+                ->format('F j, Y • h:i A') }}
+                            </span>
 
+                          </div>
 
-          <div class="announcement-item">
+                        </div>
 
-            <div class="announcement-icon">
-              <i class="fa-solid fa-circle-info"></i>
-            </div>
+              @empty
 
-            <div class="announcement-info">
+                <div class="announcement-empty">
+                  <i class="fa-regular fa-bell"></i>
+                  <p>No announcements yet.</p>
+                </div>
 
-              <h3>System Update</h3>
-
-              <p>
-                The grading system has been updated.
-              </p>
-
-              <span>August 22, 2026</span>
+              @endforelse
 
             </div>
 
@@ -517,108 +550,6 @@
 
       </div>
 
-    </div>
-
-
-
-
-    <!-- ANNOUNCEMENT MODAL -->
-    <div class="modal-overlay" id="announcementModal">
-
-      <div class="modal-box">
-
-        <div class="modal-header">
-
-          <div>
-
-            <h2>Announcements</h2>
-
-            <p>Full list of school announcements</p>
-
-          </div>
-
-          <button class="modal-close" id="closeAnnouncementModal">
-
-            <i class="fa-solid fa-xmark"></i>
-
-          </button>
-
-        </div>
-
-
-        <div class="modal-body">
-
-          <div class="announcement-list">
-
-            <div class="announcement-item">
-
-              <div class="announcement-icon">
-                <i class="fa-solid fa-bullhorn"></i>
-              </div>
-
-              <div class="announcement-info">
-
-                <h3>Grade Submission</h3>
-
-                <p>
-                  Teachers are reminded to submit their final grades.
-                </p>
-
-                <span>Today</span>
-
-              </div>
-
-            </div>
-
-
-            <div class="announcement-item">
-
-              <div class="announcement-icon">
-                <i class="fa-solid fa-calendar"></i>
-              </div>
-
-              <div class="announcement-info">
-
-                <h3>Quarterly Evaluation</h3>
-
-                <p>
-                  Quarterly evaluation will begin next week.
-                </p>
-
-                <span>Yesterday</span>
-
-              </div>
-
-            </div>
-
-
-            <div class="announcement-item">
-
-              <div class="announcement-icon">
-                <i class="fa-solid fa-circle-info"></i>
-              </div>
-
-              <div class="announcement-info">
-
-                <h3>System Update</h3>
-
-                <p>
-                  The grading system has been updated.
-                </p>
-
-                <span>August 22, 2026</span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
 
 
 
