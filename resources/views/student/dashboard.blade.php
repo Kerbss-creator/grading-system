@@ -22,7 +22,7 @@
             <div class="welcome-card">
                 <div class="welcome-text">
                     <span>FORBES ACADEMY</span>
-                    <h2>Welcome back, {{ $student->first_name }} {{ $student->last_name }}!</h2>
+                    <h2>Welcome back, STUDENT!</h2>
                     <p>
                         View your grades, academic records, and the latest
                         school announcements in one place.

@@ -26,6 +26,9 @@ Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->name('password.request');
 
+
+
+
 // ADMIN ROUTE
 
 // Dashboard
@@ -37,7 +40,6 @@ Route::get('/admin/users', function () {
     return view('admin.user-management');
 });
 
-// Student Management
 // STUDENT MANAGEMENT
 
 // student management 
@@ -56,10 +58,13 @@ Route::post('/admin/students', [StudentController::class, 'store'])
 Route::get('/admin/teachers', [TeacherController::class, 'index'])
     ->name('admin.teachers');
 
-// Adviser Management
-Route::get('/admin/advisers', function () {
-    return view('admin.adviser-management');
-})->name('admin.advisers');
+    
+// FACULTY MANAGEMENT
+Route::get('/admin/faculty-management', function () {
+    return view('admin.faculty-management');
+})->name('admin.faculty-management');
+
+
 
 // Admin Management
 Route::get('/admin/admins', function () {
@@ -116,6 +121,10 @@ Route::delete('/admin/announcement/{id}', [
 Route::get('/admin/settings', function () {
     return view('admin.settings');
 });
+
+
+
+
 
 
 // TEACHERS ROUTE

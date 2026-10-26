@@ -70,11 +70,6 @@
                 </tbody>
             </table>
         </div>
-
-        <p class="admin-table-note">
-            <i class="fa-solid fa-circle-info"></i>
-            Admin records added here are temporary and are not saved to the database yet.
-        </p>
     </section>
 
 

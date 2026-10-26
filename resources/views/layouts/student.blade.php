@@ -55,12 +55,6 @@
                 <span>My Dashboard</span>
             </a>
 
-            <!-- MY CLASSES -->
-            <a href="{{ url('/student/classes') }}"
-                class="student-nav-link {{ request()->is('student/classes*') ? 'active' : '' }}">
-                <i class="fa-solid fa-book-open"></i>
-                <span>My Classes</span>
-            </a>
 
             <!-- MY GRADES -->
             <a href="{{ url('/student/grades') }}"

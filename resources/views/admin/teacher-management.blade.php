@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+{{-- @extends('layouts.admin')
 
 @section('title', 'Teacher Management')
 @section('header', 'Teacher Management')
@@ -412,4 +412,4 @@
 
 @section('page-js')
     <script src="{{ asset('js/teacher-management.js') }}" defer></script>
-@endsection
+@endsection --}}

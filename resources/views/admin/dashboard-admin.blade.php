@@ -4,8 +4,6 @@
 
 @section('header', 'Dashboard')
 
-@section('header-description', 'Welcome, Administrator!')
-
 @section('page-css')
   <link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}">
 @endsection
@@ -21,7 +19,7 @@
 
         <span>FORBES ACADEMY</span>
 
-        <h2>Welcome to the Grading System!</h2>
+        <h2>Welcome, ADMIN NAME!</h2>
 
         <p>
           Manage students, teachers, subjects, classes, and academic

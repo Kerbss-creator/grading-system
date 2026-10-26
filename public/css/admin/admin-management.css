@@ -289,20 +289,6 @@
     color: #fff;
 }
 
-/* TABLE NOTE */
-
-.admin-table-note {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 14px 0 0;
-    color: #78867b;
-    font-size: 11px;
-}
-
-.admin-table-note i {
-    color: #528465;
-}
 
 /* EMPTY STATE */
 

@@ -97,19 +97,13 @@
                         <span>Admin</span>
                     </a>
 
-                    {{-- ADVISERS --}}
-                    <a href="/admin/advisers"
-                        class="dropdown-link {{ request()->is('admin/advisers*') ? 'active' : '' }}">
+                    {{-- FACULTY --}}
+                    <a href="/admin/faculty-management"
+                        class="dropdown-link {{ request()->is('admin/faculty-management*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-tie"></i>
-                        <span>Advisers</span>
+                        <span>Faculty</span>
                     </a>
 
-                    {{-- TEACHERS --}}
-                    <a href="/admin/teachers"
-                        class="dropdown-link {{ request()->is('admin/teachers*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-chalkboard-user"></i>
-                        <span>Teachers</span>
-                    </a>
 
                     {{-- STUDENTS --}}
                     <a href="/admin/students"
@@ -191,6 +185,14 @@
 
             </a>
 
+            <!-- AUDIT LOGS -->
+            <a href="/admin/auditlogs" class="nav-link {{ request()->is('admin/auditlogs*') ? 'active' : '' }}">
+
+                <i class="fa-solid fa-bars-progress"></i>
+
+                <span>Audit Logs</span>
+
+            </a>
 
             <!-- SETTINGS -->
             <a href="/admin/settings" class="nav-link {{ request()->is('admin/settings*') ? 'active' : '' }}">
@@ -230,12 +232,9 @@
             <div>
 
                 <h1>
-                    @yield('header', 'Dashboard')
+                    @yield('header', 'My Dashboard')
                 </h1>
 
-                <p>
-                    @yield('header-description', 'Welcome back, Administrator!')
-                </p>
 
             </div>
 
