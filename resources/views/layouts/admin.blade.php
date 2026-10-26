@@ -6,13 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-
     <title>@yield('title', 'Forbes Academy Grading System')</title>
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
@@ -33,9 +31,8 @@
     {{-- SIDEBAR --}}
     <aside class="sidebar">
 
-        <!-- LOGO -->
+        {{-- LOGO --}}
         <div class="logo-section">
-
             <div class="logo">
                 <img src="{{ asset('images/forbesologo.png') }}" alt="Forbes Academy Logo">
             </div>
@@ -44,68 +41,48 @@
                 <h2>Forbes Academy</h2>
                 <span>Grading System</span>
             </div>
-
         </div>
 
-
-        <!-- NAVIGATION -->
+        {{-- NAVIGATION --}}
         <nav class="navigation">
 
             <p class="nav-title">MAIN</p>
 
-
-            <!-- DASHBOARD -->
+            {{-- DASHBOARD --}}
             <a href="{{ url('/admin/dashboard') }}"
                 class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
-
                 <i class="fa-solid fa-gauge"></i>
-
                 <span>Dashboard</span>
-
             </a>
-
-
-
 
             {{-- USERS DROPDOWN --}}
             <div
-                class="dropdown {{ request()->is('admin/users*') || request()->is('admin/admins*') || request()->is('admin/advisers*') || request()->is('admin/teachers*') || request()->is('admin/students*') ? 'active' : '' }}">
+                class="dropdown {{ request()->is('admin/users*') || request()->is('admin/admins*') || request()->is('admin/advisers*') || request()->is('admin/teachers*') || request()->is('admin/students*') || request()->is('admin/faculty-management*') ? 'active' : '' }}">
 
-                {{-- USERS MAIN MENU --}}
                 <a href="#" class="nav-link dropdown-toggle">
-
                     <i class="fa-solid fa-users"></i>
-
                     <span>Users</span>
-
                     <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
-
                 </a>
 
-                {{-- USERS SUBMENU --}}
                 <div class="dropdown-menu">
 
-                    {{-- USER MANAGEMENT --}}
                     <a href="/admin/users" class="dropdown-link {{ request()->is('admin/users*') ? 'active' : '' }}">
                         <i class="fa-solid fa-users-gear"></i>
                         <span>User Management</span>
                     </a>
 
-                    {{-- ADMIN --}}
                     <a href="/admin/admins" class="dropdown-link {{ request()->is('admin/admins*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-shield"></i>
                         <span>Admin</span>
                     </a>
 
-                    {{-- FACULTY --}}
                     <a href="/admin/faculty-management"
                         class="dropdown-link {{ request()->is('admin/faculty-management*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-tie"></i>
                         <span>Faculty</span>
                     </a>
 
-
-                    {{-- STUDENTS --}}
                     <a href="/admin/students"
                         class="dropdown-link {{ request()->is('admin/students*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-graduate"></i>
@@ -113,183 +90,192 @@
                     </a>
 
                 </div>
-
             </div>
 
-
-
-
             <p class="nav-title">ACADEMIC MANAGEMENT</p>
-            <!-- SUBJECT MANAGEMENT -->
+
+            {{-- SUBJECT MANAGEMENT --}}
             <a href="/admin/subjects" class="nav-link {{ request()->is('admin/subjects*') ? 'active' : '' }}">
-
                 <i class="fa-solid fa-book"></i>
-
                 <span>Subject Management</span>
-
             </a>
 
-
-
-            <!-- GRADE LEVEL -->
+            {{-- GRADE LEVEL --}}
             <a href="/admin/grade-level" class="nav-link {{ request()->is('admin/grade-level*') ? 'active' : '' }}">
-
                 <i class="fa-solid fa-school"></i>
-
                 <span>Grade Level</span>
-
             </a>
 
-
-            <!-- GRADE MANAGEMENT -->
+            {{-- GRADE MANAGEMENT --}}
             <a href="/admin/grades" class="nav-link {{ request()->is('admin/grades*') ? 'active' : '' }}">
-
                 <i class="fa-solid fa-chart-column"></i>
-
                 <span>Grade Management</span>
-
             </a>
 
-
-            <!-- GRADE APPROVAL -->
+            {{-- GRADE APPROVAL --}}
             <a href="/admin/grade-approval"
                 class="nav-link {{ request()->is('admin/grade-approval*') ? 'active' : '' }}">
-
                 <i class="fa-solid fa-check-double"></i>
-
                 <span>Grade Approval</span>
-
             </a>
-
 
             <p class="nav-title">SYSTEM</p>
 
-            <!-- MY PROFILE -->
-
-            <a href="/admin/profile" class="nav-link
-               {{ request()->is('admin/profile*') ? 'active' : '' }}">
-
+            {{-- MY PROFILE --}}
+            <a href="/admin/profile" class="nav-link {{ request()->is('admin/profile*') ? 'active' : '' }}">
                 <i class="fa-solid fa-user"></i>
-
                 <span>My Profile</span>
-
             </a>
 
-
-            <!-- ANNOUNCEMENTS -->
+            {{-- ANNOUNCEMENTS --}}
             <a href="/admin/announcement" class="nav-link {{ request()->is('admin/announcement*') ? 'active' : '' }}">
-
                 <i class="fa-solid fa-bullhorn"></i>
-
                 <span>Announcements</span>
-
             </a>
 
-            <!-- AUDIT LOGS -->
+            {{-- AUDIT LOGS --}}
             <a href="/admin/auditlogs" class="nav-link {{ request()->is('admin/auditlogs*') ? 'active' : '' }}">
-
                 <i class="fa-solid fa-bars-progress"></i>
-
                 <span>Audit Logs</span>
-
             </a>
 
-            <!-- SETTINGS -->
+            {{-- SETTINGS --}}
             <a href="/admin/settings" class="nav-link {{ request()->is('admin/settings*') ? 'active' : '' }}">
-
                 <i class="fa-solid fa-gear"></i>
-
                 <span>Settings</span>
-
             </a>
 
         </nav>
 
-
-        <!-- LOGOUT -->
+        {{-- LOGOUT --}}
         <div class="logout-section">
-
             <a href="/login" class="nav-link logout">
-
                 <i class="fa-solid fa-right-from-bracket"></i>
-
                 <span>Logout</span>
-
             </a>
-
         </div>
 
     </aside>
 
-
-    <!-- MAIN CONTENT -->
+    {{-- MAIN CONTENT --}}
     <main class="main-content">
 
-
-        <!-- TOP HEADER -->
+        {{-- TOP HEADER --}}
         <header class="top-header">
 
             <div>
-
-                <h1>
-                    @yield('header', 'My Dashboard')
-                </h1>
-
-
+                <h1>@yield('header', 'My Dashboard')</h1>
             </div>
-
 
             <div class="header-right">
 
-
-                <!-- NOTIFICATION -->
+                {{-- NOTIFICATION --}}
                 <div class="notification-wrapper">
 
-                    <button class="notification-btn" id="notificationBtn" type="button">
+                    <button class="notification-btn" id="notificationBtn" type="button" aria-label="Open notifications">
 
                         <i class="fa-regular fa-bell"></i>
 
-                        <span class="notification-dot"></span>
+                        {{-- Unread indicator --}}
+                        <span class="notification-dot" id="notificationDot"
+                            style="{{ ($unreadNotifications ?? collect())->isNotEmpty() ? '' : 'display: none;' }}">
+                        </span>
 
                     </button>
 
-
-                    <!-- NOTIFICATION PANEL -->
+                    {{-- NOTIFICATION PANEL --}}
                     <div class="notification-panel" id="notificationPanel">
 
+                        {{-- Notification header --}}
                         <div class="notification-header">
 
                             <div>
-
                                 <h3>Notifications</h3>
 
-                                <span>0 unread</span>
-
+                                <span id="unreadNotificationCount">
+                                    {{ ($unreadNotifications ?? collect())->count() }}
+                                    unread
+                                </span>
                             </div>
 
-
-                            <button class="notification-close" id="notificationClose" type="button">
-
+                            <button class="notification-close" id="notificationClose" type="button"
+                                aria-label="Close notifications">
                                 <i class="fa-solid fa-xmark"></i>
-
                             </button>
 
                         </div>
 
+                        {{-- Notification list --}}
+                        <div class="notification-list" id="notificationList">
 
-                        <div class="empty-notification">
+                            @forelse (($notifications ?? collect()) as $notification)
 
-                            <div class="empty-notification-icon">
+                                                    <div class="notification-item {{ $notification->read_at ? '' : 'unread' }}"
+                                                        data-notification-id="{{ $notification->id }}">
 
-                                <i class="fa-regular fa-bell-slash"></i>
+                                                        <div class="notification-item-icon">
+                                                            <i class="fa-solid fa-bullhorn"></i>
+                                                        </div>
 
-                            </div>
+                                                        <div class="notification-item-info">
 
-                            <h4>No notifications yet</h4>
+                                                            <h4>
+                                                                {{ $notification->data['title'] ?? 'New Announcement' }}
+                                                            </h4>
 
-                            <p>
-                                You don't have any notifications at the moment.
-                            </p>
+                                                            <p>
+                                                                {{ $notification->data['message'] ?? 'Admin posted a new announcement.' }}
+                                                            </p>
+
+                                                            <span class="notification-time">
+                                                                {{ $notification->created_at
+                                ->timezone(config('app.timezone'))
+                                ->diffForHumans() }}
+                                                            </span>
+
+                                                            {{-- Notification actions --}}
+                                                            <div class="notification-actions">
+
+                                                                @if (!$notification->read_at)
+                                                                    <button type="button" class="notification-action mark-read-btn"
+                                                                        data-id="{{ $notification->id }}">
+                                                                        <i class="fa-solid fa-check"></i>
+                                                                        Mark as Read
+                                                                    </button>
+                                                                @else
+                                                                    <span class="notification-read-label">
+                                                                        <i class="fa-solid fa-check-double"></i>
+                                                                        Read
+                                                                    </span>
+                                                                @endif
+
+                                                                <button type="button" class="notification-action delete-notification-btn"
+                                                                    data-id="{{ $notification->id }}">
+                                                                    <i class="fa-regular fa-trash-can"></i>
+                                                                    Delete
+                                                                </button>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                            @empty
+
+                                <div class="empty-notification" id="emptyNotification">
+
+                                    <div class="empty-notification-icon">
+                                        <i class="fa-regular fa-bell-slash"></i>
+                                    </div>
+
+                                    <h4>No notifications yet</h4>
+
+                                    <p>You don't have any notifications at the moment.</p>
+
+                                </div>
+
+                            @endforelse
 
                         </div>
 
@@ -297,87 +283,58 @@
 
                 </div>
 
-
-                <!-- ADMIN PROFILE -->
+                {{-- ADMIN PROFILE --}}
                 <div class="profile-wrapper">
 
                     <button class="profile" id="profileBtn" type="button">
 
                         <div class="profile-icon">
-
                             <i class="fa-solid fa-user"></i>
-
                         </div>
-
 
                         <div class="profile-info">
-
                             <strong>Administrator</strong>
-
                             <span>Admin</span>
-
                         </div>
-
 
                         <i class="fa-solid fa-chevron-down profile-arrow"></i>
 
                     </button>
 
-
-                    <!-- PROFILE MENU -->
+                    {{-- PROFILE MENU --}}
                     <div class="profile-menu" id="profileMenu">
-
 
                         <div class="profile-menu-header">
 
                             <div class="profile-menu-icon">
-
                                 <i class="fa-solid fa-user"></i>
-
                             </div>
 
-
                             <div>
-
                                 <strong>Administrator</strong>
-
                                 <span>Admin Account</span>
-
                             </div>
 
                         </div>
 
-
                         <div class="profile-menu-divider"></div>
 
-
-                        <!-- SETTINGS -->
+                        {{-- SETTINGS --}}
                         <a href="/admin/settings" class="profile-menu-item">
-
                             <i class="fa-solid fa-gear"></i>
-
                             <span>Settings</span>
-
                         </a>
 
-                        <a href="/teacher/profile" class="profile-menu-item">
-
+                        {{-- MY PROFILE --}}
+                        <a href="/admin/profile" class="profile-menu-item">
                             <i class="fa-solid fa-user"></i>
-
-                            <span>
-                                My Profile
-                            </span>
-
+                            <span>My Profile</span>
                         </a>
 
-
-                        <!-- LOGOUT -->
+                        {{-- LOGOUT --}}
                         <button type="button" class="profile-menu-item logout-item" id="logoutBtn">
-
                             <i class="fa-solid fa-right-from-bracket"></i>
-
                             <span>Logout</span>
-
                         </button>
 
                     </div>
@@ -388,20 +345,16 @@
 
         </header>
 
-
-        <!-- PAGE CONTENT -->
+        {{-- PAGE CONTENT --}}
         @yield('content')
 
     </main>
 
-
-    <!-- SHARED JAVASCRIPT -->
+    {{-- SHARED JAVASCRIPT --}}
     <script src="{{ asset('js/notification.js') }}"></script>
-
     <script src="{{ asset('js/profile.js') }}"></script>
 
-
-    <!-- PAGE-SPECIFIC JAVASCRIPT -->
+    {{-- PAGE-SPECIFIC JAVASCRIPT --}}
     @yield('page-js')
 
 </body>

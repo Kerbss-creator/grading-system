@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\AnnouncementNotification;
 
 class AnnouncementController extends Controller
 {
@@ -45,6 +47,16 @@ class AnnouncementController extends Controller
             'audience' => $validated['audience'],
             'created_by' => Auth::id(),
         ]);
+
+        // SEND NOTIFICATION TO ADMIN ACCOUNTS
+        // TEMPORARY TEST: Notify the currently logged-in user
+        Notification::send(
+            [Auth::user()],
+            new AnnouncementNotification(
+                $announcement->title,
+                $announcement->message
+            )
+        );
 
         return response()->json([
             'success' => true,

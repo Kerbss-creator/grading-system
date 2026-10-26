@@ -31,7 +31,7 @@ class StudentController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $student = DB::transaction(function () use ($validated) {
             // Create the User record for authentication
             $user = User::create([
                 'name' => trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? '')),
@@ -41,7 +41,7 @@ class StudentController extends Controller
             ]);
 
             // Create the Student record
-            Student::create([
+            return Student::create([
                 'student_id' => $validated['student_id'],
                 'first_name' => $validated['first_name'],
                 'middle_name' => $validated['middle_name'] ?? null,

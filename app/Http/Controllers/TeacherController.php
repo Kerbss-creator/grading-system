@@ -33,7 +33,7 @@ class TeacherController extends Controller
         // If email is empty or null, generate a safe default
         $email = !empty($validated['email']) ? $validated['email'] : ($validated['teacher_id'] . '@forbes.edu');
 
-        DB::transaction(function () use ($validated, $email) {
+        $teacher = DB::transaction(function () use ($validated, $email) {
             User::create([
                 'name' => trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? '')),
                 'email' => $email,
@@ -41,7 +41,7 @@ class TeacherController extends Controller
                 'role' => 'teacher',
             ]);
 
-            Teacher::create([
+            return Teacher::create([
                 'teacher_id' => $validated['teacher_id'],
                 'first_name' => $validated['first_name'],
                 'middle_name' => $validated['middle_name'] ?? null,

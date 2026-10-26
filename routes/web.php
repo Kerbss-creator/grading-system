@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\NotificationController;
 use App\Models\Announcement;
 
 // Route::get('/login', [AuthController::class,'login']);
@@ -27,6 +28,18 @@ Route::get('/forgot-password', function () {
 })->name('password.request');
 
 
+// NOTIFICATION ACTIONS
+Route::middleware('auth')->group(function () {
+    Route::patch(
+        '/notifications/{id}/read',
+        [NotificationController::class, 'markAsRead']
+    )->name('notifications.read');
+
+    Route::delete(
+        '/notifications/{id}',
+        [NotificationController::class, 'destroy']
+    )->name('notifications.destroy');
+});
 
 
 // ADMIN ROUTE
