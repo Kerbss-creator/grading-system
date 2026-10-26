@@ -1,24 +1,17 @@
-
-// STUDENT MODAL
-console.log("STUDENT MANAGEMENT JS LOADED");
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-console.log("CSRF token found:", Boolean(csrfToken));
 
-
+// ==========================================
+// MODAL LOGIC (Add Student)
+// ==========================================
 const studentModal = document.getElementById("studentModal");
 const addStudentBtn = document.getElementById("addStudentBtn");
 const closeStudentModal = document.getElementById("closeStudentModal");
 const cancelStudentModal = document.getElementById("cancelStudentModal");
 const saveStudentBtn = document.getElementById("saveStudentBtn");
 
-// OPEN MODAL
-  
-function openStudentModal() {   
+function openStudentModal() { 
   if (studentModal) studentModal.classList.add("show"); 
 }
-
-
-// CLOSE MODAL
 
 function closeModal() { 
   if (studentModal) studentModal.classList.remove("show"); 
@@ -34,9 +27,102 @@ if (studentModal) {
   });
 }
 
+// ==========================================
+// EDIT MODAL CLOSE/CANCEL
+// ==========================================
+const closeEditModal = document.getElementById("closeEditModal");
+const cancelEditModal = document.getElementById("cancelEditModal");
+const editStudentModal = document.getElementById("editStudentModal");
 
-// ADD STUDENT BUTTON
+if (closeEditModal) {
+  closeEditModal.addEventListener("click", () => {
+    editStudentModal.classList.remove("show");
+  });
+}
 
+if (cancelEditModal) {
+  cancelEditModal.addEventListener("click", () => {
+    editStudentModal.classList.remove("show");
+  });
+}
+
+if (editStudentModal) {
+  editStudentModal.addEventListener("click", (event) => {
+    if (event.target === editStudentModal) {
+      editStudentModal.classList.remove("show");
+    }
+  });
+}
+
+// ==========================================
+// DELETE MODAL CLOSE/CANCEL
+// ==========================================
+const closeDeleteModal = document.getElementById("closeDeleteModal");
+const cancelDeleteModal = document.getElementById("cancelDeleteModal");
+const deleteStudentModal = document.getElementById("deleteStudentModal");
+
+if (closeDeleteModal) {
+  closeDeleteModal.addEventListener("click", () => {
+    deleteStudentModal.classList.remove("show");
+  });
+}
+
+if (cancelDeleteModal) {
+  cancelDeleteModal.addEventListener("click", () => {
+    deleteStudentModal.classList.remove("show");
+  });
+}
+
+if (deleteStudentModal) {
+  deleteStudentModal.addEventListener("click", (event) => {
+    if (event.target === deleteStudentModal) {
+      deleteStudentModal.classList.remove("show");
+    }
+  });
+}
+
+// ==========================================
+// VIEW STUDENT MODAL CLOSE/CANCEL
+// ==========================================
+const closeViewModal = document.getElementById("closeViewModal");
+const closeViewModalBtn = document.getElementById("closeViewModalBtn");
+const viewStudentModal = document.getElementById("viewStudentModal");
+
+if (closeViewModal) {
+  closeViewModal.addEventListener("click", () => {
+    viewStudentModal.classList.remove("show");
+  });
+}
+
+if (closeViewModalBtn) {
+  closeViewModalBtn.addEventListener("click", () => {
+    viewStudentModal.classList.remove("show");
+  });
+}
+
+if (viewStudentModal) {
+  viewStudentModal.addEventListener("click", (event) => {
+    if (event.target === viewStudentModal) {
+      viewStudentModal.classList.remove("show");
+    }
+  });
+}
+
+// ==========================================
+// GLOBAL ESCAPE KEY
+// ==========================================
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeModal();
+    if (editStudentModal) editStudentModal.classList.remove("show");
+    if (deleteStudentModal) deleteStudentModal.classList.remove("show");
+    if (viewStudentModal) viewStudentModal.classList.remove("show");
+  }
+});
+
+// ==========================================
+// ADD STUDENT
+// ==========================================
 if (saveStudentBtn) {
   saveStudentBtn.addEventListener("click", async function (e) {
     e.preventDefault();
@@ -65,23 +151,7 @@ if (saveStudentBtn) {
         body: JSON.stringify(formData),
       });
 
-      const responseText = await response.text();
-      console.log("HTTP Status:", response.status);
-      console.log("Response URL:", response.url);
-      console.log("Response Body:", responseText);
-
-      let data;
-
-      try {
-        data = JSON.parse(responseText);
-      } catch {
-        console.error("Server response is not JSON:", responseText);
-        showModal(
-          `Server error (HTTP ${response.status}). Check the Console for details.`,
-          "error"
-        );
-        return;
-      }
+      const data = await response.json();
       
       if (response.ok && data.success) {
         showModal(data.message || "Student added successfully!", 'success');
@@ -117,98 +187,9 @@ if (saveStudentBtn) {
   }); 
 }
 
-// EDIT BUTTON
-
-const closeEditModal = document.getElementById("closeEditModal");
-const cancelEditModal = document.getElementById("cancelEditModal");
-const editStudentModal = document.getElementById("editStudentModal");
-
-if (closeEditModal) {
-  closeEditModal.addEventListener("click", () => {
-    editStudentModal.classList.remove("show");
-  });
-}
-
-if (cancelEditModal) {
-  cancelEditModal.addEventListener("click", () => {
-    editStudentModal.classList.remove("show");
-  });
-}
-
-if (editStudentModal) {
-  editStudentModal.addEventListener("click", (event) => {
-    if (event.target === editStudentModal) {
-      editStudentModal.classList.remove("show");
-    }
-  });
-}
-
-// VIEWS CLOSE BUTTON
-
-const closeViewModal = document.getElementById("closeViewModal");
-const closeViewModalBtn = document.getElementById("closeViewModalBtn");
-const viewStudentModal = document.getElementById("viewStudentModal");
-
-if (closeViewModal) {
-  closeViewModal.addEventListener("click", () => {
-    viewStudentModal.classList.remove("show");
-  });
-}
-
-if (closeViewModalBtn) {
-  closeViewModalBtn.addEventListener("click", () => {
-    viewStudentModal.classList.remove("show");
-  });
-}
-
-if (viewStudentModal) {
-  viewStudentModal.addEventListener("click", (event) => {
-    if (event.target === viewStudentModal) {
-      viewStudentModal.classList.remove("show");
-    }
-  });
-}
-
-// DELETE CANCEL BUTTON
-
-const closeDeleteModal = document.getElementById("closeDeleteModal");
-const cancelDeleteModal = document.getElementById("cancelDeleteModal");
-const deleteStudentModal = document.getElementById("deleteStudentModal");
-
-if (closeDeleteModal) {
-  closeDeleteModal.addEventListener("click", () => {
-    deleteStudentModal.classList.remove("show");
-  });
-}
-
-if (cancelDeleteModal) {
-  cancelDeleteModal.addEventListener("click", () => {
-    deleteStudentModal.classList.remove("show");
-  });
-}
-
-if (deleteStudentModal) {
-  deleteStudentModal.addEventListener("click", (event) => {
-    if (event.target === deleteStudentModal) {
-      deleteStudentModal.classList.remove("show");
-    }
-  });
-}
-
-
-// ESCAPE KEY
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeModal();
-    if (editStudentModal) editStudentModal.classList.remove("show");
-    if (deleteStudentModal) deleteStudentModal.classList.remove("show");
-    if (viewStudentModal) viewStudentModal.classList.remove("show");
-  }
-});
-
-// VIEW STUDENT MODAL
-
+// ==========================================
+// VIEW STUDENT
+// ==========================================
 window.viewStudent = function (id) {
   const row = document.querySelector(`tr[data-id="${id}"]`);
   if (!row) return;
@@ -230,9 +211,9 @@ window.viewStudent = function (id) {
   if (viewStudentModal) viewStudentModal.classList.add("show");
 };
 
-
-// EDIT STUDENT MODAL
-
+// ==========================================
+// EDIT STUDENT
+// ==========================================
 window.editStudent = function (id) {
   const row = document.querySelector(`tr[data-id="${id}"]`);
   if (!row) return;
@@ -309,8 +290,9 @@ window.editStudent = function (id) {
   }
 };
 
-// DELETE STUDENT MODAL
-
+// ==========================================
+// DELETE STUDENT
+// ==========================================
 window.deleteStudent = function (id) {
   const row = document.querySelector(`tr[data-id="${id}"]`);
   if (!row) return;
@@ -353,8 +335,9 @@ window.deleteStudent = function (id) {
   }
 };
 
-// TOGGLE STUDENT STATUS
-
+// ==========================================
+// HIDE / UNHIDE (Toggle Status)
+// ==========================================
 window.toggleStatus = async function (id) {
   try {
     const response = await fetch(`/admin/students/${id}/toggle-status`, {
@@ -380,9 +363,9 @@ window.toggleStatus = async function (id) {
     showModal("An unexpected error occurred while updating status.", 'error');
   }
 };
-
-// STUDENT SEARCH AND FILTER
-
+// ==========================================
+// SEARCH AND FILTERS
+// ==========================================
 const studentSearch = document.getElementById("studentSearch");
 const gradeFilter = document.getElementById("gradeFilter");
 const sectionFilter = document.getElementById("sectionFilter"); 
@@ -412,15 +395,3 @@ function filterStudents() {
 if (studentSearch) studentSearch.addEventListener("input", filterStudents);
 if (gradeFilter) gradeFilter.addEventListener("change", filterStudents);
 if (sectionFilter) sectionFilter.addEventListener("change", filterStudents);
-
-// // SEARCH WHILE TYPING
-
-// studentSearch.addEventListener("input", filterStudents);  
-
-// // GRADE FILTER
-
-// gradeFilter.addEventListener("change", filterStudents);
-
-// // SECTION FILTER
-
-// sectionFilter.addEventListener("change", filterStudents);z

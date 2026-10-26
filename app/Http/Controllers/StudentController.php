@@ -12,23 +12,12 @@ class StudentController extends Controller
 {
     public function index()
     {
-        return view('admin.student-management');
-    }
-
-    public function show($id)
-    {
-       
-        // para makita ang detalye ng isang student.
-    }
-
-    public function create()
-    {
-        return view('admin.students-create');
+        $students = Student::orderBy('created_at', 'desc')->get();
+        return view('admin.student-management', compact('students'));
     }
 
     public function store(Request $request)
     {
-       
         $validated = $request->validate([
             'student_id' => 'required|unique:students,student_id',
             'first_name' => 'required|string|max:255',
@@ -46,7 +35,7 @@ class StudentController extends Controller
             // Create the User record for authentication
             $user = User::create([
                 'name' => trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? '')),
-                'email' => $validated['email'] ?? ($validated['student_id'] ?? 'student') . '@forbesacademy.edu,ph',
+                'email' => $validated['email'] ?? ($validated['student_id'] ?? 'student') . '@forbes.edu',
                 'password' => Hash::make('password123'),
                 'role' => 'student',
             ]);
@@ -66,18 +55,11 @@ class StudentController extends Controller
             ]);
         });
 
-        return response()->json(['success' => true, 'message' => 'Student added successfully.', 'student' => $student]);
-    }
-
-    public function edit($id)
-    {
-        $student = Student::findOrFail($id);
-        // para i-edit ang student record.
+        return response()->json(['success' => true, 'message' => 'Student added successfully.']);
     }
 
     public function update(Request $request, $id)
     {
-        
         $student = Student::findOrFail($id);
         
         $validated = $request->validate([
@@ -89,7 +71,7 @@ class StudentController extends Controller
             'section' => 'nullable|string|max:255',
             'sex' => 'required|string|max:255',
             'school_year' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:users,email,' . $student->id,
+            'email' => 'required|email|unique:students,email,' . $id,
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -107,19 +89,17 @@ class StudentController extends Controller
         ]);
 
         return response()->json(['success' => true, 'message' => 'Student updated successfully.']);
-    
     }
 
     public function destroy($id)
     {
-        
         $student = Student::findOrFail($id);
         $student->delete();
 
         return response()->json(['success' => true, 'message' => 'Student deleted successfully.']);
     }
 
-        public function toggleStatus($id)
+    public function toggleStatus($id)
     {
         $student = Student::findOrFail($id);
         $student->status = $student->status === 'active' ? 'inactive' : 'active';
@@ -131,5 +111,4 @@ class StudentController extends Controller
             'message' => 'Student status updated.'
         ]);
     }
-
 }

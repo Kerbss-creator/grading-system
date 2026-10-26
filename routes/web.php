@@ -43,16 +43,22 @@ Route::get('/admin/users', function () {
 // STUDENT MANAGEMENT
 
 // student management 
-Route::get('/admin/students', function () {
-    $students = DB::table('students')->get();
+// STUDENT MANAGEMENT
+Route::get('/admin/students', [StudentController::class, 'index'])
+    ->name('admin.students.index');
 
-    return view('admin.student-management', compact('students'));
-});
-
-// Save a new student
 Route::post('/admin/students', [StudentController::class, 'store'])
     ->name('admin.students.store');
-    
+
+Route::put('/admin/students/{id}', [StudentController::class, 'update'])
+    ->name('admin.students.update');
+
+Route::delete('/admin/students/{id}', [StudentController::class, 'destroy'])
+    ->name('admin.students.destroy');
+
+Route::patch('/admin/students/{id}/toggle-status', [StudentController::class, 'toggleStatus'])
+    ->name('admin.students.toggleStatus');
+
 
 // Teacher Management
 Route::get('/admin/teachers', [TeacherController::class, 'index'])
