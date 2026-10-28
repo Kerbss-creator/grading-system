@@ -41,6 +41,15 @@ class AnnouncementController extends Controller
             'audience' => 'required|in:all,teachers,advisers,students',
         ]);
 
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You must be logged in to publish an announcement.',
+            ], 401);
+        }
+
         $announcement = Announcement::create([
             'title' => $validated['title'],
             'message' => $validated['message'],
@@ -50,8 +59,8 @@ class AnnouncementController extends Controller
 
         // SEND NOTIFICATION TO ADMIN ACCOUNTS
         // TEMPORARY TEST: Notify the currently logged-in user
-        Notification::send(
-            [Auth::user()],
+        // SEND NOTIFICATION TO THE CURRENTLY LOGGED-IN USER
+        $user->notify(
             new AnnouncementNotification(
                 $announcement->title,
                 $announcement->message

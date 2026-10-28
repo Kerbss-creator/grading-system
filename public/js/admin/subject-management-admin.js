@@ -1,52 +1,119 @@
-// =========================
-// SUBJECT MODAL
-// =========================
+document.addEventListener("DOMContentLoaded", () => {
+    const subjectSearch = document.getElementById("subjectSearch");
+    const gradeFilter = document.getElementById("gradeFilter");
+    const statusFilter = document.getElementById("statusFilter");
+    const subjectTableBody = document.getElementById("subjectTableBody");
+    const subjectEmptyState = document.getElementById("subjectEmptyState");
+    const subjectCount = document.getElementById("subjectCount");
 
-const subjectModal = document.getElementById("subjectModal");
-const addSubjectBtn = document.querySelector(".add-subject-btn");
-const closeSubjectBtn = subjectModal.querySelector(".modal-close");
-const cancelSubjectBtn = subjectModal.querySelector(".cancel-btn");
-const subjectForm = document.getElementById("subjectForm");
+    if (!subjectTableBody) {
+        return;
+    }
 
-// OPEN MODAL
-addSubjectBtn.addEventListener("click", () => {
-  subjectModal.classList.add("show");
-});
+    const rows = Array.from(subjectTableBody.querySelectorAll("tr"));
 
-// CLOSE MODAL
-closeSubjectBtn.addEventListener("click", () => {
-  subjectModal.classList.remove("show");
-});
+    const getSubjectName = (row) => {
+        return (
+            row.dataset.subject ||
+            row.querySelector(".subject-name")?.textContent.trim() ||
+            ""
+        );
+    };
 
-// CANCEL
-cancelSubjectBtn.addEventListener("click", () => {
-  subjectModal.classList.remove("show");
-});
+    const filterSubjects = () => {
+        const searchValue = subjectSearch?.value.trim().toLowerCase() || "";
+        const selectedGrade = gradeFilter?.value || "";
+        const selectedStatus = statusFilter?.value.toLowerCase() || "";
 
-// CLOSE WHEN CLICKING OUTSIDE
-subjectModal.addEventListener("click", (e) => {
-  if (e.target === subjectModal) {
-    subjectModal.classList.remove("show");
-  }
-});
+        let visibleCount = 0;
 
-// SAVE SUBJECT
-subjectForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+        rows.forEach((row) => {
+            const subjectName = getSubjectName(row).toLowerCase();
+            const grades = (row.dataset.grades || "").split(",");
+            const status = (row.dataset.status || "").toLowerCase();
 
-  const subjectName = document.getElementById("subjectName").value;
-  const gradeLevel = document.getElementById("gradeLevel").value;
-  const schoolYear = document.getElementById("schoolYear").value;
-  const subjectStatus = document.getElementById("subjectStatus").value;
+            const matchesSearch = subjectName.includes(searchValue);
+            const matchesGrade =
+                !selectedGrade || grades.includes(selectedGrade);
+            const matchesStatus = !selectedStatus || status === selectedStatus;
 
-  console.log("Subject Name:", subjectName);
-  console.log("Grade Level:", gradeLevel);
-  console.log("School Year:", schoolYear);
-  console.log("Status:", subjectStatus);
+            const isVisible = matchesSearch && matchesGrade && matchesStatus;
 
-  // CLOSE MODAL
-  subjectModal.classList.remove("show");
+            row.hidden = !isVisible;
 
-  // CLEAR FORM
-  subjectForm.reset();
+            if (isVisible) {
+                visibleCount++;
+            }
+        });
+
+        if (subjectEmptyState) {
+            subjectEmptyState.hidden = visibleCount !== 0;
+        }
+
+        if (subjectCount) {
+            subjectCount.textContent = `Showing ${visibleCount} of ${rows.length} subjects`;
+        }
+    };
+
+    const openSubjectDetails = (subjectName) => {
+        if (!subjectName) {
+            return;
+        }
+
+        const destination = new URL(
+            "/admin/subject-details",
+            window.location.origin,
+        );
+
+        destination.searchParams.set("subject", subjectName);
+        window.location.href = destination.href;
+    };
+
+    subjectSearch?.addEventListener("input", filterSubjects);
+    gradeFilter?.addEventListener("change", filterSubjects);
+    statusFilter?.addEventListener("change", filterSubjects);
+
+    subjectTableBody.addEventListener("click", (event) => {
+        const row = event.target.closest("tr");
+
+        if (!row || row.hidden) {
+            return;
+        }
+
+        const subjectName = getSubjectName(row);
+        const clickedButton = event.target.closest(".view-btn");
+
+        if (clickedButton) {
+            openSubjectDetails(clickedButton.dataset.subject || subjectName);
+            return;
+        }
+
+        openSubjectDetails(subjectName);
+    });
+
+    subjectTableBody.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") {
+            return;
+        }
+
+        const row = event.target.closest("tr");
+
+        if (
+            !row ||
+            row.hidden ||
+            event.target.closest("button, a, input, select")
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+        openSubjectDetails(getSubjectName(row));
+    });
+
+    rows.forEach((row) => {
+        row.tabIndex = 0;
+        row.setAttribute("aria-label", `View ${getSubjectName(row)} details`);
+    });
+
+    filterSubjects();
 });

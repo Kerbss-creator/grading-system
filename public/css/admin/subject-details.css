@@ -1,0 +1,385 @@
+.main-content {
+     margin-left: 75px;
+    width: calc(100% - 75px);
+    min-height: 100vh;
+    padding: 35px;
+    transition:
+        margin-left 0.3s ease,
+        width 0.3s ease;
+}
+
+.sidebar:hover ~ .main-content {
+    margin-left: 280px;
+}
+
+/* SUBJECT DETAILS PAGE */
+
+.subject-details-page {
+    width: 100%;
+    min-width: 0;
+    color: #26352c;
+    font-family: "Poppins", sans-serif;
+}
+
+.subject-details-page,
+.subject-details-page * {
+    box-sizing: border-box;
+}
+
+.details-page-header {
+    margin-bottom: 25px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 22px;
+    color: #036f35;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.back-link:hover {
+    color: #0d5c2d;
+     text-decoration: underline;
+
+}
+
+.details-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.subject-icon,
+.grade-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #e7f4eb;
+    color: #036f35;
+    border-radius: 12px;
+}
+
+.subject-icon {
+    width: 58px;
+    height: 58px;
+    font-size: 23px;
+}
+
+.details-heading h1 {
+    margin: 0 0 5px;
+    color: #203b2b;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.details-heading p,
+.card-heading p {
+    margin: 0;
+    color: #78847b;
+    font-size: 12px;
+}
+
+.details-card {
+    margin-bottom: 22px;
+    padding: 25px;
+    background: #fff;
+    border: 1px solid #e7ece8;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 3%);
+}
+
+.card-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+.card-heading h2 {
+    margin: 0 0 6px;
+    color: #26352c;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.subject-status {
+    padding: 6px 12px;
+    color: #036f35;
+    background: #e7f4eb;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.subject-information-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 25px 35px;
+}
+
+.information-item {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.information-item span {
+    color: #78847b;
+    font-size: 12px;
+}
+
+.information-item strong {
+    color: #26352c;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.class-assignment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.class-assignment {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+    padding: 16px;
+    color: inherit;
+    background: #fff;
+    border: 1px solid #e6ece7;
+    border-radius: 10px;
+    text-decoration: none;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.class-assignment:hover {
+    background: #f7fbf8;
+    border-color: #036f35;
+    transform: translateY(-1px);
+}
+
+.grade-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
+}
+
+.grade-information {
+    flex: 1;
+    min-width: 0;
+}
+
+.grade-information h3 {
+    margin: 0 0 5px;
+    color: #26352c;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.grade-information p {
+    margin: 0;
+    color: #78847b;
+    font-size: 11px;
+}
+
+.assignment-label {
+    color: #036f35;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.assignment-arrow {
+    color: #036f35;
+    font-size: 13px;
+    transition: transform 0.2s ease;
+}
+
+.class-assignment:hover .assignment-arrow {
+    transform: translateX(4px);
+}
+
+/* Assigned Teachers Section */
+
+.assigned-teachers-section {
+    margin-bottom: 22px;
+}
+
+.teacher-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    padding: 7px 12px;
+    color: #036f35;
+    background: #e7f4eb;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.assigned-teacher-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.assigned-teacher-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #e6ece7;
+    border-radius: 10px;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.assigned-teacher-item:hover {
+    background: #f7fbf8;
+    border-color: #036f35;
+    transform: translateY(-2px);
+}
+
+.teacher-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    color: #036f35;
+    background: #e7f4eb;
+    border-radius: 50%;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.teacher-information {
+    flex: 1;
+    min-width: 0;
+}
+
+.teacher-information h3 {
+    margin: 0 0 5px;
+    color: #26352c;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.teacher-information p {
+    margin: 0;
+    color: #78847b;
+    font-size: 11px;
+}
+
+.teacher-subject-badge {
+    padding: 5px 10px;
+    color: #036f35;
+    background: #e7f4eb;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.teacher-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 35px 20px;
+    text-align: center;
+    background: #fafcfb;
+    border: 1px dashed #dce6df;
+    border-radius: 10px;
+}
+
+.teacher-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 14px;
+    color: #036f35;
+    background: #e7f4eb;
+    border-radius: 50%;
+    font-size: 21px;
+}
+
+.teacher-empty-state h3 {
+    margin: 0 0 7px;
+    color: #26352c;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.teacher-empty-state p {
+    max-width: 350px;
+    margin: 0;
+    color: #78847b;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+@media (max-width: 650px) {
+    .teacher-count {
+        padding: 6px 9px;
+        font-size: 10px;
+    }
+
+    .assigned-teacher-item {
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .teacher-subject-badge {
+        display: none;
+    }
+
+    .teacher-empty-state {
+        padding: 28px 15px;
+    }
+}
+
+@media (max-width: 650px) {
+    .details-card {
+        padding: 18px;
+    }
+
+    .details-heading h1 {
+        font-size: 21px;
+    }
+
+    .subject-information-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .class-assignment {
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .assignment-label {
+        display: none;
+    }
+
+    .grade-information p {
+        line-height: 1.5;
+    }
+}

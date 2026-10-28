@@ -53,9 +53,8 @@ Route::get('/admin/users', function () {
     return view('admin.user-management');
 });
 
-// STUDENT MANAGEMENT
+// ================================================//
 
-// student management 
 // STUDENT MANAGEMENT
 Route::get('/admin/students', [StudentController::class, 'index'])
     ->name('admin.students.index');
@@ -83,22 +82,60 @@ Route::get('/admin/faculty-management', function () {
     return view('admin.faculty-management');
 })->name('admin.faculty-management');
 
-
+// ================================================//
 
 // Admin Management
 Route::get('/admin/admins', function () {
     return view('admin.admin-management');
 })->name('admin.management');
 
+// ================================================//
+
 // Subject Management
 Route::get('/admin/subjects', function () {
     return view('admin.subject-management');
 });
 
+// Subject Details page
+Route::get('/admin/subject-details', function () {
+    return view('admin.subject-details');
+})->name('admin.subject-details');
+
+// ================================================//
+
+
+
 // Grade Level
 Route::get('/admin/grade-level', function () {
     return view('admin.grade-level');
 });
+
+// GRADE LEVEL DIRECTORY
+Route::get('/admin/grade-level', function () {
+    return view('admin.grade-level');
+});
+
+// GRADE LEVEL DETAILS - FRONTEND PROTOTYPE
+Route::get('/admin/grade-level/{grade}', function (int $grade) {
+    $studentCounts = [
+        7 => 168,
+        8 => 167,
+        9 => 166,
+        10 => 167,
+    ];
+
+    abort_unless(array_key_exists($grade, $studentCounts), 404);
+
+    return view('admin.grade-level-details', [
+        'gradeLevel' => 'Grade ' . $grade,
+        'studentCount' => $studentCounts[$grade],
+    ]);
+})->whereNumber('grade');
+
+
+
+//===============================================//
+
 
 // Grade Management
 Route::get('/admin/grades', function () {
