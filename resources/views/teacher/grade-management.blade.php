@@ -1,1017 +1,235 @@
 @extends('layouts.teacher')
 
-@section('title', 'Grade Management')
-
-@section('header', 'Grade Management')
-
-@section('header-description', 'Manage and update your students\' grades.')
+@section('title', 'Grading Sheet')
+@section('header', 'Grading Sheet')
+@section('header-description', 'Enter assessment scores and review computed grades for your assigned subject.')
 
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('css/teacher/grade-management.css') }}">
 @endsection
 
 @section('content')
+    @php
+        /*
+         * UI prototype only.
+         * Replace these sample values with database-backed teacher assignment and learners
+         * when the backend workflow is ready.
+         */
+        $gradebookSubject = $subjectName ?? 'Mathematics';
+        $gradebookCode = $subjectCode ?? 'MATH-7';
+        $gradebookLevel = $gradeLevel ?? 'Grade 7';
+        $gradebookYear = $schoolYear ?? '2026-2027';
 
-    {{-- GRADE MANAGEMENT CONTAINER --}}
-    <section class="grade-management-container">
-
-        
-
-        {{-- CLASS AND SUBJECT FILTERS --}}
-        <div class="selection-card">
-
-            <div class="selection-group">
-
-                <label for="classSelect">Class</label>
-
-                <div class="select-wrapper">
-
-                    <i class="fa-solid fa-chalkboard"></i>
-
-                    <select id="classSelect">
-
-                        <option value="grade7-a">
-                            Grade 7 - Section A
-                        </option>
-
-                        <option value="grade8-a">
-                            Grade 8 - Section A
-                        </option>
-
-                        <option value="grade9-a">
-                            Grade 9 - Section A
-                        </option>
-
-                        <option value="grade10-a">
-                            Grade 10 - Section A
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
+        $learners = $students ?? [
+            ['id' => 1, 'name' => 'Harvy Hicap'],
+            ['id' => 2, 'name' => 'Learner Two'],
+            ['id' => 3, 'name' => 'Learner Three'],
+            ['id' => 4, 'name' => 'Learner Four'],
+            ['id' => 5, 'name' => 'Learner Five'],
+            ['id' => 6, 'name' => 'Learner Six'],
+            ['id' => 7, 'name' => 'Learner Seven'],
+            ['id' => 8, 'name' => 'Learner Eight'],
+        ];
+    @endphp
 
 
-            <div class="selection-group">
 
-                <label for="subjectSelect">Subject</label>
-
-                <div class="select-wrapper">
-
-                    <i class="fa-solid fa-book"></i>
-
-                    <select id="subjectSelect">
-
-                        <option value="mathematics">
-                            Mathematics
-                        </option>
-
-                        <option value="science">
-                            Science
-                        </option>
-
-                        <option value="english">
-                            English
-                        </option>
-
-                        <option value="filipino">
-                            Filipino
-                        </option>
-
-                        <option value="filipino">
-                            Araling Panlipunan
-                        </option>
-
-                        <option value="filipino">
-                            TLE
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
+    <div class="gradebook-page" data-school-year="{{ $gradebookYear }}" data-subject-code="{{ $gradebookCode }}">
 
 
-            <div class="selection-group">
-
-                <label for="schoolYearSelect">School Year</label>
-
-                <div class="select-wrapper">
-
-                    <i class="fa-solid fa-calendar-days"></i>
-
-                    <select id="schoolYearSelect">
-
-                        <option value="2026-2027">
-                            2026 - 2027
-                        </option>
-
-                        <option value="2027-2028">
-                            2027 - 2028
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <div class="selection-group">
-
-                <label for="termSelect">Term</label>
-
-                <div class="select-wrapper">
-
-                    <i class="fa-solid fa-book-open"></i>
-
-                    <select id="termSelect">
-                        <option value="1st-term">
-                            1st Term
-                        </option>
-
-                        <option value="2nd-term">
-                            2nd Term
-                        </option>
-
-                        <option value="3rd-term">
-                            3rd Term
-                        </option>
-                    </select>
-                </div>
-
-            </div>
-
-
-            <button type="button" class="load-grades-btn" id="loadGradesBtn">
-                <i class="fa-solid fa-rotate"></i>
-                Load Grades
-            </button>
-
+        <div class="grade-management-header">
+            <a href="{{ url('/teacher/subjects') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to My Subjects</span>
+            </a>
         </div>
 
 
-        {{-- GRADE SUMMARY --}}
-        <div class="grade-summary">
-
-            {{-- TOTAL STUDENTS --}}
-            <div class="summary-card">
-
-                <div class="summary-icon students-icon">
-                    <i class="fa-solid fa-users"></i>
+        <section class="gradebook-overview">
+            <div class="gradebook-subject">
+                <div class="gradebook-subject-icon">
+                    <i class="fa-solid fa-calculator"></i>
                 </div>
-
-                <div class="summary-content">
-
-                    <span>Total Students</span>
-
-                    <strong id="totalStudents">
-                        32
-                    </strong>
-
-                    <small>
-                        Students in this class
-                    </small>
-
+                <div>
+                    <div class="subject-title-line">
+                        <h2>{{ $gradebookSubject }}</h2>
+                        <span class="subject-code">{{ $gradebookCode }}</span>
+                    </div>
+                    <p>{{ $gradebookLevel }} <span class="meta-dot">•</span> Assigned grade level</p>
                 </div>
-
             </div>
 
-
-            {{-- SUBMITTED GRADES --}}
-            <div class="summary-card">
-
-                <div class="summary-icon submitted-icon">
-                    <i class="fa-solid fa-circle-check"></i>
+            <div class="gradebook-filters">
+                <div class="gradebook-filter">
+                    <label for="gradebookSchoolYear">School Year</label>
+                    <select id="gradebookSchoolYear">
+                        <option value="2026-2027" @selected($gradebookYear === '2026-2027')>2026-2027</option>
+                        <option value="2027-2028" @selected($gradebookYear === '2027-2028')>2027-2028</option>
+                    </select>
                 </div>
-
-                <div class="summary-content">
-
-                    <span>Submitted</span>
-
-                    <strong id="submittedGrades">
-                        18
-                    </strong>
-
-                    <small>
-                        56% of total students
-                    </small>
-
+                <div class="gradebook-filter">
+                    <label for="gradebookTerm">Term</label>
+                    <select id="gradebookTerm">
+                        <option value="1">Term 1</option>
+                        <option value="2">Term 2</option>
+                        <option value="3">Term 3</option>
+                    </select>
                 </div>
-
             </div>
 
-
-            {{-- PENDING GRADES --}}
-            <div class="summary-card">
-
-                <div class="summary-icon pending-icon">
-                    <i class="fa-solid fa-clock"></i>
+            <div class="policy-note">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                    <strong>Grading computation preview</strong>
+                    <p>PPreview of student's grades based on assessment scores for the selected term.</p>
                 </div>
+            </div>
+        </section>
 
-                <div class="summary-content">
-
-                    <span>Pending</span>
-
-                    <strong id="pendingGrades">
-                        14
-                    </strong>
-
-                    <small>
-                        44% of total students
-                    </small>
-
-                </div>
-
+        <section class="gradebook-tabs-card">
+            <div class="gradebook-tabs" role="tablist" aria-label="Gradebook views">
+                <button class="gradebook-tab is-active" type="button" role="tab" aria-selected="true" data-view="term">Term
+                    1</button>
+                <button class="gradebook-tab" type="button" role="tab" aria-selected="false" data-view="term">Term
+                    2</button>
+                <button class="gradebook-tab" type="button" role="tab" aria-selected="false" data-view="term">Term
+                    3</button>
+                <button class="gradebook-tab" type="button" role="tab" aria-selected="false" data-view="summary">Summary of
+                    Grades</button>
             </div>
 
-
-            {{-- AVERAGE GRADE --}}
-            <div class="summary-card">
-
-                <div class="summary-icon average-icon">
-                    <i class="fa-solid fa-chart-column"></i>
+            <div class="gradebook-toolbar">
+                <div>
+                    <h3 id="gradebookTableTitle">Term 1 Scores</h3>
+                    <p>Enter scores only. Totals and weighted scores update automatically.</p>
                 </div>
+                <div class="gradebook-toolbar-actions">
+                    <button type="button" class="btn btn-light" id="assessmentSettings">
+                        <i class="fa-solid fa-sliders"></i>
+                        Assessment Settings
+                    </button>
 
-                <div class="summary-content">
-
-                    <span>Average Grade</span>
-
-                    <strong id="averageGrade">
-                        86.5
-                    </strong>
-
-                    <small>
-                        Class average
-                    </small>
-
+                    <button type="button" class="btn btn-light" id="resetGradebook">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Reset Gradebook
+                    </button>
                 </div>
-
             </div>
 
-        </div>
+            <div class="gradebook-table-wrap" id="termGradebook">
+                <table class="gradebook-table">
+                    <thead>
+                        <tr>
+                            <th class="col-number" rowspan="2">#</th>
+                            <th class="col-learner" rowspan="2">Learner Name</th>
+                            <th class="group-heading group-ww" colspan="4">Written / Oral Works <span>(20%)</span></th>
+                            <th class="group-heading group-pt" colspan="2">Product / Performance Tasks <span>(50%)</span>
+                            </th>
+                            <th class="group-heading group-ex" colspan="4">Summative Tests / Term Exam <span>(30%)</span>
+                            </th>
+                            <th class="computed-heading" rowspan="2">WW<br>PS</th>
+                            <th class="computed-heading" rowspan="2">WW<br>WS</th>
+                            <th class="computed-heading" rowspan="2">PT<br>PS</th>
+                            <th class="computed-heading" rowspan="2">PT<br>WS</th>
+                            <th class="computed-heading" rowspan="2">EX<br>PS</th>
+                            <th class="computed-heading" rowspan="2">EX<br>WS</th>
+                            <th class="computed-heading initial-heading" rowspan="2">Initial<br>Grade</th>
+                            <th class="computed-heading" rowspan="2">Term<br>Grade*</th>
+                            <th class="computed-heading" rowspan="2">Descriptor*</th>
+                        </tr>
+                        <tr>
+                            <th class="assessment-heading group-ww">WW 1 <small>Max 100</small></th>
+                            <th class="assessment-heading group-ww">WW 2 <small>Max 100</small></th>
+                            <th class="assessment-heading group-ww">WW 3 <small>Max 100</small></th>
+                            <th class="assessment-heading group-ww">WW 4 <small>Max 100</small></th>
+                            <th class="assessment-heading group-pt">PT 1 <small>Max 100</small></th>
+                            <th class="assessment-heading group-pt">PT 2 <small>Max 100</small></th>
+                            <th class="assessment-heading group-ex">ST 1 <small>Max 100</small></th>
+                            <th class="assessment-heading group-ex">ST 2 <small>Max 100</small></th>
+                            <th class="assessment-heading group-ex">ST 3 <small>Max 100</small></th>
+                            <th class="assessment-heading group-ex">Term Exam <small>Max 40</small></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($learners as $index => $learner)
+                            <tr class="learner-row" data-learner-id="{{ $learner['id'] ?? $index + 1 }}">
+                                <td class="row-number">{{ $index + 1 }}</td>
+                                <td class="learner-name">{{ $learner['name'] ?? 'Learner' }}</td>
 
 
-        {{-- MAIN GRADE CONTENT --}}
-        <div class="grade-content-grid">
-
-            {{-- STUDENT GRADES --}}
-            <div class="grades-card">
-
-                {{-- CARD HEADER --}}
-                <div class="grades-card-header">
-
-                    <div>
-
-                        <h3>Student Grades</h3>
-
-                        <p>
-                            Enter the final grade and remarks for each student.
-                        </p>
-
-                    </div>
-
-                    {{-- GRADE ACTIONS --}}
-                    <div class="grade-actions">
-
-                        <button type="button" class="save-btn" id="saveGradesBtn">
-
-                            <i class="fa-solid fa-floppy-disk"></i>
-
-                            Save Changes
-
-                        </button>
-
-                        <button type="button" class="submit-btn" id="submitGradesBtn">
-
-                            <i class="fa-solid fa-paper-plane"></i>
-
-                            Submit Grades
-
-                        </button>
-
-                    </div>
-
-                </div>
+                                {{-- TEACHER/ADVISER CAN CHANGE SCORE ITEMS --}}
 
 
-                {{-- TABLE CONTROLS --}}
-                <div class="table-controls">
+                                @foreach ([
+                                        // Written / Oral Works
+                                        ['group' => 'ww', 'max' => 10],
+                                        ['group' => 'ww', 'max' => 15],
+                                        ['group' => 'ww', 'max' => 15],
+                                        ['group' => 'ww', 'max' => 10],
 
-                    <div class="search-box">
+                                        // Performance Tasks
+                                        ['group' => 'pt', 'max' => 100],
+                                        ['group' => 'pt', 'max' => 100],
 
-                        <i class="fa-solid fa-magnifying-glass"></i>
+                                        // Summative Tests
+                                        ['group' => 'ex', 'max' => 20],
+                                        ['group' => 'ex', 'max' => 20],
+                                        ['group' => 'ex', 'max' => 20],
 
-                        <input type="text" id="studentSearch" placeholder="Search student name or ID...">
+                                        // Term Exam
+                                        ['group' => 'ex', 'max' => 40],
+                                    ] as $assessment)
 
-                    </div>
+                                    <td class="score-cell">
+                                        <input type="number" class="score-input" min="0" max="{{ $assessment['max'] }}" step="any"
+                                            inputmode="decimal" data-group="{{ $assessment['group'] }}"
+                                            data-max="{{ $assessment['max'] }}"
+                                            aria-label="{{ $learner['name'] ?? 'Learner' }} {{ strtoupper($assessment['group']) }} score"
+                                            placeholder="—">
+                                    </td>
+                                @endforeach
 
-
-                    <div class="status-filter">
-
-                        <i class="fa-solid fa-filter"></i>
-
-                        <select id="statusFilter">
-
-                            <option value="all">
-                                All Status
-                            </option>
-
-                            <option value="submitted">
-                                Submitted
-                            </option>
-
-                            <option value="pending">
-                                Pending
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                {{-- GRADE TABLE --}}
-                <div class="table-wrapper">
-
-                    <table class="grades-table">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>#</th>
-
-                                <th>Student ID</th>
-
-                                <th>Name</th>
-
-                                <th>Final Grade</th>
-
-                                <th>Remarks</th>
-
-                                <th>Status</th>
-
-                                <th>Action</th>
-
+                                <td class="computed-cell ww-ps">—</td>
+                                <td class="computed-cell ww-ws">—</td>
+                                <td class="computed-cell pt-ps">—</td>
+                                <td class="computed-cell pt-ws">—</td>
+                                <td class="computed-cell ex-ps">—</td>
+                                <td class="computed-cell ex-ws">—</td>
+                                <td class="computed-cell initial-grade">—</td>
+                                <td class="computed-cell term-grade">Pending</td>
+                                <td class="computed-cell descriptor"><span class="status-pending">Pending</span></td>
                             </tr>
-
-                        </thead>
-
-                        <tbody id="gradeTableBody">
-
-                            {{-- STUDENT 1 --}}
-                            <tr data-status="submitted">
-
-                                <td>1</td>
-
-                                <td>2026-001</td>
-
-                                <td>
-                                    Ma trishia Jacob
-                                </td>
-
-                                <td>
-
-                                    <input type="number" class="grade-input" value="92" min="0" max="100">
-
-                                </td>
-
-                                <td>
-
-                                    <select class="remarks-select">
-
-                                        <option selected>
-                                            Outstanding
-                                        </option>
-
-                                        <option>
-                                            Very Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Fairly Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Did Not Meet Expectations
-                                        </option>
-
-                                    </select>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status-badge submitted">
-                                        Submitted
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <button type="button" class="edit-btn" title="Edit Grade">
-
-                                        <i class="fa-solid fa-pen"></i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- STUDENT 2 --}}
-                            <tr data-status="submitted">
-
-                                <td>2</td>
-
-                                <td>2026-002</td>
-
-                                <td>
-                                    Harvy Hicap
-                                </td>
-
-                                <td>
-                                    <input type="number" class="grade-input" value="89" min="0" max="100">
-                                </td>
-
-                                <td>
-
-                                    <select class="remarks-select">
-
-                                        <option>
-                                            Outstanding
-                                        </option>
-
-                                        <option selected>
-                                            Very Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Fairly Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Did Not Meet Expectations
-                                        </option>
-
-                                    </select>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status-badge submitted">
-                                        Submitted
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <button type="button" class="edit-btn" title="Edit Grade">
-
-                                        <i class="fa-solid fa-pen"></i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- STUDENT 3 --}}
-                            <tr data-status="submitted">
-
-                                <td>3</td>
-
-                                <td>2026-003</td>
-
-                                <td>
-                                    Mark Reyes
-                                </td>
-
-                                <td>
-
-                                    <input type="number" class="grade-input" value="84" min="0" max="100">
-
-                                </td>
-
-                                <td>
-
-                                    <select class="remarks-select">
-
-                                        <option>
-                                            Outstanding
-                                        </option>
-
-                                        <option>
-                                            Very Satisfactory
-                                        </option>
-
-                                        <option selected>
-                                            Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Fairly Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Did Not Meet Expectations
-                                        </option>
-
-                                    </select>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status-badge submitted">
-                                        Submitted
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <button type="button" class="edit-btn" title="Edit Grade">
-
-                                        <i class="fa-solid fa-pen"></i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- STUDENT 4 --}}
-                            <tr data-status="pending">
-
-                                <td>4</td>
-
-                                <td>2026-004</td>
-
-                                <td>
-                                    Lisa Cruz
-                                </td>
-
-                                <td>
-
-                                    <input type="number" class="grade-input" value="76" min="0" max="100">
-
-                                </td>
-
-                                <td>
-
-                                    <select class="remarks-select">
-
-                                        <option>
-                                            Outstanding
-                                        </option>
-
-                                        <option>
-                                            Very Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Satisfactory
-                                        </option>
-
-                                        <option selected>
-                                            Fairly Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Did Not Meet Expectations
-                                        </option>
-
-                                    </select>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status-badge pending">
-                                        Pending
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <button type="button" class="edit-btn" title="Edit Grade">
-
-                                        <i class="fa-solid fa-pen"></i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- STUDENT 5 --}}
-                            <tr data-status="submitted">
-
-                                <td>5</td>
-
-                                <td>2026-005</td>
-
-                                <td>
-                                    Daniel Ramos
-                                </td>
-
-                                <td>
-
-                                    <input type="number" class="grade-input" value="93" min="0" max="100">
-
-                                </td>
-
-                                <td>
-
-                                    <select class="remarks-select">
-
-                                        <option selected>
-                                            Outstanding
-                                        </option>
-
-                                        <option>
-                                            Very Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Fairly Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Did Not Meet Expectations
-                                        </option>
-
-                                    </select>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status-badge submitted">
-                                        Submitted
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <button type="button" class="edit-btn" title="Edit Grade">
-
-                                        <i class="fa-solid fa-pen"></i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- STUDENT 6 --}}
-                            <tr data-status="pending">
-
-                                <td>6</td>
-
-                                <td>2026-006</td>
-
-                                <td>
-                                    Sophia Garcia
-                                </td>
-
-                                <td>
-
-                                    <input type="number" class="grade-input" value="88" min="0" max="100">
-
-                                </td>
-
-                                <td>
-
-                                    <select class="remarks-select">
-
-                                        <option>
-                                            Outstanding
-                                        </option>
-
-                                        <option selected>
-                                            Very Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Fairly Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Did Not Meet Expectations
-                                        </option>
-
-                                    </select>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status-badge pending">
-                                        Pending
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <button type="button" class="edit-btn" title="Edit Grade">
-
-                                        <i class="fa-solid fa-pen"></i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- STUDENT 7 --}}
-                            <tr data-status="pending">
-
-                                <td>7</td>
-
-                                <td>2026-007</td>
-
-                                <td>
-                                    Matthew Santos
-                                </td>
-
-                                <td>
-
-                                    <input type="number" class="grade-input" value="80" min="0" max="100">
-
-                                </td>
-
-                                <td>
-
-                                    <select class="remarks-select">
-
-                                        <option>
-                                            Outstanding
-                                        </option>
-
-                                        <option>
-                                            Very Satisfactory
-                                        </option>
-
-                                        <option selected>
-                                            Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Fairly Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Did Not Meet Expectations
-                                        </option>
-
-                                    </select>
-
-                                </td>
-
-                                <td>
-                                    <span class="status-badge pending">
-                                        Pending
-                                    </span>
-                                </td>
-
-                                <td>
-
-                                    <button type="button" class="edit-btn" title="Edit Grade">
-
-                                        <i class="fa-solid fa-pen"></i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- STUDENT 8 --}}
-                            <tr data-status="submitted">
-
-                                <td>8</td>
-
-                                <td>2026-008</td>
-
-                                <td>
-                                    Ella Fernandez
-                                </td>
-
-                                <td>
-
-                                    <input type="number" class="grade-input" value="95" min="0" max="100">
-
-                                </td>
-
-                                <td>
-
-                                    <select class="remarks-select">
-
-                                        <option selected>
-                                            Outstanding
-                                        </option>
-
-                                        <option>
-                                            Very Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Fairly Satisfactory
-                                        </option>
-
-                                        <option>
-                                            Did Not Meet Expectations
-                                        </option>
-
-                                    </select>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="status-badge submitted">
-                                        Submitted
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <button type="button" class="edit-btn" title="Edit Grade">
-
-                                        <i class="fa-solid fa-pen"></i>
-
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
 
+            <div class="summary-view is-hidden" id="summaryGradebook">
+                <div class="summary-empty-icon"><i class="fa-solid fa-chart-column"></i></div>
+                <h3>Summary of Grades</h3>
+                <p>Term 1-3 grades will appear here once term results and the approved grade conversion rules are connected.
+                </p>
+            </div>
 
-            {{-- RIGHT INFORMATION PANEL --}}
-            <aside class="grade-sidebar">
-
-                {{-- GRADE LEGEND --}}
-                <div class="info-card">
-
-                    <div class="info-card-title">
-
-                        <i class="fa-solid fa-circle-info"></i>
-
-                        <h3>Grade Legend</h3>
-
-                    </div>
-
-
-                    <div class="legend-list">
-
-                        <div class="legend-item">
-
-                            <span>90 - 100</span>
-
-                            <strong>Outstanding</strong>
-
-                        </div>
-
-                        <div class="legend-item">
-
-                            <span>85 - 89</span>
-
-                            <strong>Very Satisfactory</strong>
-
-                        </div>
-
-                        <div class="legend-item">
-
-                            <span>80 - 84</span>
-
-                            <strong>Satisfactory</strong>
-
-                        </div>
-
-                        <div class="legend-item">
-
-                            <span>75 - 79</span>
-
-                            <strong>Fairly Satisfactory</strong>
-
-                        </div>
-
-                        <div class="legend-item">
-
-                            <span>Below 75</span>
-
-                            <strong>Did Not Meet Expectations</strong>
-
-                        </div>
-
-                    </div>
-
+            <div class="gradebook-footer">
+                <div class="computation-legend">
+                    <strong><i class="fa-solid fa-circle-info"></i> Computation preview</strong>
+                    <p><b>PS</b> = Percentage Score · <b>WS</b> = Weighted Score</p>
+                    <p>WW 20% · PT 50% · EX 30%. The Initial Grade is a preview; official Term Grade and Descriptor are
+                        pending policy validation.</p>
                 </div>
-
-
-                {{-- GRADE NOTE --}}
-                <div class="info-note">
-
-                    <div class="note-icon">
-
-                        <i class="fa-solid fa-lightbulb"></i>
-
-                    </div>
-
-                    <div>
-
-                        <strong>Note</strong>
-
-                        <p>
-                            You can only manage the Final Grade and Remarks for this subject.
-                        </p>
-
-                    </div>
-
+                <div class="gradebook-actions">
+                    <button type="button" class="btn btn-light" id="clearScores">
+                        <i class="fa-solid fa-eraser"></i> Clear scores
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveGradebook">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
                 </div>
-
-
-                {{-- SUBMISSION DEADLINE --}}
-                <div class="deadline-card">
-
-                    <div class="deadline-icon">
-
-                        <i class="fa-solid fa-calendar-check"></i>
-
-                    </div>
-
-                    <div>
-
-                        <strong>Submission Deadline</strong>
-
-                        <p>
-                            October 15, 2026
-                        </p>
-
-                        <small>
-                            Subject to change
-                        </small>
-
-                    </div>
-
-                </div>
-
-            </aside>
-
-        </div>
-
-    </section>
-
+            </div>
+        </section>
+    </div>
 @endsection
-
 
 @section('page-js')
     <script src="{{ asset('js/teacher/grade-management.js') }}"></script>

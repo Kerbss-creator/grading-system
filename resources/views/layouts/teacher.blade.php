@@ -109,18 +109,6 @@
             </p>
 
 
-            <!-- GRADE MANAGEMENT -->
-
-            <a href="/teacher/grades" class="teacher-nav-link
-               {{ request()->is('teacher/grades*') ? 'active' : '' }}">
-
-                <i class="fa-solid fa-chart-column"></i>
-
-                <span>Grade Management</span>
-
-            </a>
-
-
 
             <!-- GRADE SUBMISSION -->
 

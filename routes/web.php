@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
@@ -194,10 +195,25 @@ Route::get('/teacher/classes', function () {
     return view('teacher.classes');
 });
 
-// Teacher Grade Management
-Route::get('/teacher/grades', function () {
-    return view('teacher.grade-management');
-});
+Route::get('/teacher/grade-management', function (Request $request) {
+    $subjectCodes = [
+        'MATH-7' => ['name' => 'Mathematics', 'grade' => 'Grade 7'],
+        'SCI-8'  => ['name' => 'Science', 'grade' => 'Grade 8'],
+        'ENG-9'  => ['name' => 'English', 'grade' => 'Grade 9'],
+        'AP-10'  => ['name' => 'Araling Panlipunan', 'grade' => 'Grade 10'],
+    ];
+
+    $code = $request->query('subject', 'MATH-7');
+
+    abort_unless(isset($subjectCodes[$code]), 404);
+
+    return view('teacher.grade-management', [
+        'subjectCode' => $code,
+        'subjectName' => $subjectCodes[$code]['name'],
+        'gradeLevel' => $subjectCodes[$code]['grade'],
+        'schoolYear' => $request->query('school_year', '2026-2027'),
+    ]);
+})->name('teacher.grade-management');
 
 // Teacher Grade Submission
 Route::get('/teacher/grade-submission', function () {
