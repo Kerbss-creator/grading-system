@@ -177,7 +177,7 @@
                                         ['group' => 'ex', 'max' => 20],
 
                                         // Term Exam
-                                        ['group' => 'ex', 'max' => 40],
+                                        ['group' => 'ex', 'max' => 50],
                                     ] as $assessment)
 
                                     <td class="score-cell">
@@ -205,10 +205,79 @@
             </div>
 
             <div class="summary-view is-hidden" id="summaryGradebook">
-                <div class="summary-empty-icon"><i class="fa-solid fa-chart-column"></i></div>
-                <h3>Summary of Grades</h3>
-                <p>Term 1-3 grades will appear here once term results and the approved grade conversion rules are connected.
-                </p>
+
+                <div class="summary-school-header">
+                    <img src="{{ asset('images/forbesologo.png') }}" alt="Forbes Academy Logo" class="summary-school-logo">
+
+                    <div class="summary-school-title">
+                        <h3>
+                            SUMMARY OF GRADES IN
+                            {{ strtoupper($gradebookSubject) }}
+                            {{ strtoupper($gradebookLevel) }}
+                        </h3>
+                        <p>School Year {{ $gradebookYear }}</p>
+                    </div>
+                </div>
+
+                <div class="summary-table-wrap">
+                    <table class="summary-grades-table">
+                        <thead>
+                            <tr>
+                                <th class="summary-number-column">#</th>
+                                <th class="summary-learner-column">LEARNERS</th>
+                                <th>TERM 1</th>
+                                <th>TERM 2</th>
+                                <th>TERM 3</th>
+                                <th class="summary-final-column">FINAL GRADE</th>
+                                <th class="summary-result-column">DESCRIPTOR</th>
+                                <th class="summary-result-column">REMARK</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse ($learners as $index => $learner)
+                                <tr data-summary-learner-id="{{ $learner['id'] ?? $index + 1 }}">
+                                    <td class="summary-number">
+                                        {{ $index + 1 }}
+                                    </td>
+
+                                    <td class="summary-learner-name">
+                                        {{ $learner['name'] ?? 'Learner' }}
+                                    </td>
+
+                                    <td class="summary-term-grade" data-term="1">—</td>
+                                    <td class="summary-term-grade" data-term="2">—</td>
+                                    <td class="summary-term-grade" data-term="3">—</td>
+
+                                    <td class="summary-final-grade">—</td>
+
+                                    <td class="summary-descriptor">
+                                        <span class="summary-pending">Pending</span>
+                                    </td>
+
+                                    <td class="summary-remark">
+                                        <span class="summary-pending">Pending</span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="summary-no-learners">
+                                        No learners available for this subject.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="summary-footer-note">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>
+                        Term grades, final grades, descriptors, and remarks will appear
+                        when the approved grading computation and saved results are available.
+                    </span>
+                </div>
+
             </div>
 
             <div class="gradebook-footer">
