@@ -332,11 +332,17 @@
 
                         </div>
 
+                        
                         <div class="profile-info">
 
-                            <strong>Adviser</strong>
+                            {{-- DYNAMIC NAME --}}
+                        <strong>
+                            {{ Auth::user()?->name ?? 'Adviser' }}
+                        </strong>
 
-                            <span>Adviser Account</span>
+                        <span>
+                            {{ ucfirst(Auth::user()?->role ?? 'adviser') }} Account
+                        </span>
 
                         </div>
 
@@ -356,13 +362,18 @@
 
                             </div>
 
-                            <div>
+                        <div class="profile-info">
 
-                                <strong>Adviser</strong>
+                            {{-- DYNAMIC NAME --}}
+                            <strong>
+                                {{ Auth::user()?->name ?? 'Adviser' }}
+                            </strong>
 
-                                <span>Adviser Account</span>
+                            <span>
+                                {{ ucfirst(Auth::user()?->role ?? 'adviser') }} Account
+                            </span>
 
-                            </div>
+                        </div>
 
                         </div>
 

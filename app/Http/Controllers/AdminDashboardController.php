@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Models\Announcement;
 
 class AdminDashboardController extends Controller
 {
@@ -32,7 +33,13 @@ class AdminDashboardController extends Controller
         $recentStudents = Student::orderBy('created_at', 'desc')->limit(5)->get();
 
         // Placeholder for pending grades (update when Grades table is created)
-        $pendingGrades = 0; 
+        $pendingGrades = 0;
+
+        $latestAnnouncements = Announcement::latest()
+            ->take(3)
+            ->get();
+
+        $allAnnouncements = Announcement::latest()->get();
 
         return view('admin.dashboard-admin', compact(
             'totalStudents',
@@ -42,7 +49,9 @@ class AdminDashboardController extends Controller
             'totalClasses',
             'studentsByGrade',
             'recentStudents',
-            'pendingGrades'
+            'pendingGrades',
+            'latestAnnouncements',
+            'allAnnouncements'
         ));
     }
 }

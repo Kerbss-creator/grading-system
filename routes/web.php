@@ -10,6 +10,9 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\NotificationController;
 use App\Models\Announcement;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\StudentDashboardController;
+use App\Http\Controllers\FacultyController;
 
 // Route::get('/login', [AuthController::class,'login']);
 
@@ -46,7 +49,7 @@ Route::middleware('auth')->group(function () {
 // ADMIN ROUTE
 
 // Dashboard
-Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->name('admin.dashboard');
 
 // User Management
@@ -79,9 +82,19 @@ Route::get('/admin/teachers', [TeacherController::class, 'index'])
 
     
 // FACULTY MANAGEMENT
-Route::get('/admin/faculty-management', function () {
-    return view('admin.faculty-management');
-})->name('admin.faculty-management');
+
+ // FACULTY MANAGEMENT
+Route::get('/admin/faculty-management', [FacultyController::class, 'index'])
+    ->name('admin.faculty-management');
+
+Route::post('/admin/faculty-management', [FacultyController::class, 'store'])
+    ->name('admin.faculty.store');
+
+Route::put('/admin/faculty-management/{id}', [FacultyController::class, 'update'])
+    ->name('admin.faculty.update');
+
+Route::delete('/admin/faculty-management/{id}', [FacultyController::class, 'destroy'])
+    ->name('admin.faculty.destroy');
 
 // ================================================//
 
@@ -181,13 +194,11 @@ Route::get('/admin/settings', function () {
 
 
 
-
-
-
 // TEACHERS ROUTE
 
 // Dashboard
 Route::get('/teacher/dashboard', [DashboardController::class, 'teacher'])
+    ->middleware('auth')
     ->name('teacher.dashboard');
 
 // Teacher Classes
@@ -251,12 +262,13 @@ Route::get('/teacher/settings', function () {
 // ADVISER
 
 Route::get('/adviser/dashboard', [DashboardController::class, 'adviser'])
+    ->middleware('auth')
     ->name('adviser.dashboard');
 
 // ADVISER CLASSES PAGE
-Route::get('adviser/classes', function () {
+Route::get('/adviser/classes', function () {
     return view('adviser.classes');
-})->name('classes');
+})->name('adviser.classes');
 
 // MY STUDENTS
 Route::get('adviser/students', function () {
@@ -299,7 +311,8 @@ Route::get('/adviser/settings', function () {
 // STUDENTS ROUTE
 
 // STUDENT DASHBOARD
-Route::get('/student/dashboard', [DashboardController::class, 'student'])
+
+Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
     ->name('student.dashboard');
 
 // STUDENT GRADES ROUTE

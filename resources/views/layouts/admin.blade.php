@@ -45,50 +45,39 @@
 
         {{-- NAVIGATION --}}
         <nav class="navigation">
-
             <p class="nav-title">MAIN</p>
-
             {{-- DASHBOARD --}}
             <a href="{{ url('/admin/dashboard') }}"
                 class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                 <i class="fa-solid fa-gauge"></i>
                 <span>Dashboard</span>
             </a>
-
             {{-- USERS DROPDOWN --}}
-            <div
-                class="dropdown {{ request()->is('admin/users*') || request()->is('admin/admins*') || request()->is('admin/advisers*') || request()->is('admin/teachers*') || request()->is('admin/students*') || request()->is('admin/faculty-management*') ? 'active' : '' }}">
-
+            <div class="dropdown {{ request()->is('admin/users*') || request()->is('admin/admins*') || request()->is('admin/advisers*') || request()->is('admin/teachers*') || request()->is('admin/students*') || request()->is('admin/faculty-management*') ? 'active' : '' }}">
                 <a href="#" class="nav-link dropdown-toggle">
                     <i class="fa-solid fa-users"></i>
                     <span>Users</span>
                     <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
                 </a>
-
                 <div class="dropdown-menu">
-
                     <a href="/admin/users" class="dropdown-link {{ request()->is('admin/users*') ? 'active' : '' }}">
                         <i class="fa-solid fa-users-gear"></i>
                         <span>User Management</span>
                     </a>
-
                     <a href="/admin/admins" class="dropdown-link {{ request()->is('admin/admins*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-shield"></i>
                         <span>Admin</span>
                     </a>
-
                     <a href="/admin/faculty-management"
                         class="dropdown-link {{ request()->is('admin/faculty-management*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-tie"></i>
                         <span>Faculty</span>
                     </a>
-
                     <a href="/admin/students"
                         class="dropdown-link {{ request()->is('admin/students*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-graduate"></i>
                         <span>Students</span>
                     </a>
-
                 </div>
             </div>
 

@@ -23,7 +23,7 @@
 
                 <span>FORBES ACADEMY</span>
 
-                <h2>Welcome back, Teacher!</h2>
+                <h2>Welcome {{ Auth::user()?->name ?? 'Teacher' }}!</h2>
 
                 <p>
                     Manage your classes, grades, and academic records

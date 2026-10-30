@@ -14,72 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const grades = ["Grade 7", "Grade 8", "Grade 9", "Grade 10"];
 
     // DEMO DATA ONLY — records are not saved to the database.
-    let facultyRecords = [
-        {
-            id: 1,
-            facultyId: "FAC-001",
-            firstName: "Maria",
-            middleName: "Dela",
-            lastName: "Santos",
-            email: "maria.santos@example.com",
-            teacher: true,
-            adviser: true,
-            advisoryGrade: "Grade 7",
-            status: "Active",
-            assignments: [
-                { grade: "Grade 7", subject: "English" },
-                { grade: "Grade 8", subject: "English" },
-                { grade: "Grade 9", subject: "English" },
-            ],
-        },
-        {
-            id: 2,
-            facultyId: "FAC-002",
-            firstName: "Juan",
-            middleName: "",
-            lastName: "Reyes",
-            email: "juan.reyes@example.com",
-            teacher: true,
-            adviser: false,
-            advisoryGrade: "",
-            status: "Active",
-            assignments: [
-                { grade: "Grade 7", subject: "Mathematics" },
-                { grade: "Grade 8", subject: "Mathematics" },
-            ],
-        },
-        {
-            id: 3,
-            facultyId: "FAC-003",
-            firstName: "Ana",
-            middleName: "Lopez",
-            lastName: "Cruz",
-            email: "ana.cruz@example.com",
-            teacher: true,
-            adviser: true,
-            advisoryGrade: "Grade 9",
-            status: "Active",
-            assignments: [
-                { grade: "Grade 9", subject: "Science" },
-                { grade: "Grade 10", subject: "Science" },
-            ],
-        },
-        {
-            id: 4,
-            facultyId: "FAC-004",
-            firstName: "Pedro",
-            middleName: "",
-            lastName: "Garcia",
-            email: "pedro.garcia@example.com",
-            teacher: false,
-            adviser: true,
-            advisoryGrade: "Grade 10",
-            status: "Inactive",
-            assignments: [],
-        },
-    ];
+// Load faculty records from Laravel database.
+    let facultyRecords = (window.facultyData || []).map((record) => ({
+        ...record,
+        assignments: record.assignments || [],
+    }));
 
-    let nextRecordId = 5;
     let editingRecordId = null;
     let deletingRecordId = null;
 
@@ -439,27 +379,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Show or hide fields based on the selected responsibilities.
+
     function updateResponsibilityFields() {
-        if (teachingSection && teacherCheckbox) {
-            teachingSection.hidden = !teacherCheckbox.checked;
-        }
-
-        if (advisorySection && adviserCheckbox) {
-            advisorySection.hidden = !adviserCheckbox.checked;
-        }
-
-        if (assignmentsList && teacherCheckbox) {
-            assignmentsList.querySelectorAll("select").forEach((select) => {
-                select.required = teacherCheckbox.checked;
-            });
-        }
-
-        const advisoryGrade = document.getElementById("advisoryGrade");
-
-        if (advisoryGrade && adviserCheckbox) {
-            advisoryGrade.required = adviserCheckbox.checked;
-        }
+    if (teachingSection && teacherCheckbox) {
+        teachingSection.hidden = !teacherCheckbox.checked;
     }
+
+    if (advisorySection && adviserCheckbox) {
+        advisorySection.hidden = !adviserCheckbox.checked;
+    }
+
+    if (assignmentsList && teacherCheckbox) {
+        assignmentsList.querySelectorAll("select").forEach((select) => {
+            select.required = teacherCheckbox.checked;
+        });
+    }
+
+    const advisoryGrade = document.getElementById("advisoryGrade");
+
+    if (advisoryGrade && adviserCheckbox) {
+        advisoryGrade.required = adviserCheckbox.checked;
+    }
+}
+
 
     // Reset the Add/Edit form.
     function resetForm() {
@@ -507,9 +449,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         teacherCheckbox.checked = record.teacher;
         adviserCheckbox.checked = record.adviser;
-
-        document.getElementById("advisoryGrade").value =
-            record.advisoryGrade || "";
 
         assignmentsList.innerHTML = "";
 
@@ -666,13 +605,12 @@ document.addEventListener("DOMContentLoaded", () => {
     adviserCheckbox.addEventListener("change", updateResponsibilityFields);
 
     // Save new or edited demo record.
-    form.addEventListener("submit", (event) => {
+
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         if (!teacherCheckbox.checked && !adviserCheckbox.checked) {
-            alert(
-                "Please select at least one responsibility: Teacher or Adviser.",
-            );
+            alert("Please select Teacher, Adviser, or both.");
             return;
         }
 
@@ -682,122 +620,107 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const facultyId = document.getElementById("facultyId").value.trim();
         const email = document.getElementById("facultyEmail").value.trim();
+        const advisoryGrade = document.getElementById("advisoryGrade").value;
 
-        const duplicateId = facultyRecords.some(
-            (record) =>
-                record.facultyId.toLowerCase() === facultyId.toLowerCase() &&
-                record.id !== editingRecordId,
-        );
-
-        if (duplicateId) {
-            alert(
-                "This Faculty ID is already in use. Please enter a unique Faculty ID.",
-            );
-
-            document.getElementById("facultyId").focus();
-            return;
-        }
-
-        const duplicateEmail = facultyRecords.some(
-            (record) =>
-                record.email.toLowerCase() === email.toLowerCase() &&
-                record.id !== editingRecordId,
-        );
-
-        if (duplicateEmail) {
-            alert("This email address is already in use.");
-            document.getElementById("facultyEmail").focus();
-            return;
-        }
-
-        const recordData = {
-            facultyId,
-            firstName: document.getElementById("facultyFirstName").value.trim(),
-            middleName: document
-                .getElementById("facultyMiddleName")
-                .value.trim(),
-            lastName: document.getElementById("facultyLastName").value.trim(),
-            email,
-            teacher: teacherCheckbox.checked,
-            adviser: adviserCheckbox.checked,
-            advisoryGrade: adviserCheckbox.checked
-                ? document.getElementById("advisoryGrade").value
-                : "",
-            status: document.getElementById("facultyStatus").value,
-            assignments,
-        };
-
-        if (recordData.adviser && !recordData.advisoryGrade) {
+        if (adviserCheckbox.checked && !advisoryGrade) {
             alert("Please select the advisory grade level.");
             document.getElementById("advisoryGrade").focus();
             return;
         }
 
-        if (editingRecordId !== null) {
-            const index = facultyRecords.findIndex(
-                (record) => record.id === editingRecordId,
-            );
+        const recordData = {
+            faculty_id: facultyId,
+            first_name: document.getElementById("facultyFirstName").value.trim(),
+            middle_name: document.getElementById("facultyMiddleName").value.trim(),
+            last_name: document.getElementById("facultyLastName").value.trim(),
+            email: email,
+            status: document.getElementById("facultyStatus").value.toLowerCase(),
+            teacher: teacherCheckbox.checked,
+            adviser: adviserCheckbox.checked,
+            assignments: teacherCheckbox.checked
+                ? assignments.map((item) => ({
+                    grade_level: item.grade,
+                    subject: item.subject,
+                }))
+                : [],
+            advisory_grade: adviserCheckbox.checked ? advisoryGrade : "",
+            school_year: "",
+        };
 
-            if (index !== -1) {
-                facultyRecords[index] = {
-                    ...facultyRecords[index],
-                    ...recordData,
-                };
-            }
-        } else {
-            facultyRecords.push({
-                id: nextRecordId++,
-                ...recordData,
-            });
+        const isEditing = editingRecordId !== null;
+        const url = isEditing
+            ? `/admin/faculty-management/${editingRecordId}`
+            : "/admin/faculty-management";
+
+        const method = isEditing ? "PUT" : "POST";
+
+        const csrfToken = form.querySelector('input[name="_token"]')?.value;
+
+        if (!csrfToken) {
+            alert("CSRF token not found. Check that @csrf is inside the form.");
+            return;
         }
 
-        const wasEditing = editingRecordId !== null;
-
-        closeModal(formModal);
-        resetForm();
-        renderTable();
-
-        alert(
-            wasEditing
-                ? "Faculty updated in demo mode."
-                : "Faculty added in demo mode.",
+        const saveButton = form.querySelector(
+            'button[type="submit"], input[type="submit"]'
         );
+
+        if (saveButton) saveButton.disabled = true;
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify(recordData),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                const validationMessages = result.errors
+                    ? Object.values(result.errors).flat().join("\n")
+                    : result.message || "Unable to save faculty.";
+
+                alert(validationMessages);
+                return;
+            }
+
+            alert(result.message || "Faculty saved successfully.");
+
+            closeModal(formModal);
+            window.location.reload();
+        } catch (error) {
+            console.error("Faculty save error:", error);
+            alert("Unable to connect to the server. Check the browser console and Laravel log.");
+        } finally {
+            if (saveButton) saveButton.disabled = false;
+        }
     });
 
-    // Table actions: View, Edit, Toggle Status, Delete.
+    // Handle View, Edit, Toggle, and Delete buttons.
     tableBody.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-action]");
+        const button = event.target.closest("button[data-action]");
 
         if (!button) return;
 
         const id = Number(button.dataset.id);
         const action = button.dataset.action;
 
-        const record = facultyRecords.find((item) => item.id === id);
-
-        if (!record) return;
+        console.log("Faculty action:", action, "ID:", id);
 
         if (action === "view") {
             openViewModal(id);
-        }
-
-        if (action === "edit") {
+        } else if (action === "edit") {
             openEditForm(id);
-        }
-
-        if (action === "toggle") {
-            record.status = record.status === "Active" ? "Inactive" : "Active";
-
-            renderTable();
-        }
-
-        if (action === "delete") {
+        } else if (action === "delete") {
             deletingRecordId = id;
-
-            document.getElementById("deleteFacultyMessage").textContent =
-                `Are you sure you want to delete ${fullName(record)} (${record.facultyId})?`;
-
             openModal(deleteModal);
+        } else if (action === "toggle") {
+            toggleFacultyStatus(id);
         }
     });
 
@@ -805,19 +728,57 @@ document.addEventListener("DOMContentLoaded", () => {
     const confirmDeleteBtn = document.getElementById("confirmDeleteFaculty");
 
     if (confirmDeleteBtn) {
-        confirmDeleteBtn.addEventListener("click", () => {
+        confirmDeleteBtn.addEventListener("click", async () => {
             if (deletingRecordId === null) return;
 
-            facultyRecords = facultyRecords.filter(
-                (record) => record.id !== deletingRecordId,
-            );
+            const id = deletingRecordId;
+            const csrfToken = form.querySelector('input[name="_token"]')?.value;
 
-            deletingRecordId = null;
+            if (!csrfToken) {
+                alert("CSRF token not found. Please check the form's @csrf.");
+                return;
+            }
 
-            closeModal(deleteModal);
-            renderTable();
+            confirmDeleteBtn.disabled = true;
+
+            try {
+                const response = await fetch(
+                    `/admin/faculty-management/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": csrfToken,
+                        },
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert(result.message || "Unable to delete faculty.");
+                    return;
+                }
+
+                // Remove from the visible list only after database deletion succeeds.
+                facultyRecords = facultyRecords.filter(
+                    (record) => Number(record.id) !== Number(id)
+                );
+
+                deletingRecordId = null;
+                closeModal(deleteModal);
+                renderTable();
+
+                alert(result.message || "Faculty deleted successfully.");
+            } catch (error) {
+                console.error("Faculty delete error:", error);
+                alert("Unable to connect to the server. The faculty record was not confirmed deleted.");
+            } finally {
+                confirmDeleteBtn.disabled = false;
+            }
         });
     }
+
 
     // Search and filters.
     if (searchInput) {
