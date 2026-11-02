@@ -1,0 +1,778 @@
+/* BACK BUTTON */
+.grade-management-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 16px;
+    background-color: #036f35;
+    color: #ffffff;
+    text-decoration: none;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.back-button:hover {
+    background-color: #025c2c;
+    color: #ffffff;
+    transform: translateX(-2px);
+}
+
+.back-button:focus-visible {
+    outline: 2px solid #036f35;
+    outline-offset: 3px;
+}
+
+/* Forbes Academy — Teacher Grading Sheet UI */
+:root {
+    --grade-green: #036f35;
+    --grade-green-dark: #025c2c;
+    --grade-text: #18332a;
+    --grade-muted: #6b7d75;
+    --grade-border: #dce8e1;
+    --grade-surface: #ffffff;
+    --grade-page: #f5f8f6;
+    --grade-blue: #eaf3ff;
+    --grade-purple: #f1edff;
+    --grade-teal: #e8f7f1;
+    --grade-shadow: 0 8px 24px rgba(24, 62, 42, 0.06);
+}
+
+.gradebook-page {
+    color: var(--grade-text);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.gradebook-overview {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(270px, 0.95fr) minmax(
+            230px,
+            1fr
+        );
+    gap: 22px;
+    align-items: center;
+    padding: 22px;
+    background: var(--grade-surface);
+    border: 1px solid var(--grade-border);
+    border-radius: 16px;
+    box-shadow: var(--grade-shadow);
+}
+
+.gradebook-subject {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+}
+
+.gradebook-subject-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 58px;
+    height: 58px;
+    border-radius: 16px;
+    color: var(--grade-green);
+    background: #e7f6ec;
+    font-size: 25px;
+}
+
+.subject-title-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.subject-title-line h2 {
+    margin: 0;
+    color: #18382a;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.subject-code {
+    padding: 5px 9px;
+    color: var(--grade-green);
+    background: #eaf7ee;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.gradebook-subject p {
+    margin: 8px 0 0;
+    color: var(--grade-muted);
+    font-size: 13px;
+}
+
+.meta-dot {
+    padding: 0 5px;
+}
+
+.gradebook-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.gradebook-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.gradebook-filter label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #52685d;
+}
+
+.gradebook-filter select {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    color: var(--grade-text);
+    background: #fff;
+    border: 1px solid var(--grade-border);
+    border-radius: 9px;
+    font: inherit;
+    font-size: 13px;
+}
+
+.gradebook-filter select:focus,
+.score-input:focus {
+    outline: 2px solid rgba(3, 111, 53, 0.18);
+    border-color: var(--grade-green);
+}
+
+.policy-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 14px;
+    border: 1px solid #dce8fb;
+    border-radius: 12px;
+    color: #101010;
+    background: #c6f9d5;
+    font-size: 12px;
+}
+
+.policy-note > i {
+    margin-top: 2px;
+    font-size: 17px;
+}
+
+.policy-note strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.policy-note p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.gradebook-tabs-card {
+    min-width: 0;
+    background: var(--grade-surface);
+    border: 1px solid var(--grade-border);
+    border-radius: 16px;
+    box-shadow: var(--grade-shadow);
+    overflow: hidden;
+}
+
+.gradebook-tabs {
+    display: flex;
+    gap: 5px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--grade-border);
+    overflow-x: auto;
+}
+
+.gradebook-tab {
+    flex: 0 0 auto;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 9px;
+    color: #53695d;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        color 0.22s ease,
+        background 0.22s ease,
+        transform 0.22s ease;
+}
+
+.gradebook-tab:hover {
+    color: var(--grade-green);
+    background: #f0f8f2;
+}
+
+.gradebook-tab.is-active {
+    color: #fff;
+    background: var(--grade-green);
+    box-shadow: 0 5px 12px rgba(3, 111, 53, 0.16);
+}
+
+.gradebook-tab:focus-visible,
+.btn:focus-visible {
+    outline: 3px solid rgba(3, 111, 53, 0.24);
+    outline-offset: 2px;
+}
+
+.gradebook-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 20px;
+}
+
+.gradebook-toolbar h3 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    color: #18382a;
+}
+
+.gradebook-toolbar p {
+    margin: 0;
+    color: var(--grade-muted);
+    font-size: 12px;
+}
+
+.gradebook-table-wrap {
+    width: 100%;
+    overflow: auto;
+    border-top: 1px solid var(--grade-border);
+    border-bottom: 1px solid var(--grade-border);
+}
+
+.gradebook-table {
+    width: 100%;
+    min-width: 1450px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+}
+
+.gradebook-table th,
+.gradebook-table td {
+    padding: 9px 8px;
+    text-align: center;
+    border-right: 1px solid #e5eee8;
+    border-bottom: 1px solid #e5eee8;
+    white-space: nowrap;
+}
+
+.gradebook-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    color: #304c3d;
+    background: #f7faf8;
+    font-weight: 700;
+}
+
+.gradebook-table thead tr:first-child th {
+    height: 48px;
+}
+
+.gradebook-table thead tr:nth-child(2) th {
+    top: 48px;
+    height: 48px;
+}
+
+.gradebook-table th span {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.gradebook-table th small {
+    display: block;
+    margin-top: 5px;
+    color: #718379;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.gradebook-table .col-number {
+    width: 42px;
+    min-width: 42px;
+}
+
+.gradebook-table .col-learner {
+    position: sticky;
+    left: 0;
+    z-index: 4;
+    min-width: 185px;
+    text-align: left;
+    background: #f7faf8;
+}
+
+.gradebook-table tbody .learner-name {
+    position: sticky;
+    left: 42px;
+    z-index: 1;
+    min-width: 185px;
+    text-align: left;
+    color: #2c4437;
+    background: #fff;
+    font-weight: 600;
+}
+
+.gradebook-table .row-number {
+    color: #7c8d83;
+    background: #fbfdfb;
+}
+
+.group-ww {
+    background: #ffe8c2 !important;
+}
+
+.group-pt {
+    background: #9eb7e5 !important;
+}
+
+.group-ex {
+    background: #bdd2a6 !important;
+}
+
+.assessment-heading {
+    min-width: 82px;
+}
+
+.computed-heading {
+    min-width: 74px;
+    background: #f3f7f4 !important;
+}
+
+.initial-heading {
+    background: #e8f4ed !important;
+}
+
+.gradebook-table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.gradebook-table tbody tr:hover td {
+    background-color: #f4faf6;
+}
+
+.gradebook-table tbody tr:hover .learner-name {
+    background: #f4faf6;
+}
+
+.gradebook-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.score-cell {
+    background: #fff;
+}
+
+.score-input {
+    width: 66px;
+    max-width: 100%;
+    padding: 8px 5px;
+    color: #243d30;
+    text-align: center;
+    background: #fff;
+    border: 1px solid #d8e5dc;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 12px;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.score-input:invalid,
+.score-input.is-invalid {
+    border-color: #d92d20;
+    background: #fff3f2;
+}
+
+.computed-cell {
+    background: #fbfdfb;
+    font-variant-numeric: tabular-nums;
+}
+
+.ww-ps,
+.ww-ws {
+    background: #f0f6ff !important;
+}
+
+.pt-ps,
+.pt-ws {
+    background: #effaf4 !important;
+}
+
+.ex-ps,
+.ex-ws {
+    background: #f6f3ff !important;
+}
+
+.initial-grade {
+    color: #075e32;
+    background: #edf8f0 !important;
+    font-weight: 800;
+}
+
+.status-pending {
+    display: inline-block;
+    padding: 5px 8px;
+    color: #6b7280;
+    background: #f0f2f1;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.gradebook-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 20px;
+}
+
+.computation-legend {
+    min-width: 0;
+}
+
+.computation-legend strong {
+    color: var(--grade-green);
+    font-size: 12px;
+}
+
+.computation-legend p {
+    margin: 7px 0 0;
+    color: #62766a;
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+.computation-legend .unsaved-note {
+    color: #9a5b0a;
+    font-weight: 700;
+}
+
+.gradebook-actions,
+.gradebook-toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-light {
+    color: #405b4b;
+    background: #fff;
+    border-color: var(--grade-border);
+}
+
+.btn-light:hover {
+    color: var(--grade-green);
+    border-color: #b7d6c1;
+    background: #f7fbf8;
+}
+
+.btn-primary {
+    color: #fff;
+    background: var(--grade-green);
+    border-color: var(--grade-green);
+}
+
+.btn-primary:hover {
+    background: var(--grade-green-dark);
+    border-color: var(--grade-green-dark);
+}
+
+.summary-view {
+    min-height: 330px;
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.summary-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 15px;
+    border-radius: 18px;
+    color: var(--grade-green);
+    background: #e9f7ee;
+    font-size: 25px;
+}
+
+.summary-view h3 {
+    margin: 0 0 8px;
+    color: #1d3b2b;
+}
+
+.summary-view p {
+    max-width: 480px;
+    margin: 0 auto;
+    color: var(--grade-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+/* =========================================
+   SUMMARY OF GRADES
+========================================= */
+
+.summary-view {
+    width: 100%;
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+.summary-school-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid #e8eee9;
+}
+
+.summary-school-logo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.summary-school-title {
+    flex: 1;
+    text-align: center;
+    padding-right: 72px;
+}
+
+.summary-school-title h3 {
+    margin: 0 0 6px;
+    color: #222222;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.summary-school-title p {
+   
+    color: #555555;
+    font-size: 13px;
+}
+
+.summary-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #222222;
+}
+
+.summary-grades-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    color: #222222;
+    background: #ffffff;
+    font-size: 13px;
+}
+
+.summary-grades-table th,
+.summary-grades-table td {
+    padding: 10px 12px;
+    border: 1px solid #222222;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.summary-grades-table thead th {
+    background: #ffffff;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.summary-grades-table .summary-number-column {
+    width: 42px;
+}
+
+.summary-grades-table .summary-learner-column {
+    min-width: 190px;
+    text-align: left;
+}
+
+.summary-grades-table .summary-final-column {
+    min-width: 105px;
+    background: #eaf5ed;
+}
+
+.summary-grades-table .summary-result-column {
+    min-width: 120px;
+}
+
+.summary-grades-table tbody tr:hover {
+    background: #f5faf6;
+}
+
+.summary-grades-table .summary-number {
+    background: #f4f8f4;
+}
+
+.summary-grades-table .summary-learner-name {
+    text-align: left;
+    font-weight: 500;
+}
+
+.summary-grades-table .summary-final-grade {
+    background: #f0f8f1;
+    font-weight: 700;
+}
+
+.summary-grades-table .summary-pending {
+    color: #777777;
+    font-size: 12px;
+}
+
+.summary-grades-table .summary-no-learners {
+    padding: 28px;
+    color: #777777;
+}
+
+.summary-footer-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #f3f8f4;
+    border-left: 4px solid #036f35;
+    border-radius: 4px;
+    color: #555555;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.summary-footer-note i {
+    margin-top: 3px;
+    color: #036f35;
+}
+
+@media (max-width: 768px) {
+    .summary-view {
+        padding: 14px;
+    }
+
+    .summary-school-header {
+        gap: 10px;
+    }
+
+    .summary-school-logo {
+        width: 52px;
+        height: 52px;
+    }
+
+    .summary-school-title {
+        padding-right: 0;
+    }
+
+    .summary-school-title h3 {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .gradebook-overview {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .policy-note {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 760px) {
+    .gradebook-overview {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .gradebook-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .gradebook-toolbar,
+    .gradebook-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .gradebook-actions {
+        width: 100%;
+    }
+
+    .gradebook-actions .btn {
+        flex: 1;
+    }
+
+    .gradebook-tab {
+        padding: 10px 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gradebook-tab,
+    .gradebook-table tbody tr,
+    .score-input,
+    .btn {
+        transition: none !important;
+    }
+}

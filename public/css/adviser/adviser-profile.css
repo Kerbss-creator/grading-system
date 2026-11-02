@@ -1,0 +1,600 @@
+/* Adviser Profile Page */
+
+.adviser-profile-container {
+    width: 100%;
+    padding: 5px 0 30px;
+    color: #26332c;
+}
+
+.adviser-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px 26px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border: 1px solid #e7ebe8;
+    border-radius: 12px;
+}
+
+.adviser-profile-avatar {
+    width: 76px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #e8f4ed;
+    color: #036f35;
+    font-size: 23px;
+    font-weight: 600;
+}
+
+.adviser-profile-heading {
+    flex: 1;
+    min-width: 180px;
+}
+
+.adviser-profile-heading h2 {
+    margin: 0 0 3px;
+    color: #1d2b24;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.adviser-profile-heading p {
+    margin: 0 0 7px;
+    color: #777f7a;
+    font-size: 13px;
+}
+
+.adviser-profile-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #267a4b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.adviser-profile-status i {
+    font-size: 7px;
+}
+
+.adviser-profile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.adviser-profile-btn {
+    min-height: 38px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 7px;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.adviser-profile-btn.primary {
+    border: 1px solid #036f35;
+    background: #036f35;
+    color: #ffffff;
+}
+
+.adviser-profile-btn.primary:hover {
+    background: #0d5c2d;
+}
+
+.adviser-profile-btn.secondary {
+    border: 1px solid #d9e0dc;
+    background: #ffffff;
+    color: #3f4944;
+}
+
+.adviser-profile-btn.secondary:hover {
+    background: #f5f8f6;
+    border-color: #cbd5cf;
+}
+
+.adviser-profile-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.adviser-profile-card {
+    min-width: 0;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e7ebe8;
+    border-radius: 12px;
+}
+
+.adviser-profile-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 22px;
+    border-bottom: 1px solid #edf0ee;
+}
+
+.adviser-profile-card-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: #e8f4ed;
+    color: #036f35;
+    font-size: 15px;
+}
+
+.adviser-profile-card-icon.account {
+    background: #eef4f0;
+}
+
+.adviser-profile-card-icon.teaching {
+    background: #e8f4ed;
+}
+
+.adviser-profile-card-header h3 {
+    margin: 0 0 2px;
+    color: #26332c;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.adviser-profile-card-header p {
+    margin: 0;
+    color: #8a928d;
+    font-size: 11px;
+}
+
+.adviser-profile-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 6px 22px 18px;
+}
+
+.adviser-profile-info-item {
+    min-width: 0;
+    padding: 14px 10px 12px 0;
+    border-bottom: 1px solid #f0f2f1;
+}
+
+.adviser-profile-info-item:nth-last-child(-n + 2) {
+    border-bottom: none;
+}
+
+.adviser-info-label {
+    display: block;
+    margin-bottom: 4px;
+    color: #929994;
+    font-size: 11px;
+}
+
+.adviser-info-value {
+    display: block;
+    overflow-wrap: anywhere;
+    color: #35413a;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.adviser-profile-info-list {
+    padding: 7px 22px 12px;
+}
+
+.adviser-profile-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #f0f2f1;
+}
+
+.adviser-profile-list-item:last-child {
+    border-bottom: none;
+}
+
+.adviser-list-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #f1f6f3;
+    color: #036f35;
+    font-size: 13px;
+}
+
+.adviser-list-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.adviser-account-active {
+    display: inline-block;
+    color: #28794c;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.adviser-assignment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 22px;
+}
+
+.adviser-assignment-item {
+    min-width: 0;
+    padding: 4px 12px;
+    text-align: center;
+    border-right: 1px solid #edf0ee;
+}
+
+.adviser-assignment-item:first-child {
+    padding-left: 0;
+}
+
+.adviser-assignment-item:last-child {
+    padding-right: 0;
+    border-right: none;
+}
+
+.adviser-assignment-value {
+    display: block;
+    margin-bottom: 5px;
+    color: #036f35;
+    font-size: 20px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.adviser-assignment-label {
+    color: #858d88;
+    font-size: 11px;
+}
+
+/* Modal */
+
+.adviser-profile-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(26, 35, 30, 0.48);
+}
+
+.adviser-profile-modal-overlay.show {
+    display: flex;
+}
+
+.adviser-profile-modal {
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.adviser-profile-modal.password-modal {
+    max-width: 470px;
+}
+
+.adviser-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 21px 23px;
+    border-bottom: 1px solid #edf0ee;
+}
+
+.adviser-modal-header h3 {
+    margin: 0 0 3px;
+    color: #26332c;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.adviser-modal-header p {
+    margin: 0;
+    color: #8a928d;
+    font-size: 11px;
+}
+
+.adviser-modal-close {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 6px;
+    background: #f4f6f5;
+    color: #727a75;
+    cursor: pointer;
+}
+
+.adviser-modal-close:hover {
+    background: #e9eeeb;
+    color: #26332c;
+}
+
+#editProfileForm,
+#changePasswordForm {
+    padding: 21px 23px 23px;
+}
+
+.adviser-modal-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.adviser-form-group {
+    min-width: 0;
+    margin-bottom: 16px;
+}
+
+.adviser-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #4a554f;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.adviser-form-group input {
+    width: 100%;
+    height: 38px;
+    padding: 0 11px;
+    box-sizing: border-box;
+    border: 1px solid #dce2de;
+    border-radius: 7px;
+    outline: none;
+    background: #ffffff;
+    color: #37423c;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.adviser-form-group input:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 2px rgba(3, 111, 53, 0.08);
+}
+
+.adviser-form-group input:disabled {
+    background: #f5f7f6;
+    color: #8a928d;
+    cursor: not-allowed;
+}
+
+.adviser-password-input {
+    position: relative;
+}
+
+.adviser-password-input input {
+    padding-right: 42px;
+}
+
+.adviser-toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #8a928d;
+    cursor: pointer;
+}
+
+.adviser-toggle-password:hover {
+    color: #036f35;
+}
+
+.adviser-password-note,
+.adviser-demo-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 2px 0 16px;
+    padding: 10px 11px;
+    border-radius: 7px;
+    background: #f3f8f5;
+    color: #69746e;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.adviser-password-note i,
+.adviser-demo-note i {
+    margin-top: 2px;
+    color: #036f35;
+}
+
+.adviser-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 3px;
+}
+
+.adviser-modal-btn {
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 7px;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.adviser-modal-btn.cancel {
+    border: 1px solid #dce2de;
+    background: #ffffff;
+    color: #68716c;
+}
+
+.adviser-modal-btn.cancel:hover {
+    background: #f5f7f6;
+}
+
+.adviser-modal-btn.save {
+    border: 1px solid #036f35;
+    background: #036f35;
+    color: #ffffff;
+}
+
+.adviser-modal-btn.save:hover {
+    background: #0d5c2d;
+}
+
+.adviser-modal-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.adviser-profile-toast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 10000;
+    max-width: calc(100vw - 48px);
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: #26332c;
+    color: #ffffff;
+    font-size: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+.adviser-profile-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive layout */
+
+@media (max-width: 1000px) {
+    .adviser-profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .adviser-profile-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .adviser-profile-actions {
+        width: 100%;
+        margin-left: 94px;
+    }
+}
+
+@media (max-width: 700px) {
+    .adviser-profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .adviser-profile-actions {
+        margin-left: 0;
+    }
+
+    .adviser-profile-btn {
+        flex: 1;
+    }
+
+    .adviser-profile-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .adviser-profile-info-item:nth-last-child(-n + 2) {
+        border-bottom: 1px solid #f0f2f1;
+    }
+
+    .adviser-profile-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .adviser-assignment-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .adviser-assignment-item,
+    .adviser-assignment-item:first-child,
+    .adviser-assignment-item:last-child {
+        padding: 0 0 16px;
+        border-right: none;
+        border-bottom: 1px solid #edf0ee;
+    }
+
+    .adviser-assignment-item:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .adviser-modal-form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .adviser-profile-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .adviser-profile-btn {
+        width: 100%;
+    }
+
+    .adviser-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .adviser-modal-btn {
+        width: 100%;
+    }
+
+    .adviser-modal-header,
+    #editProfileForm,
+    #changePasswordForm {
+        padding-left: 17px;
+        padding-right: 17px;
+    }
+}
