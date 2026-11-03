@@ -314,29 +314,51 @@
     font-weight: 500;
 }
 
+/* STICKY FIRST TWO COLUMNS */
 .gradebook-table .col-number {
+    position: sticky;
+    left: 0;
+    z-index: 6;
     width: 42px;
     min-width: 42px;
+    background: #f7faf8;
 }
 
 .gradebook-table .col-learner {
     position: sticky;
-    left: 0;
-    z-index: 4;
+    left: 42px;
+    z-index: 5;
     min-width: 185px;
     text-align: left;
     background: #f7faf8;
 }
 
+.gradebook-table tbody .row-number {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    color: #7c8d83;
+    background: #fbfdfb;
+}
+
 .gradebook-table tbody .learner-name {
     position: sticky;
     left: 42px;
-    z-index: 1;
+    z-index: 3;
     min-width: 185px;
     text-align: left;
     color: #2c4437;
     background: #fff;
     font-weight: 600;
+}
+
+/* Keep sticky cells readable when hovering */
+.gradebook-table tbody tr:hover .row-number {
+    background: #f4faf6;
+}
+
+.gradebook-table tbody tr:hover .learner-name {
+    background: #f4faf6;
 }
 
 .gradebook-table .row-number {
@@ -471,11 +493,6 @@
     line-height: 1.55;
 }
 
-.computation-legend .unsaved-note {
-    color: #9a5b0a;
-    font-weight: 700;
-}
-
 .gradebook-actions,
 .gradebook-toolbar-actions {
     display: flex;
@@ -607,7 +624,6 @@
 }
 
 .summary-school-title p {
-   
     color: #555555;
     font-size: 13px;
 }
@@ -704,6 +720,297 @@
 .summary-footer-note i {
     margin-top: 3px;
     color: #036f35;
+}
+
+/* SCORE INPUT */
+.gradebook-table .score-input {
+    display: block;
+    width: 100%;
+    min-width: 65px;
+    min-height: 36px;
+    padding: 6px;
+    box-sizing: border-box;
+    text-align: center;
+    cursor: cell;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+/* Highlight currently selected score cell */
+.gradebook-table .score-input:focus {
+    outline: 2px solid #036f35;
+    outline-offset: -2px;
+    background-color: #effaf3;
+    border-color: #036f35;
+    position: relative;
+    z-index: 1;
+}
+
+/* Highlight the active input row */
+.gradebook-table .learner-row:focus-within {
+    background-color: #f8fcf9;
+}
+
+/* Invalid score */
+.gradebook-table .score-input.is-invalid {
+    border-color: #dc3545;
+    background-color: #fff1f1;
+}
+
+.gradebook-table .score-input.is-invalid:focus {
+    outline-color: #dc3545;
+}
+
+/* ASSESSMENT SETTINGS MODAL*/
+
+.assessment-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.assessment-modal-overlay.is-hidden {
+    display: none;
+}
+
+.assessment-modal {
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+}
+
+.assessment-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 22px 24px;
+    border-bottom: 1px solid #e8ece9;
+}
+
+.assessment-modal-header h3 {
+    margin: 0 0 5px;
+    color: #173c29;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.assessment-modal-header p {
+    margin: 0;
+    color: #758078;
+    font-size: 13px;
+}
+
+.assessment-modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 7px;
+    background: #f2f5f3;
+    color: #555;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.assessment-modal-body {
+    padding: 22px 24px;
+}
+
+.assessment-fixed-weights {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 13px;
+    border: 1px solid #dcece1;
+    border-radius: 9px;
+    background: #f3faf5;
+    font-size: 12px;
+}
+
+.assessment-fixed-weights strong {
+    width: 100%;
+    color: #245b38;
+    font-size: 13px;
+}
+
+.assessment-fixed-weights span {
+    padding: 5px 9px;
+    border-radius: 5px;
+    background: #fff;
+    color: #245b38;
+    font-weight: 700;
+}
+
+.assessment-setting-row {
+    display: grid;
+    grid-template-columns: 1fr 110px 45px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.assessment-setting-row label {
+    color: #35443a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.assessment-setting-row input {
+    width: 100%;
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid #d9e1dc;
+    border-radius: 7px;
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.assessment-setting-row input:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.1);
+}
+
+.assessment-group-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #53665a;
+}
+
+.assessment-settings-note {
+    margin: 18px 0 0;
+    padding: 12px;
+    border-radius: 7px;
+    background: #f6f7f6;
+    color: #6d786f;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.assessment-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #e8ece9;
+}
+
+@media (max-width: 480px) {
+    .assessment-modal-header,
+    .assessment-modal-body,
+    .assessment-modal-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .assessment-setting-row {
+        grid-template-columns: 1fr 90px 35px;
+        gap: 8px;
+    }
+}
+
+/* Blur Modal */
+.gradebook-page:has(.assessment-modal-overlay:not(.is-hidden))
+    > *:not(#assessmentSettingsModal) {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.assessment-modal-overlay {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+/* WARNING MODAL */
+.warning-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.warning-modal-overlay.is-hidden {
+    display: none;
+}
+
+.warning-modal {
+    width: min(100%, 420px);
+    padding: 28px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.warning-modal-icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: #fff3cd;
+    color: #9a6700;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.warning-modal h3 {
+    margin: 0 0 10px;
+    color: #202124;
+    font-size: 20px;
+}
+
+.warning-modal p {
+    margin: 0;
+    color: #626262;
+    line-height: 1.6;
+}
+
+.warning-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.warning-modal-actions button {
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+}
+
+.warning-cancel-btn {
+    background: #f1f3f5;
+    color: #333;
+}
+
+.warning-confirm-btn {
+    background: #b42318;
+    color: #fff;
 }
 
 @media (max-width: 768px) {

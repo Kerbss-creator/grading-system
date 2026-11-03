@@ -13,8 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const grades = ["Grade 7", "Grade 8", "Grade 9", "Grade 10"];
 
-    // DEMO DATA ONLY — records are not saved to the database.
-// Load faculty records from Laravel database.
+    // Load faculty records from Laravel database.
     let facultyRecords = (window.facultyData || []).map((record) => ({
         ...record,
         assignments: record.assignments || [],
@@ -124,6 +123,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeAllModals() {
         [formModal, viewModal, deleteModal].forEach(closeModal);
+    }
+
+    // Show success state after creating, updating, or deleting faculty.
+    function showSuccessState(title, message) {
+        document.getElementById("facultySuccessModal")?.remove();
+
+        const successModal = document.createElement("div");
+
+        successModal.id = "facultySuccessModal";
+        successModal.className = "faculty-modal-overlay show";
+
+        successModal.setAttribute("aria-hidden", "false");
+
+        successModal.innerHTML = `
+            <div class="faculty-success-modal" role="dialog" aria-modal="true">
+                <div class="faculty-success-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+
+                <h2>${escapeHTML(title)}</h2>
+
+                <p>${escapeHTML(message)}</p>
+
+                <button type="button" id="facultySuccessDone">
+                    Done
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(successModal);
+        document.body.style.overflow = "hidden";
+
+        document
+            .getElementById("facultySuccessDone")
+            .addEventListener("click", () => {
+                window.location.reload();
+            });
     }
 
     function assignmentSummary(record) {
@@ -249,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </td>
 
                         <td>
-                            <span class="faculty-status-badge ${record.status.toLowerCase()}">
+                            <span class="faculty-status-badge ${String(record.status).toLowerCase()}">
                                 ${escapeHTML(record.status)}
                             </span>
                         </td>
@@ -302,7 +338,6 @@ document.addEventListener("DOMContentLoaded", () => {
             )
             .join("");
 
-        // Important: update empty state after rendering rows.
         updateEmptyState(filteredRecords);
         updateSummaryCards();
     }
@@ -378,30 +413,28 @@ document.addEventListener("DOMContentLoaded", () => {
         updateResponsibilityFields();
     }
 
-    // Show or hide fields based on the selected responsibilities.
-
+    // Show or hide fields based on selected responsibilities.
     function updateResponsibilityFields() {
-    if (teachingSection && teacherCheckbox) {
-        teachingSection.hidden = !teacherCheckbox.checked;
+        if (teachingSection && teacherCheckbox) {
+            teachingSection.hidden = !teacherCheckbox.checked;
+        }
+
+        if (advisorySection && adviserCheckbox) {
+            advisorySection.hidden = !adviserCheckbox.checked;
+        }
+
+        if (assignmentsList && teacherCheckbox) {
+            assignmentsList.querySelectorAll("select").forEach((select) => {
+                select.required = teacherCheckbox.checked;
+            });
+        }
+
+        const advisoryGrade = document.getElementById("advisoryGrade");
+
+        if (advisoryGrade && adviserCheckbox) {
+            advisoryGrade.required = adviserCheckbox.checked;
+        }
     }
-
-    if (advisorySection && adviserCheckbox) {
-        advisorySection.hidden = !adviserCheckbox.checked;
-    }
-
-    if (assignmentsList && teacherCheckbox) {
-        assignmentsList.querySelectorAll("select").forEach((select) => {
-            select.required = teacherCheckbox.checked;
-        });
-    }
-
-    const advisoryGrade = document.getElementById("advisoryGrade");
-
-    if (advisoryGrade && adviserCheckbox) {
-        advisoryGrade.required = adviserCheckbox.checked;
-    }
-}
-
 
     // Reset the Add/Edit form.
     function resetForm() {
@@ -433,7 +466,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Open an existing record for editing.
     function openEditForm(id) {
-        const record = facultyRecords.find((item) => item.id === id);
+        const record = facultyRecords.find(
+            (item) => Number(item.id) === Number(id),
+        );
 
         if (!record) return;
 
@@ -472,7 +507,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // View faculty details.
     function openViewModal(id) {
-        const record = facultyRecords.find((item) => item.id === id);
+        const record = facultyRecords.find(
+            (item) => Number(item.id) === Number(id),
+        );
 
         if (!record) return;
 
@@ -604,8 +641,7 @@ document.addEventListener("DOMContentLoaded", () => {
     teacherCheckbox.addEventListener("change", updateResponsibilityFields);
     adviserCheckbox.addEventListener("change", updateResponsibilityFields);
 
-    // Save new or edited demo record.
-
+    // Save new or edited faculty record.
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -630,24 +666,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const recordData = {
             faculty_id: facultyId,
-            first_name: document.getElementById("facultyFirstName").value.trim(),
-            middle_name: document.getElementById("facultyMiddleName").value.trim(),
+            first_name: document
+                .getElementById("facultyFirstName")
+                .value.trim(),
+            middle_name: document
+                .getElementById("facultyMiddleName")
+                .value.trim(),
             last_name: document.getElementById("facultyLastName").value.trim(),
             email: email,
-            status: document.getElementById("facultyStatus").value.toLowerCase(),
+            status: document
+                .getElementById("facultyStatus")
+                .value.toLowerCase(),
             teacher: teacherCheckbox.checked,
             adviser: adviserCheckbox.checked,
             assignments: teacherCheckbox.checked
                 ? assignments.map((item) => ({
-                    grade_level: item.grade,
-                    subject: item.subject,
-                }))
+                      grade_level: item.grade,
+                      subject: item.subject,
+                  }))
                 : [],
             advisory_grade: adviserCheckbox.checked ? advisoryGrade : "",
             school_year: "",
         };
 
         const isEditing = editingRecordId !== null;
+
         const url = isEditing
             ? `/admin/faculty-management/${editingRecordId}`
             : "/admin/faculty-management";
@@ -662,7 +705,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const saveButton = form.querySelector(
-            'button[type="submit"], input[type="submit"]'
+            'button[type="submit"], input[type="submit"]',
         );
 
         if (saveButton) saveButton.disabled = true;
@@ -689,13 +732,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            alert(result.message || "Faculty saved successfully.");
-
+            // Close the form and display the correct success state.
             closeModal(formModal);
-            window.location.reload();
+
+            if (isEditing) {
+                showSuccessState(
+                    "Faculty Updated Successfully!",
+                    result.message ||
+                        "The faculty information has been updated successfully.",
+                );
+            } else {
+                showSuccessState(
+                    "Faculty Created Successfully!",
+                    result.message ||
+                        "The new faculty account has been created successfully.",
+                );
+            }
         } catch (error) {
             console.error("Faculty save error:", error);
-            alert("Unable to connect to the server. Check the browser console and Laravel log.");
+            alert(
+                "Unable to connect to the server. Check the browser console and Laravel log.",
+            );
         } finally {
             if (saveButton) saveButton.disabled = false;
         }
@@ -750,7 +807,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             Accept: "application/json",
                             "X-CSRF-TOKEN": csrfToken,
                         },
-                    }
+                    },
                 );
 
                 const result = await response.json();
@@ -760,25 +817,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                // Remove from the visible list only after database deletion succeeds.
                 facultyRecords = facultyRecords.filter(
-                    (record) => Number(record.id) !== Number(id)
+                    (record) => Number(record.id) !== Number(id),
                 );
 
                 deletingRecordId = null;
                 closeModal(deleteModal);
-                renderTable();
 
-                alert(result.message || "Faculty deleted successfully.");
+                // Display the success modal after successful deletion.
+                showSuccessState(
+                    "Faculty Deleted Successfully!",
+                    result.message ||
+                        "The faculty record has been deleted successfully.",
+                );
             } catch (error) {
                 console.error("Faculty delete error:", error);
-                alert("Unable to connect to the server. The faculty record was not confirmed deleted.");
+                alert(
+                    "Unable to connect to the server. The faculty record was not confirmed deleted.",
+                );
             } finally {
                 confirmDeleteBtn.disabled = false;
             }
         });
     }
-
 
     // Search and filters.
     if (searchInput) {

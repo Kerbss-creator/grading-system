@@ -222,9 +222,9 @@
 
                 <p>
 
-                   @yield(
-                    'header-description',
-                    'Welcome back, ' . (Auth::user()?->name ?? 'Teacher') . '!'
+                    @yield(
+                        'header-description',
+                        'Welcome back, ' . (Auth::user()?->name ?? 'Teacher') . '!'
                     )
 
                 </p>
@@ -334,13 +334,13 @@
                         <div class="profile-info">
 
                             {{-- DYNAMIC NAME --}}
-                        <strong>
-                            {{ Auth::user()?->name ?? 'Guest' }}
-                        </strong>
+                            <strong>
+                                {{ Auth::user()?->name ?? 'Guest' }}
+                            </strong>
 
-                        <span>
-                            {{ ucfirst(Auth::user()?->role ?? 'guest') }} Account
-                        </span>
+                            <span>
+                                {{ ucfirst(Auth::user()?->role ?? 'guest') }} Account
+                            </span>
                         </div>
 
 
@@ -372,11 +372,11 @@
                             <div>
 
                                 <strong>
-                                    {{ Auth::user()->name }}
+                                    {{ Auth::user()?->name ?? 'Teacher' }}
                                 </strong>
 
                                 <span>
-                                    {{ ucfirst(Auth::user()->role) }} Account
+                                    {{ ucfirst(Auth::user()?->role ?? 'teacher') }} Account
                                 </span>
 
                             </div>

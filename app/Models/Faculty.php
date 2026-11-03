@@ -29,7 +29,7 @@ class Faculty extends Model
     public function teachingAssignments(): HasMany
     {
         return $this->hasMany(TeachingAssignment::class);
-    }
+    }   
 
     public function advisoryAssignments(): HasMany
     {

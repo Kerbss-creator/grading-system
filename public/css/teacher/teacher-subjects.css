@@ -237,7 +237,29 @@
 .subject-icon.ap {
     background: #b4772c;
 }
+.subject-icon.tle {
+    background: #d97706;
+}
 
+.subject-icon.mapeh {
+    background: #9333ea;
+}
+
+.subject-icon.filipino {
+    background: #c2410c;
+}
+
+.subject-icon.values-education {
+    background: #db2777;
+}
+
+.subject-icon.computer-education {
+    background: #0891b2;
+}
+
+.subject-icon.default {
+    background: #036f35;
+}
 .subject-code {
     display: inline-flex;
     align-items: center;

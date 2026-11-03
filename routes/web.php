@@ -1,39 +1,56 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\AnnouncementController;
-use App\Http\Controllers\NotificationController;
-use App\Models\Announcement;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\StudentDashboardController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Teacher\GradeManagementController;
+use App\Http\Controllers\Teacher\SubjectController;
+use App\Models\Announcement;
 
-// Route::get('/login', [AuthController::class,'login']);
 
-// LOGIN
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATION ROUTES
+|--------------------------------------------------------------------------
+*/
+
+// Login
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
+
 Route::post('/login', [AuthController::class, 'login'])
     ->name('login.submit');
 
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->name('logout');
-
-// RESET PASSWORD
+// Forgot Password
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->name('password.request');
 
+// Logout
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
 
-// NOTIFICATION ACTIONS
-Route::middleware('auth')->group(function () {
+
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATED SHARED ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
+
+    // Notifications
     Route::patch(
         '/notifications/{id}/read',
         [NotificationController::class, 'markAsRead']
@@ -43,296 +60,365 @@ Route::middleware('auth')->group(function () {
         '/notifications/{id}',
         [NotificationController::class, 'destroy']
     )->name('notifications.destroy');
+
 });
 
 
-// ADMIN ROUTE
+/*
+|--------------------------------------------------------------------------
+| ADMIN ROUTES
+|--------------------------------------------------------------------------
+*/
 
-// Dashboard
-Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
-    ->name('admin.dashboard');
+Route::middleware(['auth', 'school.role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-// User Management
-Route::get('/admin/users', function () {
-    return view('admin.user-management');
-});
+        // Dashboard
+        Route::get(
+            '/dashboard',
+            [AdminDashboardController::class, 'index']
+        )->name('dashboard');
 
-// ================================================//
 
-// STUDENT MANAGEMENT
-Route::get('/admin/students', [StudentController::class, 'index'])
-    ->name('admin.students.index');
+        // User Management
+        Route::get('/users', function () {
+            return view('admin.user-management');
+        })->name('users.index');
 
-Route::post('/admin/students', [StudentController::class, 'store'])
-    ->name('admin.students.store');
 
-Route::put('/admin/students/{id}', [StudentController::class, 'update'])
-    ->name('admin.students.update');
+        // Admin Management
+        Route::get('/admins', function () {
+            return view('admin.admin-management');
+        })->name('management');
 
-Route::delete('/admin/students/{id}', [StudentController::class, 'destroy'])
-    ->name('admin.students.destroy');
 
-Route::patch('/admin/students/{id}/toggle-status', [StudentController::class, 'toggleStatus'])
-    ->name('admin.students.toggleStatus');
+        /*
+        |--------------------------------------------------------------------------
+        | STUDENT MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
 
+        Route::get('/students', [StudentController::class, 'index'])
+            ->name('students.index');
 
-// Teacher Management
-Route::get('/admin/teachers', [TeacherController::class, 'index'])
-    ->name('admin.teachers');
+        Route::post('/students', [StudentController::class, 'store'])
+            ->name('students.store');
 
-    
-// FACULTY MANAGEMENT
+        Route::put('/students/{id}', [StudentController::class, 'update'])
+            ->name('students.update');
 
- // FACULTY MANAGEMENT
-Route::get('/admin/faculty-management', [FacultyController::class, 'index'])
-    ->name('admin.faculty-management');
+        Route::delete('/students/{id}', [StudentController::class, 'destroy'])
+            ->name('students.destroy');
 
-Route::post('/admin/faculty-management', [FacultyController::class, 'store'])
-    ->name('admin.faculty.store');
+        Route::patch(
+            '/students/{id}/toggle-status',
+            [StudentController::class, 'toggleStatus']
+        )->name('students.toggleStatus');
 
-Route::put('/admin/faculty-management/{id}', [FacultyController::class, 'update'])
-    ->name('admin.faculty.update');
 
-Route::delete('/admin/faculty-management/{id}', [FacultyController::class, 'destroy'])
-    ->name('admin.faculty.destroy');
+        /*
+        |--------------------------------------------------------------------------
+        | TEACHER MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
 
-// ================================================//
+        Route::get('/teachers', [TeacherController::class, 'index'])
+            ->name('teachers');
 
-// Admin Management
-Route::get('/admin/admins', function () {
-    return view('admin.admin-management');
-})->name('admin.management');
 
-// ================================================//
+        /*
+        |--------------------------------------------------------------------------
+        | FACULTY MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
 
-// Subject Management
-Route::get('/admin/subjects', function () {
-    return view('admin.subject-management');
-});
+        Route::get('/faculty-management', [FacultyController::class, 'index'])
+            ->name('faculty-management');
 
-// Subject Details page
-Route::get('/admin/subject-details', function () {
-    return view('admin.subject-details');
-})->name('admin.subject-details');
+        Route::post('/faculty-management', [FacultyController::class, 'store'])
+            ->name('faculty.store');
 
-// ================================================//
+        Route::put('/faculty-management/{id}', [FacultyController::class, 'update'])
+            ->name('faculty.update');
 
+        Route::delete('/faculty-management/{id}', [FacultyController::class, 'destroy'])
+            ->name('faculty.destroy');
 
 
-// Grade Level
-Route::get('/admin/grade-level', function () {
-    return view('admin.grade-level');
-});
+        /*
+        |--------------------------------------------------------------------------
+        | SUBJECT MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
 
-// GRADE LEVEL DIRECTORY
-Route::get('/admin/grade-level', function () {
-    return view('admin.grade-level');
-});
+        Route::get('/subjects', function () {
+            return view('admin.subject-management');
+        })->name('subjects.index');
 
-// GRADE LEVEL DETAILS - FRONTEND PROTOTYPE
-Route::get('/admin/grade-level/{grade}', function (int $grade) {
-    $studentCounts = [
-        7 => 168,
-        8 => 167,
-        9 => 166,
-        10 => 167,
-    ];
+        Route::get('/subject-details', function () {
+            return view('admin.subject-details');
+        })->name('subject-details');
 
-    abort_unless(array_key_exists($grade, $studentCounts), 404);
 
-    return view('admin.grade-level-details', [
-        'gradeLevel' => 'Grade ' . $grade,
-        'studentCount' => $studentCounts[$grade],
-    ]);
-})->whereNumber('grade');
+        /*
+        |--------------------------------------------------------------------------
+        | GRADE LEVEL MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
 
+        Route::get('/grade-level', function () {
+            return view('admin.grade-level');
+        })->name('grade-level');
 
+        Route::get('/grade-level/{grade}', function (int $grade) {
 
-//===============================================//
-
-
-// Grade Management
-Route::get('/admin/grades', function () {
-    return view('admin.grade-management');
-});
-
-// Grade Approval
-Route::get('/admin/grade-approval', function () {
-    return view('admin.grade-approval');
-});
-
-// Announcements
+            $studentCounts = [
+                7 => 168,
+                8 => 167,
+                9 => 166,
+                10 => 167,
+            ];
 
-// Admin Announcements
-Route::get('/admin/announcement', [
-    AnnouncementController::class,
-    'index'
-])->name('admin.announcement');
-
-//POST ANNOUNCEMENT
-Route::post('/admin/announcement', [
-    AnnouncementController::class,
-    'store'
-])->name('admin.announcement.store');
-
-// UPDATE ANNOUNCEMENT
-Route::put('/admin/announcement/{id}', [
-    AnnouncementController::class,
-    'update'
-])->name('admin.announcement.update');
-
-//DELETE ANNOUNCEMENT
-Route::delete('/admin/announcement/{id}', [
-    AnnouncementController::class,
-    'destroy'
-])->name('admin.announcement.destroy');
+            abort_unless(
+                array_key_exists($grade, $studentCounts),
+                404
+            );
 
-// Settings
-Route::get('/admin/settings', function () {
-    return view('admin.settings');
-});
-
-
-
-// TEACHERS ROUTE
-
-// Dashboard
-Route::get('/teacher/dashboard', [DashboardController::class, 'teacher'])
-    ->middleware('auth')
-    ->name('teacher.dashboard');
-
-// Teacher Classes
-Route::get('/teacher/classes', function () {
-    return view('teacher.classes');
-});
-
-Route::get('/teacher/grade-management', function (Request $request) {
-    $subjectCodes = [
-        'MATH-7' => ['name' => 'Mathematics', 'grade' => 'Grade 7'],
-        'SCI-8'  => ['name' => 'Science', 'grade' => 'Grade 8'],
-        'ENG-9'  => ['name' => 'English', 'grade' => 'Grade 9'],
-        'AP-10'  => ['name' => 'Araling Panlipunan', 'grade' => 'Grade 10'],
-    ];
-
-    $code = $request->query('subject', 'MATH-7');
-
-    abort_unless(isset($subjectCodes[$code]), 404);
-
-    return view('teacher.grade-management', [
-        'subjectCode' => $code,
-        'subjectName' => $subjectCodes[$code]['name'],
-        'gradeLevel' => $subjectCodes[$code]['grade'],
-        'schoolYear' => $request->query('school_year', '2026-2027'),
-    ]);
-})->name('teacher.grade-management');
-
-// Teacher Grade Submission
-Route::get('/teacher/grade-submission', function () {
-    return view('teacher.grade-submission');
-});
-
-// Teacher Subjects
-Route::get('/teacher/subjects', function () {
-    return view('teacher.subjects');
-});
-
-// Teacher Profile
-Route::get('/teacher/profile', function () {
-    return view('teacher.profile');
-});
-
-// Teacher Announcement
-Route::get('/teacher/announcements', function () {
-    $announcements = \App\Models\Announcement::whereIn('audience', [
-        'all',
-        'teachers',
-    ])
-        ->latest()
-        ->get();
-
-    return view('teacher.announcements', compact('announcements'));
-})->name('teacher.announcements');
-
-
-// Teacher Settings
-Route::get('/teacher/settings', function () {
-    return view('teacher.settings');
-})->name('teacher.settings');
-
-// ADVISER
-
-Route::get('/adviser/dashboard', [DashboardController::class, 'adviser'])
-    ->middleware('auth')
-    ->name('adviser.dashboard');
-
-// ADVISER CLASSES PAGE
-Route::get('/adviser/classes', function () {
-    return view('adviser.classes');
-})->name('adviser.classes');
-
-// MY STUDENTS
-Route::get('adviser/students', function () {
-    return view('adviser.students');
-})->name('students');
-
-// ACADEMIC RECORDS
-Route::get('/adviser/academic-records', function () {
-    return view('adviser.academic-records');
-})->name('adviser.academic-records');
-
-
-// GRADE SUBMISSION HISTORY
-Route::get('/adviser/grade-review', function () {
-    return view('adviser.grade-review');
-})->name('adviser.grade-review');
-
-// ANNOUNCEMENT
-Route::get('/adviser/announcements', function () {
-    $announcements = \App\Models\Announcement::whereIn('audience', [
-        'all',
-        'advisers',
-    ])
-        ->latest()
-        ->get();
-
-    return view('adviser.announcements', compact('announcements'));
-})->name('adviser.announcements');
-
-// ADVISER PROFILE
-Route::get('/adviser/profile', function () {
-    return view('adviser.profile');
-});
-
-// ADVISER SETTINGS
-Route::get('/adviser/settings', function () {
-    return view('adviser.settings');
-});
-
-// STUDENTS ROUTE
-
-// STUDENT DASHBOARD
-
-Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
-    ->name('student.dashboard');
-
-// STUDENT GRADES ROUTE
-Route::view('/student/grades', 'student.grades')
-    ->name('student.grades');
-
-// STUDENT ANNOUNCEMENT 
-
-Route::get('/student/announcements', function () {
-    $announcements = \App\Models\Announcement::whereIn('audience', [
-        'all',
-        'students',
-    ])
-        ->latest()
-        ->get();
-
-    return view('student.announcements', compact('announcements'));
-})->name('student.announcements');
-
-
-// STUDENT PROFILE 
-Route::view('/student/profile', 'student.profile')
-    ->name('student.profile');
+            return view('admin.grade-level-details', [
+                'gradeLevel' => 'Grade ' . $grade,
+                'studentCount' => $studentCounts[$grade],
+            ]);
+
+        })->whereNumber('grade')->name('grade-level.details');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GRADE MANAGEMENT
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/grades', function () {
+            return view('admin.grade-management');
+        })->name('grades.index');
+
+        Route::get('/grade-approval', function () {
+            return view('admin.grade-approval');
+        })->name('grade-approval');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ANNOUNCEMENTS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/announcement', [
+            AnnouncementController::class,
+            'index'
+        ])->name('announcement');
+
+        Route::post('/announcement', [
+            AnnouncementController::class,
+            'store'
+        ])->name('announcement.store');
+
+        Route::put('/announcement/{id}', [
+            AnnouncementController::class,
+            'update'
+        ])->name('announcement.update');
+
+        Route::delete('/announcement/{id}', [
+            AnnouncementController::class,
+            'destroy'
+        ])->name('announcement.destroy');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/settings', function () {
+            return view('admin.settings');
+        })->name('settings');
+
+    });
+
+
+/*
+|--------------------------------------------------------------------------
+| TEACHER ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'school.role:teacher'])
+    ->prefix('teacher')
+    ->name('teacher.')
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'teacher'])
+            ->name('dashboard');
+
+
+        // My Classes
+        Route::get('/classes', function () {
+            return view('teacher.classes');
+        })->name('classes');
+
+
+        // Grade Management
+        Route::get('/grade-management', [GradeManagementController::class, 'index'])
+            ->name('grade-management');
+
+
+        // Grade Submission
+        Route::get('/grade-submission', function () {
+            return view('teacher.grade-submission');
+        })->name('grade-submission');
+
+
+        // MY SUBJECTS
+        Route::get('/subjects', [SubjectController::class, 'index'])
+            ->name('subjects');
+
+
+        // Announcements
+        Route::get('/announcements', function () {
+
+            $announcements = Announcement::whereIn('audience', [
+                'all',
+                'teachers',
+            ])->latest()->get();
+
+            return view('teacher.announcements', compact('announcements'));
+
+        })->name('announcements');
+
+
+        // My Profile
+        Route::get('/profile', function () {
+            return view('teacher.profile');
+        })->name('profile');
+
+
+        // Settings
+        Route::get('/settings', function () {
+            return view('teacher.settings');
+        })->name('settings');
+
+    });
+
+
+/*
+|--------------------------------------------------------------------------
+| ADVISER ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'school.role:adviser'])
+    ->prefix('adviser')
+    ->name('adviser.')
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'adviser'])
+            ->name('dashboard');
+
+
+        // Advisory Classes
+        Route::get('/classes', function () {
+            return view('adviser.classes');
+        })->name('classes');
+
+
+        // My Students
+        Route::get('/students', function () {
+            return view('adviser.students');
+        })->name('students');
+
+
+        // Academic Records
+        Route::get('/academic-records', function () {
+            return view('adviser.academic-records');
+        })->name('academic-records');
+
+
+        // Grade Submission History
+        Route::get('/grade-review', function () {
+            return view('adviser.grade-review');
+        })->name('grade-review');
+
+
+        // Announcements
+        Route::get('/announcements', function () {
+
+            $announcements = Announcement::whereIn('audience', [
+                'all',
+                'advisers',
+            ])->latest()->get();
+
+            return view('adviser.announcements', compact('announcements'));
+
+        })->name('announcements');
+
+
+        // My Profile
+        Route::get('/profile', function () {
+            return view('adviser.profile');
+        })->name('profile');
+
+
+        // Settings
+        Route::get('/settings', function () {
+            return view('adviser.settings');
+        })->name('settings');
+
+    });
+
+
+/*
+|--------------------------------------------------------------------------
+| STUDENT ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'school.role:student'])
+    ->prefix('student')
+    ->name('student.')
+    ->group(function () {
+
+        // Dashboard
+        Route::get('/dashboard', [
+            StudentDashboardController::class,
+            'index'
+        ])->name('dashboard');
+
+
+        // Grades
+        Route::view('/grades', 'student.grades')
+            ->name('grades');
+
+
+        // Announcements
+        Route::get('/announcements', function () {
+
+            $announcements = Announcement::whereIn('audience', [
+                'all',
+                'students',
+            ])->latest()->get();
+
+            return view('student.announcements', compact('announcements'));
+
+        })->name('announcements');
+
+
+        // My Profile
+        Route::view('/profile', 'student.profile')
+            ->name('profile');
+
+    });

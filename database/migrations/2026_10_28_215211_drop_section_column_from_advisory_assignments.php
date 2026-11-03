@@ -1,28 +1,15 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
-        Schema::table('advisory_assignments', function (Blueprint $table) {
-            //
-        });
+        // Keep the section column for advisory assignments.
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('advisory_assignments', function (Blueprint $table) {
-            //
-        });
+        // No changes to reverse.
     }
 };
