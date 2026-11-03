@@ -11,9 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const term = termSelect?.value || "1st-term";
 
         subjectLinks.forEach((link) => {
-            const subjectCode = link.dataset.subjectCode;
+            const assignmentId = link.dataset.assignmentId;
 
-            if (!subjectCode) {
+            if (!assignmentId) {
                 return;
             }
 
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.origin,
             );
 
-            targetUrl.searchParams.set("subject", subjectCode);
+            targetUrl.searchParams.set("assignment", assignmentId);
             targetUrl.searchParams.set("school_year", schoolYear);
             targetUrl.searchParams.set("term", term);
 
@@ -38,6 +38,5 @@ document.addEventListener("DOMContentLoaded", () => {
         termSelect.addEventListener("change", updateSubjectLinks);
     }
 
-    // Set the correct links when the page first loads.
     updateSubjectLinks();
 });

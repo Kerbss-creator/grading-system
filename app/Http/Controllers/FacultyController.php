@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Faculty;
-use Illuminate\Http\Request;
-use App\Models\TeachingAssignment;
-use App\Models\AdvisoryAssignment;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class FacultyController extends Controller
 {
@@ -23,7 +21,6 @@ class FacultyController extends Controller
         return view('admin.faculty-management', compact('faculty'));
     }
 
-    
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -51,19 +48,19 @@ class FacultyController extends Controller
 
         if (!$validated['teacher'] && !$validated['adviser']) {
             return response()->json([
-                'message' => 'Pumili ng Teacher, Adviser, o pareho.',
+                'message' => 'Please select Teacher, Adviser, or both.',
             ], 422);
         }
 
         if ($validated['adviser'] && empty($validated['advisory_grade'])) {
             return response()->json([
-                'message' => 'Kailangan ang advisory grade level.'
+                'message' => 'Please select an advisory grade level.',
             ], 422);
         }
 
         if ($validated['teacher'] && empty($validated['assignments'])) {
             return response()->json([
-                'message' => 'Magdagdag ng kahit isang teaching assignment.',
+                'message' => 'Please add at least one teaching assignment',
             ], 422);
         }
 
@@ -73,6 +70,7 @@ class FacultyController extends Controller
             : ($validated['adviser'] ? 'adviser' : 'teacher');
 
         $faculty = DB::transaction(function () use ($validated, $role) {
+
             // Gumawa ng login account.
             $user = User::create([
                 'name' => trim(
@@ -80,7 +78,9 @@ class FacultyController extends Controller
                     $validated['last_name']
                 ),
                 'email' => $validated['email'],
-                'password' => Hash::make($validated['temporary_password'] ?? 'faculty123'),
+                'password' => Hash::make(
+                    $validated['temporary_password'] ?? 'faculty123'
+                ),
                 'role' => $role,
             ]);
 
@@ -116,7 +116,7 @@ class FacultyController extends Controller
         });
 
         return response()->json([
-            'message' => 'Faculty at login account ay matagumpay na nagawa.',
+            'message' => 'Faculty and login account created successfully.',
             'faculty' => $faculty->load([
                 'teachingAssignments',
                 'advisoryAssignments',
@@ -124,22 +124,26 @@ class FacultyController extends Controller
         ], 201);
     }
 
-
     public function update(Request $request, int $id)
     {
         $faculty = Faculty::findOrFail($id);
 
         $validated = $request->validate([
             'faculty_id' => [
-                'required', 'string', 'max:50',
+                'required',
+                'string',
+                'max:50',
                 Rule::unique('faculty', 'faculty_id')->ignore($faculty->id),
             ],
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => [
-                'required', 'email', 'max:255',
+                'required',
+                'email',
+                'max:255',
                 Rule::unique('faculty', 'email')->ignore($faculty->id),
+                Rule::unique('users', 'email')->ignore($faculty->user_id),
             ],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'teacher' => ['required', 'boolean'],
@@ -153,25 +157,29 @@ class FacultyController extends Controller
 
         if (!$validated['teacher'] && !$validated['adviser']) {
             return response()->json([
-                'message' => 'Pumili ng Teacher, Adviser, o pareho.',
+                'message' => 'Please select Teacher, Adviser, or both.',
             ], 422);
         }
 
         if ($validated['adviser'] && empty($validated['advisory_grade'])) {
             return response()->json([
-                'message' => 'Kailangan ang advisory grade level.'
+                'message' => 'Please select an advisory grade level.',
             ], 422);
         }
 
         if ($validated['teacher'] && empty($validated['assignments'])) {
             return response()->json([
-                'message' => 'Magdagdag ng kahit isang teaching assignment.',
+                'message' => 'Please add at least one teaching assignment.',
             ], 422);
         }
 
-
+        // FIX: Tukuyin muna ang login role bago gamitin sa transaction.
+        $role = $validated['teacher'] && $validated['adviser']
+            ? 'teacher_adviser'
+            : ($validated['adviser'] ? 'adviser' : 'teacher');
 
         DB::transaction(function () use ($faculty, $validated, $role) {
+
             $faculty->update([
                 'faculty_id' => $validated['faculty_id'],
                 'first_name' => $validated['first_name'],
@@ -182,6 +190,7 @@ class FacultyController extends Controller
                 'role' => $role,
             ]);
 
+            // Update linked login account.
             if ($faculty->user) {
                 $faculty->user->update([
                     'name' => trim(
@@ -193,6 +202,7 @@ class FacultyController extends Controller
                 ]);
             }
 
+            // Replace existing assignments with submitted assignments.
             $faculty->teachingAssignments()->delete();
             $faculty->advisoryAssignments()->delete();
 
@@ -214,7 +224,7 @@ class FacultyController extends Controller
         });
 
         return response()->json([
-            'message' => 'Matagumpay na na-update ang faculty.',
+            'message' => 'Faculty updated successfully.',
             'faculty' => $faculty->fresh()->load([
                 'teachingAssignments',
                 'advisoryAssignments',
@@ -225,11 +235,11 @@ class FacultyController extends Controller
     public function destroy(int $id)
     {
         $faculty = Faculty::findOrFail($id);
+
         $faculty->delete();
 
         return response()->json([
-            'message' => 'Matagumpay na na-delete ang faculty.',
+            'message' => 'Faculty deleted successfully.',
         ]);
     }
 }
-

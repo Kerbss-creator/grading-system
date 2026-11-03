@@ -101,7 +101,7 @@
                 <span>English</span>
               </div>
             </td>
-            <td>Grades 7–10</td>
+            <td>Grades 7-10</td>
             <td><span class="status-badge active">Active</span></td>
             <td>
               <button type="button" class="view-btn" data-subject="English" aria-label="View English details"

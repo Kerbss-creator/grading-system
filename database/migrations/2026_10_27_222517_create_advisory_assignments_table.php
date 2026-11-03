@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -17,14 +16,13 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('grade_level');
-            $table->string('section');
 
             $table->string('school_year')->nullable();
 
             $table->timestamps();
 
             $table->unique(
-                ['faculty_id', 'grade_level', 'section', 'school_year'],
+                ['faculty_id', 'grade_level', 'school_year'],
                 'advisory_assignment_unique'
             );
         });

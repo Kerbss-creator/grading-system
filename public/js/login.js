@@ -1,47 +1,34 @@
-// LOGIN
+// =====================================
+// FORBES ACADEMY INTRO
+// =====================================
 
-// const loginBtn = document.getElementById("loginBtn");
-// const loginLoader = document.getElementById("loginLoader");
+const introScreen = document.getElementById("introScreen");
 
-// if (loginBtn) {
-//     loginBtn.addEventListener("click", function () {
+if (introScreen) {
+    window.addEventListener("load", function () {
+        setTimeout(function () {
+            introScreen.classList.add("hide");
+        }, 2500);
+    });
+}
 
-//         // Show loading screen
-//         if (loginLoader) {
-//             loginLoader.classList.add("show");
-//         }
-
-//         // Prevent clicking again
-//         loginBtn.disabled = true;
-
-//         // Go to Laravel dashboard
-//         setTimeout(function () {
-//             window.location.href = "/admin/dashboard";
-//         }, 800);
-
-//     });
-// }
+// =====================================
+// LOGIN LOADING SCREEN
+// =====================================
 
 const loginForm = document.getElementById("loginForm");
 const loginBtn = document.getElementById("loginBtn");
 const loginLoader = document.getElementById("loginLoader");
 
 if (loginForm) {
-
     loginForm.addEventListener("submit", function () {
-
-        // Show loading screen
         if (loginLoader) {
             loginLoader.classList.add("show");
         }
 
-        // Prevent multiple submissions
         if (loginBtn) {
             loginBtn.disabled = true;
             loginBtn.textContent = "Logging in...";
         }
-
     });
-
 }
-
