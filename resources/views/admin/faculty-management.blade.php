@@ -129,6 +129,7 @@
             </div>
 
             <form id="facultyForm">
+                    @csrf
                 <div class="faculty-modal-body">
                     <h3 class="faculty-section-title">Basic Information</h3>
 
@@ -268,6 +269,32 @@
     </div>
 @endsection
 
-@section('page-js')
-    <script src="{{ asset('js/admin/faculty-management.js') }}" defer></script>
-@endsection
+
+
+<script>
+    window.facultyData = {{ Illuminate\Support\Js::from(
+        $faculty->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'facultyId' => $item->faculty_id,
+                'firstName' => $item->first_name,
+                'middleName' => $item->middle_name ?? '',
+                'lastName' => $item->last_name,
+                'email' => $item->email,
+                'status' => ucfirst($item->status),
+                'teacher' => $item->teachingAssignments->isNotEmpty(),
+                'adviser' => $item->advisoryAssignments->isNotEmpty(),
+                'advisoryGrade' => $item->advisoryAssignments->first()?->grade_level ?? '',
+                'schoolYear' => $item->advisoryAssignments->first()?->school_year ?? '',
+                'assignments' => $item->teachingAssignments->map(function ($assignment) {
+                    return [
+                        'grade' => $assignment->grade_level,
+                        'subject' => $assignment->subject,
+                    ];
+                })->values(),
+            ];
+        })->values()
+    ) }};
+</script>
+
+<script src="{{ asset('js/admin/faculty-management.js') }}" defer></script>

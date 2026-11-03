@@ -10,47 +10,20 @@
 
 @section('content')
     @php
-        $subjects = [
-            [
-                'name' => 'Mathematics',
-                'code' => 'MATH-7',
-                'grade' => 'Grade 7',
-                'classes' => '1',
-                'students' => '84 Students',
-                'icon' => 'fa-calculator',
-                'type' => 'mathematics',
-            ],
-            [
-                'name' => 'Science',
-                'code' => 'SCI-8',
-                'grade' => 'Grade 8',
-                'classes' => '1',
-                'students' => '78 Students',
-                'icon' => 'fa-flask',
-                'type' => 'science',
-            ],
-            [
-                'name' => 'English',
-                'code' => 'ENG-9',
-                'grade' => 'Grade 9',
-                'classes' => '1',
-                'students' => '81 Students',
-                'icon' => 'fa-book',
-                'type' => 'english',
-            ],
-            [
-                'name' => 'Araling Panlipunan',
-                'code' => 'AP-10',
-                'grade' => 'Grade 10',
-                'classes' => '1',
-                'students' => '76 Students',
-                'icon' => 'fa-earth-asia',
-                'type' => 'ap',
-            ],
-        ];
-
         $selectedSchoolYear = request('school_year', '2026-2027');
         $selectedTerm = request('term', '1st-term');
+
+        $subjectStyles = [
+            'Mathematics' => ['code' => 'MATH', 'icon' => 'fa-calculator', 'type' => 'mathematics'],
+            'Science' => ['code' => 'SCI', 'icon' => 'fa-flask', 'type' => 'science'],
+            'English' => ['code' => 'ENG', 'icon' => 'fa-book', 'type' => 'english'],
+            'Araling Panlipunan' => ['code' => 'AP', 'icon' => 'fa-earth-asia', 'type' => 'ap'],
+            'TLE' => ['code' => 'TLE', 'icon' => 'fa-screwdriver-wrench', 'type' => 'tle'],
+            'MAPEH' => ['code' => 'MAPEH', 'icon' => 'fa-music', 'type' => 'mapeh'],
+            'Filipino' => ['code' => 'FIL', 'icon' => 'fa-book-open', 'type' => 'filipino'],
+            'Values Education' => ['code' => 'VE', 'icon' => 'fa-heart', 'type' => 'values-education'],
+            'Computer Education' => ['code' => 'COMP', 'icon' => 'fa-computer', 'type' => 'computer-education'],
+        ];
     @endphp
 
     <div class="subjects-container">
@@ -96,30 +69,44 @@
             </div>
             <div class="summary-info">
                 <span>Assigned Subjects</span>
-                <strong>{{ count($subjects) }}</strong>
+                <strong>{{ $assignments->count() }}</strong>
             </div>
         </div>
 
         <div class="subjects-grid">
-            @foreach ($subjects as $subject)
-                <a href="{{ url('/teacher/grade-management') }}?subject={{ urlencode($subject['code']) }}&school_year={{ urlencode($selectedSchoolYear) }}&term={{ urlencode($selectedTerm) }}"
-                    class="subject-card-link" data-subject-code="{{ $subject['code'] }}"
-                    aria-label="Open {{ $subject['name'] }} grading spreadsheet">
+            @forelse ($assignments as $assignment)
+
+                @php
+                    $style = $subjectStyles[$assignment->subject] ?? [
+                        'code' => strtoupper(substr($assignment->subject, 0, 3)),
+                        'icon' => 'fa-book',
+                        'type' => 'default',
+                    ];
+
+                    $gradeNumber = preg_replace('/\D/', '', $assignment->grade_level);
+                    $subjectCode = $style['code'] . '-' . $gradeNumber;
+                @endphp
+
+                <a href="{{ url('/teacher/grade-management') }}?assignment={{ $assignment->id }}&school_year={{ urlencode($selectedSchoolYear) }}&term={{ urlencode($selectedTerm) }}"
+                    class="subject-card-link" data-assignment-id="{{ $assignment->id }}" data-subject-code="{{ $subjectCode }}"
+                    aria-label="Open {{ $assignment->subject }} grading spreadsheet">
+
                     <article class="subject-card">
 
                         <div class="subject-card-top">
-                            <div class="subject-icon {{ $subject['type'] }}">
-                                <i class="fa-solid {{ $subject['icon'] }}"></i>
+                            <div class="subject-icon {{ $style['type'] }}">
+                                <i class="fa-solid {{ $style['icon'] }}"></i>
                             </div>
-                            <span class="subject-code">{{ $subject['code'] }}</span>
+
+                            <span class="subject-code">{{ $subjectCode }}</span>
                         </div>
 
                         <div class="subject-content">
-                            <h2>{{ $subject['name'] }}</h2>
+                            <h2>{{ $assignment->subject }}</h2>
 
                             <p class="subject-level">
                                 <i class="fa-solid fa-layer-group"></i>
-                                {{ $subject['grade'] }}
+                                {{ $assignment->grade_level }}
                             </p>
 
                             <div class="subject-details">
@@ -127,7 +114,7 @@
                                     <i class="fa-solid fa-chalkboard"></i>
                                     <div>
                                         <span>Classes</span>
-                                        <strong>{{ $subject['classes'] }}</strong>
+                                        <strong>1</strong>
                                     </div>
                                 </div>
 
@@ -135,7 +122,7 @@
                                     <i class="fa-solid fa-users"></i>
                                     <div>
                                         <span>Students</span>
-                                        <strong>{{ $subject['students'] }}</strong>
+                                        <strong>{{ $assignment->student_count }} Students</strong>
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +137,16 @@
 
                     </article>
                 </a>
-            @endforeach
+
+            @empty
+
+                <div class="empty-state">
+                    <i class="fa-solid fa-book-open"></i>
+                    <h3>No Subjects Assigned Yet</h3>
+                    <p>Your assigned subjects will appear here once the administrator assigns them to you.</p>
+                </div>
+
+            @endforelse
         </div>
     </div>
 @endsection

@@ -167,7 +167,7 @@ if (saveStudentBtn) {
         document.getElementById("studentStatus").value = "active";
         
         // DELAY RELOAD SO USER CAN SEE THE MODAL
-        setTimeout(() => { window.location.reload(); }, 1500);
+        setTimeout(() => { window.location.reload(); }, 1000);
       } else {
         let errorMsg = "Error saving student:\n";
         if (data.errors) {
@@ -272,7 +272,7 @@ window.editStudent = function (id) {
           if (editStudentModal) editStudentModal.classList.remove("show");
           
           // DELAY RELOAD SO USER CAN SEE THE MODAL
-          setTimeout(() => { window.location.reload(); }, 1500);
+          setTimeout(() => { window.location.reload(); }, 1000);
         } else {
           let errorMsg = "Error updating student:\n";
           if (data.errors) {
@@ -323,7 +323,7 @@ window.deleteStudent = function (id) {
           if (deleteStudentModal) deleteStudentModal.classList.remove("show");
           
           // DELAY RELOAD SO USER CAN SEE THE MODAL
-          setTimeout(() => { window.location.reload(); }, 1500);
+          setTimeout(() => { window.location.reload(); }, 1000);
         } else {
           showModal("Error deleting student.", 'error');
         }
@@ -354,7 +354,7 @@ window.toggleStatus = async function (id) {
       showModal(`Student is now ${data.status}.`, 'success');
       
       // DELAY RELOAD SO USER CAN SEE THE MODAL
-      setTimeout(() => { window.location.reload(); }, 1500);
+      setTimeout(() => { window.location.reload(); }, 1000);
     } else {
       showModal("Error updating status.", 'error');
     }

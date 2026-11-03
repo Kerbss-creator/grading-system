@@ -28,6 +28,44 @@
 
 <body>
 
+    {{-- LOGOUT LOADING SCREEN --}}
+    <div id="logoutLoader" class="logout-loader">
+        <div class="logout-loader-content">
+
+            <div class="logout-logo-wrapper">
+                <img src="{{ asset('images/forbesologo.png') }}" alt="Forbes Academy Logo">
+            </div>
+
+            <h2>FORBES ACADEMY</h2>
+            <p class="logout-school-level">JUNIOR HIGH SCHOOL</p>
+
+            <div class="logout-divider"></div>
+
+            <p class="logout-status">SIGNING YOU OUT</p>
+
+            <span class="logout-description">
+                Please wait while we securely end your session...
+            </span>
+
+            <div class="logout-spinner"></div>
+
+            <div class="logout-progress">
+                <span></span>
+            </div>
+
+            <div class="logout-footer">
+                EXCELLENCE IN EDUCATION
+            </div>
+
+        </div>
+    </div>
+
+    {{-- HIDDEN LOGOUT FORM --}}
+    <form id="logoutForm" action="{{ route('logout') }}" method="POST" hidden>
+        @csrf
+    </form>
+
+    
     {{-- SIDEBAR --}}
     <aside class="sidebar">
 
@@ -45,50 +83,40 @@
 
         {{-- NAVIGATION --}}
         <nav class="navigation">
-
             <p class="nav-title">MAIN</p>
-
             {{-- DASHBOARD --}}
             <a href="{{ url('/admin/dashboard') }}"
                 class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                 <i class="fa-solid fa-gauge"></i>
                 <span>Dashboard</span>
             </a>
-
             {{-- USERS DROPDOWN --}}
             <div
                 class="dropdown {{ request()->is('admin/users*') || request()->is('admin/admins*') || request()->is('admin/advisers*') || request()->is('admin/teachers*') || request()->is('admin/students*') || request()->is('admin/faculty-management*') ? 'active' : '' }}">
-
                 <a href="#" class="nav-link dropdown-toggle">
                     <i class="fa-solid fa-users"></i>
                     <span>Users</span>
                     <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
                 </a>
-
                 <div class="dropdown-menu">
-
                     <a href="/admin/users" class="dropdown-link {{ request()->is('admin/users*') ? 'active' : '' }}">
                         <i class="fa-solid fa-users-gear"></i>
                         <span>User Management</span>
                     </a>
-
                     <a href="/admin/admins" class="dropdown-link {{ request()->is('admin/admins*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-shield"></i>
                         <span>Admin</span>
                     </a>
-
                     <a href="/admin/faculty-management"
                         class="dropdown-link {{ request()->is('admin/faculty-management*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-tie"></i>
                         <span>Faculty</span>
                     </a>
-
                     <a href="/admin/students"
                         class="dropdown-link {{ request()->is('admin/students*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-graduate"></i>
                         <span>Students</span>
                     </a>
-
                 </div>
             </div>
 
@@ -104,12 +132,6 @@
             <a href="/admin/grade-level" class="nav-link {{ request()->is('admin/grade-level*') ? 'active' : '' }}">
                 <i class="fa-solid fa-school"></i>
                 <span>Grade Level</span>
-            </a>
-
-            {{-- GRADE MANAGEMENT --}}
-            <a href="/admin/grades" class="nav-link {{ request()->is('admin/grades*') ? 'active' : '' }}">
-                <i class="fa-solid fa-chart-column"></i>
-                <span>Grade Management</span>
             </a>
 
             {{-- GRADE APPROVAL --}}
@@ -149,7 +171,7 @@
 
         {{-- LOGOUT --}}
         <div class="logout-section">
-            <a href="/login" class="nav-link logout">
+            <a href="/login" class="nav-link logout js-logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Logout</span>
             </a>
@@ -332,7 +354,7 @@
                         </a>
 
                         {{-- LOGOUT --}}
-                        <button type="button" class="profile-menu-item logout-item" id="logoutBtn">
+                        <button type="button" class="profile-menu-item logout-item js-logout">
                             <i class="fa-solid fa-right-from-bracket"></i>
                             <span>Logout</span>
                         </button>

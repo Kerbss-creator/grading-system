@@ -83,7 +83,7 @@
 
           <span>Total Students</span>
 
-          <h3>668</h3>
+          <h3>{{ number_format($totalStudents) }}</h3>
 
           <small>
             <i class="fa-solid fa-users"></i>

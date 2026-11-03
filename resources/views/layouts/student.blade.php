@@ -169,8 +169,8 @@
                         </div>
 
                         <div class="profile-info">
-                            <strong>Student</strong>
-                            <span>Student Account</span>
+                            <strong>{{ Auth::user()->name }}</strong>
+                            <span>{{ ucfirst(Auth::user()->role) }} Account</span>
                         </div>
 
                         <i class="fa-solid fa-chevron-down profile-arrow"></i>
