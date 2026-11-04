@@ -10,6 +10,8 @@ use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\SchoolCsvController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Teacher\GradeManagementController;
@@ -60,7 +62,6 @@ Route::middleware(['auth'])->group(function () {
         '/notifications/{id}',
         [NotificationController::class, 'destroy']
     )->name('notifications.destroy');
-
 });
 
 
@@ -118,6 +119,7 @@ Route::middleware(['auth', 'school.role:admin'])
         )->name('students.toggleStatus');
 
 
+
         /*
         |--------------------------------------------------------------------------
         | TEACHER MANAGEMENT
@@ -128,11 +130,7 @@ Route::middleware(['auth', 'school.role:admin'])
             ->name('teachers');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | FACULTY MANAGEMENT
-        |--------------------------------------------------------------------------
-        */
+        // FACULTY MANAGEMENT
 
         Route::get('/faculty-management', [FacultyController::class, 'index'])
             ->name('faculty-management');
@@ -146,6 +144,32 @@ Route::middleware(['auth', 'school.role:admin'])
         Route::delete('/faculty-management/{id}', [FacultyController::class, 'destroy'])
             ->name('faculty.destroy');
 
+        Route::patch('/faculty-management/{id}/toggle-status', [FacultyController::class, 'toggleStatus'])
+            ->name('faculty.toggleStatus');
+            
+
+        //csv import/export routes
+
+        Route::get('/imports/{type}', [SchoolCsvController::class, 'index'])
+            ->name('imports.index');
+
+        Route::post('/imports/{type}/preview', [SchoolCsvController::class, 'preview'])
+            ->name('imports.preview');
+
+        Route::post('/imports/{type}/confirm', [SchoolCsvController::class, 'confirm'])
+            ->name('imports.confirm');
+
+        Route::get('/exports/{type}', [SchoolCsvController::class, 'export'])
+            ->name('exports.csv');
+
+        Route::get('/activity-log', [ActivityLogController::class, 'index'])
+            ->name('activity-log');
+
+        Route::get('/recycle-bin', [ActivityLogController::class, 'trash'])
+            ->name('recycle-bin');
+
+        Route::post('/recycle-bin/{type}/{id}/restore', [ActivityLogController::class, 'restore'])
+            ->name('recycle-bin.restore');
 
         /*
         |--------------------------------------------------------------------------
@@ -190,7 +214,6 @@ Route::middleware(['auth', 'school.role:admin'])
                 'gradeLevel' => 'Grade ' . $grade,
                 'studentCount' => $studentCounts[$grade],
             ]);
-
         })->whereNumber('grade')->name('grade-level.details');
 
 
@@ -245,7 +268,6 @@ Route::middleware(['auth', 'school.role:admin'])
         Route::get('/settings', function () {
             return view('admin.settings');
         })->name('settings');
-
     });
 
 
@@ -296,7 +318,6 @@ Route::middleware(['auth', 'school.role:teacher'])
             ])->latest()->get();
 
             return view('teacher.announcements', compact('announcements'));
-
         })->name('announcements');
 
 
@@ -310,7 +331,6 @@ Route::middleware(['auth', 'school.role:teacher'])
         Route::get('/settings', function () {
             return view('teacher.settings');
         })->name('settings');
-
     });
 
 
@@ -363,7 +383,6 @@ Route::middleware(['auth', 'school.role:adviser'])
             ])->latest()->get();
 
             return view('adviser.announcements', compact('announcements'));
-
         })->name('announcements');
 
 
@@ -377,7 +396,6 @@ Route::middleware(['auth', 'school.role:adviser'])
         Route::get('/settings', function () {
             return view('adviser.settings');
         })->name('settings');
-
     });
 
 
@@ -413,12 +431,10 @@ Route::middleware(['auth', 'school.role:student'])
             ])->latest()->get();
 
             return view('student.announcements', compact('announcements'));
-
         })->name('announcements');
 
 
         // My Profile
         Route::view('/profile', 'student.profile')
             ->name('profile');
-
     });

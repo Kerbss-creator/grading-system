@@ -1,3 +1,4 @@
+
 /* MAIN CONTENT */
 
 .main-content {
@@ -11,7 +12,7 @@
     margin-left: 280px;
 }
 
-/* PAGE HEADER */
+/*  PAGE HEADER  */
 
 .page-header {
     display: flex;
@@ -104,49 +105,104 @@
     font-size: 11px;
 }
 
-/* STUDENT MANAGEMENT */
+/*  STUDENT MANAGEMENT CARD */
 
 .student-management {
-    padding: 25px;
-    border-radius: 12px;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    padding: 28px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.045);
 }
 
-/* TOOLBAR */
+/*   BULK ACTION TOOLBAR */
+
+.records-utility-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.records-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid #cfdae8;
+    border-radius: 9px;
+    background: #fff;
+    color: #173b5c;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.records-button:hover:not(:disabled) {
+    border-color: #036f35;
+    background: #f5fbf7;
+    color: #036f35;
+}
+
+.records-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.records-button.records-danger {
+    border-color: #e6eaf0;
+    color: #e38d87;
+}
+
+.records-button.records-danger:hover:not(:disabled) {
+    border-color: #e53935;
+    background: #fff5f5;
+    color: #d32f2f;
+}
+
+/*   STUDENT TOOLBAR  */
 
 .student-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    gap: 15px;
+    margin-bottom: 23px;
 }
-
-.toolbar-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* ADD STUDENT */
 
 .add-student-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 11px 16px;
+    min-height: 46px;
+    padding: 0 18px;
     border: none;
-    border-radius: 7px;
-    background: #036f35;
+    border-radius: 9px;
+    background: #007638;
     color: white;
     font-family: "Poppins", sans-serif;
     font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
     cursor: pointer;
     transition: 0.2s ease;
 }
 
 .add-student-btn:hover {
-    background: #025c2c;
+    background: #005f2e;
+}
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 13px;
 }
 
 /* SEARCH */
@@ -155,16 +211,18 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 220px;
-    height: 40px;
+    width: 243px;
+    height: 44px;
     padding: 0 12px;
     border: 1px solid #ddd;
-    border-radius: 7px;
+    border-radius: 9px;
     background: white;
+    transition: 0.2s ease;
 }
 
 .search-box:focus-within {
     border-color: #036f35;
+    box-shadow: 0 0 0 2px rgba(3, 111, 53, 0.07);
 }
 
 .search-box i {
@@ -176,26 +234,28 @@
     width: 100%;
     border: none;
     outline: none;
+    background: transparent;
     font-family: "Poppins", sans-serif;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .search-box input::placeholder {
     color: #aaa;
 }
 
-/* FILTER */
+/* FILTERS */
 
 .filter-select {
-    height: 40px;
-    padding: 0 12px;
+    min-width: 130px;
+    height: 44px;
+    padding: 0 14px;
     border: 1px solid #ddd;
-    border-radius: 7px;
+    border-radius: 9px;
     outline: none;
     background: white;
     color: #555;
     font-family: "Poppins", sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
 }
 
@@ -203,7 +263,7 @@
     border-color: #036f35;
 }
 
-/* TABLE */
+/*  STUDENT TABLE */
 
 .table-container {
     width: 100%;
@@ -212,55 +272,78 @@
 
 .student-table {
     width: 100%;
+    min-width: 950px;
     border-collapse: collapse;
     font-size: 13px;
 }
 
+.student-table thead {
+    background: #f6f8f8;
+}
+
 .student-table th {
-    padding: 14px 15px;
-    border-bottom: 1px solid #e5e5e5;
-    background: #f7f9f8;
-    color: #555;
+    height: 55px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e8e8;
+    background: #f6f8f8;
+    color: #35475a;
     font-size: 12px;
     font-weight: 600;
     text-align: left;
+    white-space: nowrap;
 }
 
 .student-table td {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    color: #555;
+    height: 69px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e9ecef;
+    color: #48566a;
+    font-size: 13px;
+    white-space: nowrap;
 }
 
 .student-table tbody tr {
-    transition: 0.2s ease;
+    transition: background 0.2s ease;
 }
 
 .student-table tbody tr:hover {
     background: #fafcfb;
 }
 
-/* STATUS */
+.student-management input[type="checkbox"],
+.records-select-all,
+.record-check {
+    accent-color: #007638;
+    cursor: pointer;
+}
+/*  CLICKABLE STUDENT NAME */
 
-.status {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 20px;
+.student-name-link {
+    color: #007638 !important;
+    font-weight: 600;
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.student-name-link:hover {
+    color: #005526 !important;
+    text-decoration-thickness: 2px;
+}
+
+/* GRADE AND STATUS */
+
+.grade-text {
+    color: #48566a;
+}
+
+.student-status {
+    color: #64748b;
     font-size: 11px;
-    font-weight: 500;
 }
 
-.status.active {
-    background: #e5f5eb;
-    color: #08763b;
-}
-
-.status.inactive {
-    background: #fbeaea;
-    color: #c62828;
-}
-
-/* ACTION BUTTONS */
+/*  ACTION BUTTONS= */
 
 .action-buttons {
     display: flex;
@@ -269,60 +352,65 @@
 }
 
 .action-buttons button {
-    width: 32px;
-    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-size: 15px;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .view-btn {
-    background: #eef4ff;
-    color: #3569b8;
+    background: #edf3ff;
+    color: #2865bd;
 }
 
 .edit-btn {
-    background: #fff5df;
-    color: #b47b00;
+    background: #fff4dd;
+    color: #bd8200;
 }
 
 .delete-btn {
     background: #ffeded;
-    color: #d32f2f;
+    color: #d52d35;
 }
 
-.view-btn:hover {
-    background: #dce8ff;
+.action-buttons .action-btn {
+    background: #f0f0f0 !important;
+    color: #536170 !important;
 }
 
-.edit-btn:hover {
-    background: #ffebbd;
+.view-btn:hover,
+.edit-btn:hover,
+.delete-btn:hover,
+.action-buttons .action-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.96);
 }
 
-.delete-btn:hover {
-    background: #ffd9d9;
-}
-
-/* PAGINATION */
+/*   PAGINATION */
 
 .pagination {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     gap: 5px;
-    margin-top: 20px;
+    margin-top: 22px;
 }
 
 .page-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 8px;
     background: white;
     color: #555;
     font-family: "Poppins", sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
     transition: 0.2s ease;
 }
@@ -333,17 +421,16 @@
 }
 
 .page-btn.active {
-    border-color: #036f35;
-    background: #036f35;
+    background: #007638;
+    border-color: #007638;
     color: white;
 }
 
-/* STUDENT MODAL */
+/*    STUDENT MODALS  */
 
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     z-index: 9999;
     display: none;
     align-items: center;
@@ -351,7 +438,9 @@
     width: 100%;
     height: 100vh;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.30);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .modal-overlay.show {
@@ -361,7 +450,8 @@
 .student-modal {
     width: 520px;
     max-width: 100%;
-    overflow: hidden;
+    max-height: 92vh;
+    overflow-y: auto;
     border-radius: 12px;
     background: white;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
@@ -584,8 +674,6 @@
     color: #333;
 }
 
-/* DELETE BUTTON */
-
 .delete-confirm-btn {
     display: flex;
     align-items: center;
@@ -605,7 +693,7 @@
     background: #b71c1c;
 }
 
-/* STUDENT MANAGEMENT EMPTY STATE */
+/*  EMPTY STATE  */
 
 .student-table .empty-state-row:hover {
     background: #fff;
@@ -670,9 +758,7 @@
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .empty-state-add-btn:hover {
@@ -685,9 +771,89 @@
     outline-offset: 3px;
 }
 
-/* RESPONSIVE EMPTY STATE */
+/*  ANIMATION    */
+
+@keyframes modalShow {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/*  RESPONSIVE    */
+
+@media (max-width: 1100px) {
+    .student-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .toolbar-right {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 900px) {
+    .main-content {
+        padding: 25px;
+    }
+
+    .records-utility-bar {
+        gap: 8px;
+    }
+
+    .student-management {
+        padding: 20px;
+    }
+}
 
 @media (max-width: 600px) {
+    .student-management {
+        padding: 13px;
+    }
+
+    .records-button {
+        min-height: 40px;
+        padding: 0 10px;
+        font-size: 11px;
+    }
+
+    .toolbar-right {
+        align-items: stretch;
+    }
+
+    .search-box {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .filter-select {
+        flex: 1;
+        min-width: 110px;
+    }
+
+    .student-modal {
+        width: 100%;
+    }
+
+    .form-row,
+    .student-info {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
     .student-empty-state {
         min-height: 290px;
         padding: 30px 15px;
@@ -702,98 +868,25 @@
     }
 }
 
-
-/* STUDENT MODAL WITH BACKGROUND BLUR */
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-
-    display: none;
-    align-items: center;
-    justify-content: center;
-
-    width: 100%;
-    height: 100vh;
-    padding: 20px;
-
-    /* Dark transparent overlay */
-    background: rgba(0, 0, 0, 0.30);
-
-    /* Blur the background behind the modal */
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-}
-
-/* SHOW MODAL */
-.modal-overlay.show {
-    display: flex;
-}
-
-/* STUDENT MODAL BOX */
-.student-modal {
-    width: 520px;
-    max-width: 100%;
-    max-height: 92vh;
-    overflow-y: auto;
-
-    border-radius: 12px;
-    background: white;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-
-    animation: modalShow 0.2s ease;
-}
-
-
-/* RESPONSIVE VIEW MODAL */
-
-@media (max-width: 600px) {
-    .student-info {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ANIMATION */
-
-@keyframes modalShow {
-    from {
-        opacity: 0;
-        transform: translateY(-10px) scale(0.98);
+@media (max-width: 480px) {
+    .main-content {
+        padding: 15px;
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 900px) {
-    .student-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
+    .student-management {
+        padding: 12px;
     }
 
-    .toolbar-right {
-        flex-wrap: wrap;
+    .records-button {
+        font-size: 10px;
     }
 
-    .search-box {
-        flex: 1;
-        min-width: 180px;
-    }
-}
-
-@media (max-width: 600px) {
-    .student-modal {
-        width: 100%;
+    .pagination {
+        gap: 4px;
     }
 
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
+    .page-btn {
+        width: 32px;
+        height: 32px;
     }
 }

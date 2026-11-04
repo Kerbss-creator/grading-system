@@ -57,6 +57,8 @@ class AuthController extends Controller
         // ==========================================
 
         // Standard Email/Password Login for Students, Teachers, and Regular Admins
+        
+        // Standard Email/Password Login
         $credentials = [
             'email' => $inputUsername,
             'password' => $inputPassword,
@@ -64,9 +66,30 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
             $user = Auth::user();
 
-            
+            // Check Faculty account status
+            if (in_array($user->role, [
+                'teacher',
+                'adviser',
+                'teacher_adviser',
+            ], true)) {
+
+                $faculty = $user->faculty;
+
+                if (!$faculty || $faculty->status !== 'active') {
+                    Auth::logout();
+
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return back()->withErrors([
+                        'email' => 'Your faculty account is inactive or unavailable.',
+                    ])->onlyInput('email');
+                }
+            }
+
             if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             }
@@ -75,7 +98,10 @@ class AuthController extends Controller
                 return redirect()->route('teacher.dashboard');
             }
 
-            if (in_array($user->role, ['adviser', 'teacher_adviser'], true)) {
+            if (in_array($user->role, [
+                'adviser',
+                'teacher_adviser',
+            ], true)) {
                 return redirect()->route('adviser.dashboard');
             }
 
@@ -85,12 +111,16 @@ class AuthController extends Controller
 
             Auth::logout();
 
-            return back()->withErrors(['email' => 'Your account does not have a valid role.',]);
-            
-            }
-        return back()->withErrors(['email' => 'The email or password is incorrect.'])->onlyInput('email');
-    }
+            return back()->withErrors([
+                'email' => 'Your account does not have a valid role.',
+            ]);
+        }
 
+        return back()->withErrors([
+            'email' => 'The email or password is incorrect.',
+        ])->onlyInput('email');
+    }
+    
     public function logout(Request $request)
     {
         Auth::logout();
@@ -100,4 +130,5 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
+
 }

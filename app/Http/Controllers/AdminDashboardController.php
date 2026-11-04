@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Student;
-use App\Models\Teacher;
+use App\Models\Faculty;
 use App\Models\User;
+use App\Models\Teacher;
 use App\Models\Announcement;
 
 class AdminDashboardController extends Controller
@@ -14,9 +15,9 @@ class AdminDashboardController extends Controller
     {
         // Get total counts from database
         $totalStudents = Student::count();
-        $totalTeachers = Teacher::count();
+        $totalFaculties = Faculty::count();
         $totalAdmins = User::where('role', 'admin')->count();
-        
+
         // Get students by grade level (useful for charts/lists later)
         $studentsByGrade = Student::selectRaw('grade_level, COUNT(*) as count')
             ->groupBy('grade_level')
@@ -27,7 +28,7 @@ class AdminDashboardController extends Controller
         $totalSubjects = Teacher::select('subject')->distinct()->count();
 
         // For now, estimate total classes based on teachers (can be updated when a Classes table is added)
-        $totalClasses = Teacher::count(); 
+        $totalClasses = Teacher::count();
 
         // Get recent students for a "Recently Added" section
         $recentStudents = Student::orderBy('created_at', 'desc')->limit(5)->get();
@@ -43,7 +44,7 @@ class AdminDashboardController extends Controller
 
         return view('admin.dashboard-admin', compact(
             'totalStudents',
-            'totalTeachers',
+            'totalFaculties',
             'totalAdmins',
             'totalSubjects',
             'totalClasses',

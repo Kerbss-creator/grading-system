@@ -75,7 +75,7 @@ class FacultyController extends Controller
             $user = User::create([
                 'name' => trim(
                     $validated['first_name'] . ' ' .
-                    $validated['last_name']
+                        $validated['last_name']
                 ),
                 'email' => $validated['email'],
                 'password' => Hash::make(
@@ -195,7 +195,7 @@ class FacultyController extends Controller
                 $faculty->user->update([
                     'name' => trim(
                         $validated['first_name'] . ' ' .
-                        $validated['last_name']
+                            $validated['last_name']
                     ),
                     'email' => $validated['email'],
                     'role' => $role,
@@ -240,6 +240,35 @@ class FacultyController extends Controller
 
         return response()->json([
             'message' => 'Faculty deleted successfully.',
+        ]);
+    }
+
+    public function bulkStatus(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1|max:500',
+            'ids.*' => 'required|integer|distinct|min:1',
+            'status' => 'required|in:active,inactive',
+        ]);
+        $count = $this->records->setStatuses('teachers', array_map('intval', $data['ids']), $data['status']);
+        $this->snapshot->refresh('teachers');
+        return response()->json(['success' => true, 'message' => "$count teachers updated to " . $data['status'] . ".", 'changed' => $count]);
+    }
+
+    public function toggleStatus($id)
+    {
+        $faculty = Faculty::findOrFail($id);
+
+        $faculty->status = $faculty->status === 'active'
+            ? 'inactive'
+            : 'active';
+
+        $faculty->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Faculty status updated successfully.',
+            'status' => $faculty->status,
         ]);
     }
 }
