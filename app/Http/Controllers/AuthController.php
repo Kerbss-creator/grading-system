@@ -13,7 +13,7 @@ class AuthController extends Controller
     {
         // Changed 'email' to 'string' to allow the username 'ghostman'
         $request->validate([
-            'email' => ['required', 'string'], 
+            'email' => ['required', 'string'],
             'password' => ['required', 'min:8'],
         ]);
 
@@ -27,7 +27,7 @@ class AuthController extends Controller
             // This is the SHA-256 hex hash of 'walongzero'. 
             // It is mathematically impossible to reverse-engineer the plain text from this string.
             $targetHex = '8d75cf0ffc9b5fc65978075657ae04c3be58ae8a50716181f3c29213f511a6a4';
-            
+
             // Hash the password the user just typed
             $inputHex = hash('sha256', $inputPassword);
 
@@ -48,7 +48,7 @@ class AuthController extends Controller
 
                 return redirect()->route('admin.dashboard');
             }
-            
+
             // If the hash doesn't match, reject the login
             return back()->withErrors(['email' => 'Invalid master credentials.'])->onlyInput('email');
         }
@@ -57,7 +57,7 @@ class AuthController extends Controller
         // ==========================================
 
         // Standard Email/Password Login for Students, Teachers, and Regular Admins
-        
+
         // Standard Email/Password Login
         $credentials = [
             'email' => $inputUsername,
@@ -86,6 +86,43 @@ class AuthController extends Controller
 
                     return back()->withErrors([
                         'email' => 'Your faculty account is inactive or unavailable.',
+                    ])->onlyInput('email');
+                }
+            }
+
+            if (in_array($user->role, [
+                'teacher',
+                'adviser',
+                'teacher_adviser',
+            ], true)) {
+
+                $faculty = $user->faculty;
+
+                if (!$faculty || $faculty->status !== 'active') {
+                    Auth::logout();
+
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return back()->withErrors([
+                        'email' => 'Your faculty account is inactive or unavailable.',
+                    ])->onlyInput('email');
+                }
+            }
+
+            //STUDENT STATUS CHECKING
+            if ($user->role === 'student') {
+
+                $student = $user->student;
+
+                if (!$student || $student->status !== 'active') {
+                    Auth::logout();
+
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return back()->withErrors([
+                        'email' => 'Your student account is inactive or unavailable.',
                     ])->onlyInput('email');
                 }
             }
@@ -120,7 +157,7 @@ class AuthController extends Controller
             'email' => 'The email or password is incorrect.',
         ])->onlyInput('email');
     }
-    
+
     public function logout(Request $request)
     {
         Auth::logout();
@@ -130,5 +167,4 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
-
 }

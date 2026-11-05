@@ -12,12 +12,12 @@
 <section class="faculty-management">
 
     {{-- IMPORT / EXPORT / BULK ACTIONS --}}
-    <div class="records-utility-bar" data-record-type="teachers">
-        <a class="records-button" href="{{ route('admin.imports.index', 'teachers') }}">
+    <div class="records-utility-bar" data-record-type="faculty">
+        <a class="records-button" href="{{ route('admin.imports.index', 'faculty') }}">
             <i class="fa-solid fa-file-import"></i> Import CSV
         </a>
 
-        <a class="records-button" href="{{ route('admin.exports.csv', 'teachers') }}">
+        <a class="records-button" href="{{ route('admin.exports.csv', 'faculty') }}">
             <i class="fa-solid fa-file-export"></i> Export CSV
         </a>
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Faculty;
 use App\Models\User;
+use App\Services\PersonRecordService;
+use App\Services\SchoolCsvSnapshotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -64,18 +66,18 @@ class FacultyController extends Controller
             ], 422);
         }
 
-        // Tukuyin ang login role mula sa faculty assignments.
+        // Determine login role based on faculty assignments.
         $role = $validated['teacher'] && $validated['adviser']
             ? 'teacher_adviser'
             : ($validated['adviser'] ? 'adviser' : 'teacher');
 
         $faculty = DB::transaction(function () use ($validated, $role) {
 
-            // Gumawa ng login account.
+            // Create login account.
             $user = User::create([
                 'name' => trim(
                     $validated['first_name'] . ' ' .
-                        $validated['last_name']
+                    $validated['last_name']
                 ),
                 'email' => $validated['email'],
                 'password' => Hash::make(
@@ -84,7 +86,7 @@ class FacultyController extends Controller
                 'role' => $role,
             ]);
 
-            // I-link ang faculty profile sa login account.
+            // Link faculty profile to login account.
             $faculty = Faculty::create([
                 'user_id' => $user->id,
                 'faculty_id' => $validated['faculty_id'],
@@ -173,7 +175,7 @@ class FacultyController extends Controller
             ], 422);
         }
 
-        // FIX: Tukuyin muna ang login role bago gamitin sa transaction.
+        // Determine login role before the transaction.
         $role = $validated['teacher'] && $validated['adviser']
             ? 'teacher_adviser'
             : ($validated['adviser'] ? 'adviser' : 'teacher');
@@ -195,14 +197,14 @@ class FacultyController extends Controller
                 $faculty->user->update([
                     'name' => trim(
                         $validated['first_name'] . ' ' .
-                            $validated['last_name']
+                        $validated['last_name']
                     ),
                     'email' => $validated['email'],
                     'role' => $role,
                 ]);
             }
 
-            // Replace existing assignments with submitted assignments.
+            // Replace existing assignments.
             $faculty->teachingAssignments()->delete();
             $faculty->advisoryAssignments()->delete();
 
@@ -232,27 +234,46 @@ class FacultyController extends Controller
         ]);
     }
 
-    public function destroy(int $id)
-    {
-        $faculty = Faculty::findOrFail($id);
+    public function destroy(
+        PersonRecordService $records,
+        SchoolCsvSnapshotService $snapshots,
+        int $id
+    ) {
+        // Soft-delete faculty record and linked login account.
+        $records->delete('faculty', [$id]);
 
-        $faculty->delete();
+        // Refresh faculty CSV snapshot.
+        $snapshots->refresh('faculty');
 
         return response()->json([
             'message' => 'Faculty deleted successfully.',
         ]);
     }
 
-    public function bulkStatus(Request $request)
-    {
+    public function bulkStatus(
+        Request $request,
+        PersonRecordService $records,
+        SchoolCsvSnapshotService $snapshots
+    ) {
         $data = $request->validate([
             'ids' => 'required|array|min:1|max:500',
             'ids.*' => 'required|integer|distinct|min:1',
             'status' => 'required|in:active,inactive',
         ]);
-        $count = $this->records->setStatuses('teachers', array_map('intval', $data['ids']), $data['status']);
-        $this->snapshot->refresh('teachers');
-        return response()->json(['success' => true, 'message' => "$count teachers updated to " . $data['status'] . ".", 'changed' => $count]);
+
+        $count = $records->setStatuses(
+            'faculty',
+            array_map('intval', $data['ids']),
+            $data['status']
+        );
+
+        $snapshots->refresh('faculty');
+
+        return response()->json([
+            'success' => true,
+            'message' => "$count faculty updated to " . $data['status'] . ".",
+            'changed' => $count,
+        ]);
     }
 
     public function toggleStatus($id)

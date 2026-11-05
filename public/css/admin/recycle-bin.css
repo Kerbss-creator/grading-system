@@ -1,0 +1,480 @@
+
+/* MAIN CONTENT */
+
+.main-content {
+    margin-left: 75px;
+    min-height: 100vh;
+    padding: 35px;
+    transition: 0.3s ease;
+}
+
+.sidebar:hover ~ .main-content {
+    margin-left: 280px;
+}
+
+
+/* =========================================
+   RECYCLE BIN MAIN CONTAINER
+========================================= */
+
+.recycle-bin {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 28px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.045);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.recycle-bin * {
+    box-sizing: border-box;
+}
+
+/* =========================================
+   INFORMATION CARD
+========================================= */
+
+.recycle-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding: 18px;
+    margin-bottom: 25px;
+    border: 1px solid #dceee3;
+    border-radius: 10px;
+    background: #f5fbf7;
+}
+
+.recycle-info-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #e0f2e7;
+    color: #036f35;
+    font-size: 20px;
+}
+
+.recycle-info h3 {
+    margin: 0 0 5px;
+    color: #036f35;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.recycle-info p {
+    margin: 0;
+    color: #777;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* =========================================
+   CATEGORY TABS
+========================================= */
+
+.recycle-tabs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 23px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.recycle-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 13px 16px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: #64748b;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.recycle-tab i {
+    font-size: 14px;
+}
+
+.recycle-tab span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 20px;
+    background: #edf1f3;
+    color: #64748b;
+    font-size: 10px;
+}
+
+.recycle-tab:hover {
+    color: #036f35;
+}
+
+.recycle-tab.active {
+    border-bottom-color: #036f35;
+    color: #036f35;
+    font-weight: 600;
+}
+
+.recycle-tab.active span {
+    background: #e5f5eb;
+    color: #036f35;
+}
+
+/* =========================================
+   SEARCH TOOLBAR
+========================================= */
+
+.recycle-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 100%;
+    margin-bottom: 22px;
+}
+
+.recycle-search {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 300px;
+    max-width: 100%;
+    height: 44px;
+    padding: 0 13px;
+    border: 1px solid #ddd;
+    border-radius: 9px;
+    background: #fff;
+    transition: 0.2s ease;
+}
+
+.recycle-search:focus-within {
+    border-color: #036f35;
+    box-shadow: 0 0 0 2px rgba(3, 111, 53, 0.07);
+}
+
+.recycle-search i {
+    flex-shrink: 0;
+    color: #999;
+    font-size: 13px;
+}
+
+.recycle-search input {
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #35475a;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+}
+
+.recycle-search input::placeholder {
+    color: #aaa;
+}
+
+.recycle-toolbar-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #929292;
+    font-size: 11px;
+}
+
+/* =========================================
+   CATEGORY PANELS
+========================================= */
+
+.recycle-panel {
+    display: none;
+    width: 100%;
+    min-width: 0;
+}
+
+.recycle-panel.active {
+    display: block;
+}
+
+.recycle-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.recycle-panel-header h3 {
+    margin: 0 0 5px;
+    color: #35475a;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.recycle-panel-header p {
+    margin: 0;
+    color: #888;
+    font-size: 11px;
+}
+
+.recycle-count {
+    padding: 7px 11px;
+    border-radius: 20px;
+    background: #e5f5eb;
+    color: #036f35;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* =========================================
+   TABLE CONTAINER
+========================================= */
+
+.recycle-table-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 1px solid #edf0f0;
+    border-radius: 9px;
+}
+
+.recycle-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.recycle-table thead {
+    background: #f6f8f8;
+}
+
+.recycle-table th {
+    height: 53px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e5e8e8;
+    background: #f6f8f8;
+    color: #35475a;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.recycle-table td {
+    height: 65px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+    color: #48566a;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.recycle-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.recycle-table tbody tr:hover {
+    background: #fafcfb;
+}
+
+.recycle-name {
+    color: #036f35 !important;
+    font-weight: 600;
+}
+
+/* =========================================
+   RESTORE BUTTON
+========================================= */
+
+.restore-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 35px;
+    padding: 0 12px;
+    border: 1px solid #cce8d6;
+    border-radius: 7px;
+    background: #edf8f0;
+    color: #036f35;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.restore-btn:hover {
+    border-color: #036f35;
+    background: #036f35;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.recycle-table .recycle-empty-row:hover {
+    background: #fff;
+}
+
+.recycle-table .recycle-empty-row td {
+    padding: 0;
+    border-bottom: none;
+}
+
+.recycle-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    padding: 35px 20px;
+    text-align: center;
+}
+
+.recycle-empty > i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 65px;
+    height: 65px;
+    margin-bottom: 15px;
+    border-radius: 50%;
+    background: #e5f5eb;
+    color: #036f35;
+    font-size: 25px;
+}
+
+.recycle-empty h3 {
+    margin: 0 0 7px;
+    color: #35475a;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.recycle-empty p {
+    margin: 0;
+    color: #999;
+    font-size: 12px;
+}
+
+/* =========================================
+   RESPONSIVE - TABLET
+========================================= */
+
+@media (max-width: 900px) {
+    .recycle-bin {
+        padding: 20px;
+    }
+
+    .recycle-tabs {
+        gap: 4px;
+    }
+
+    .recycle-tab {
+        padding: 12px 10px;
+        font-size: 12px;
+    }
+}
+
+/* =========================================
+   RESPONSIVE - MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+    .recycle-bin {
+        padding: 13px;
+    }
+
+    .recycle-info {
+        align-items: flex-start;
+        padding: 13px;
+    }
+
+    .recycle-info p {
+        font-size: 11px;
+    }
+
+    .recycle-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px;
+    }
+
+    .recycle-tab {
+        justify-content: flex-start;
+        padding: 11px 8px;
+        font-size: 11px;
+    }
+
+    .recycle-toolbar {
+        align-items: stretch;
+    }
+
+    .recycle-search {
+        width: 100%;
+    }
+
+    .recycle-toolbar-label {
+        font-size: 10px;
+    }
+
+    .recycle-panel-header {
+        align-items: flex-start;
+    }
+
+    .recycle-panel-header h3 {
+        font-size: 14px;
+    }
+
+    .recycle-panel-header p {
+        font-size: 10px;
+    }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+    .recycle-tab {
+        gap: 6px;
+        font-size: 10px;
+    }
+
+    .recycle-tab span {
+        min-width: 19px;
+        height: 19px;
+    }
+
+    .recycle-count {
+        font-size: 10px;
+    }
+}

@@ -65,7 +65,7 @@
         @csrf
     </form>
 
-    
+
     {{-- SIDEBAR --}}
     <aside class="sidebar">
 
@@ -161,6 +161,12 @@
                 <span>Audit Logs</span>
             </a>
 
+            {{-- RECYCLE BIN --}}
+            <a href="/admin/recycle-bin" class="nav-link {{ request()->is('admin/recycle-bin*') ? 'active' : '' }}">
+                <i class="fa-solid fa-trash"></i>
+                <span>Recycle Bin</span>
+            </a>
+
             {{-- SETTINGS --}}
             <a href="/admin/settings" class="nav-link {{ request()->is('admin/settings*') ? 'active' : '' }}">
                 <i class="fa-solid fa-gear"></i>
@@ -232,70 +238,70 @@
 
                             @forelse (($notifications ?? collect()) as $notification)
 
-                                                    <div class="notification-item {{ $notification->read_at ? '' : 'unread' }}"
-                                                        data-notification-id="{{ $notification->id }}">
+                            <div class="notification-item {{ $notification->read_at ? '' : 'unread' }}"
+                                data-notification-id="{{ $notification->id }}">
 
-                                                        <div class="notification-item-icon">
-                                                            <i class="fa-solid fa-bullhorn"></i>
-                                                        </div>
+                                <div class="notification-item-icon">
+                                    <i class="fa-solid fa-bullhorn"></i>
+                                </div>
 
-                                                        <div class="notification-item-info">
+                                <div class="notification-item-info">
 
-                                                            <h4>
-                                                                {{ $notification->data['title'] ?? 'New Announcement' }}
-                                                            </h4>
+                                    <h4>
+                                        {{ $notification->data['title'] ?? 'New Announcement' }}
+                                    </h4>
 
-                                                            <p>
-                                                                {{ $notification->data['message'] ?? 'Admin posted a new announcement.' }}
-                                                            </p>
+                                    <p>
+                                        {{ $notification->data['message'] ?? 'Admin posted a new announcement.' }}
+                                    </p>
 
-                                                            <span class="notification-time">
-                                                                {{ $notification->created_at
+                                    <span class="notification-time">
+                                        {{ $notification->created_at
                                 ->timezone(config('app.timezone'))
                                 ->diffForHumans() }}
-                                                            </span>
+                                    </span>
 
-                                                            {{-- Notification actions --}}
-                                                            <div class="notification-actions">
+                                    {{-- Notification actions --}}
+                                    <div class="notification-actions">
 
-                                                                @if (!$notification->read_at)
-                                                                    <button type="button" class="notification-action mark-read-btn"
-                                                                        data-id="{{ $notification->id }}">
-                                                                        <i class="fa-solid fa-check"></i>
-                                                                        Mark as Read
-                                                                    </button>
-                                                                @else
-                                                                    <span class="notification-read-label">
-                                                                        <i class="fa-solid fa-check-double"></i>
-                                                                        Read
-                                                                    </span>
-                                                                @endif
+                                        @if (!$notification->read_at)
+                                        <button type="button" class="notification-action mark-read-btn"
+                                            data-id="{{ $notification->id }}">
+                                            <i class="fa-solid fa-check"></i>
+                                            Mark as Read
+                                        </button>
+                                        @else
+                                        <span class="notification-read-label">
+                                            <i class="fa-solid fa-check-double"></i>
+                                            Read
+                                        </span>
+                                        @endif
 
-                                                                <button type="button" class="notification-action delete-notification-btn"
-                                                                    data-id="{{ $notification->id }}">
-                                                                    <i class="fa-regular fa-trash-can"></i>
-                                                                    Delete
-                                                                </button>
+                                        <button type="button" class="notification-action delete-notification-btn"
+                                            data-id="{{ $notification->id }}">
+                                            <i class="fa-regular fa-trash-can"></i>
+                                            Delete
+                                        </button>
 
-                                                            </div>
+                                    </div>
 
-                                                        </div>
+                                </div>
 
-                                                    </div>
+                            </div>
 
                             @empty
 
-                                <div class="empty-notification" id="emptyNotification">
+                            <div class="empty-notification" id="emptyNotification">
 
-                                    <div class="empty-notification-icon">
-                                        <i class="fa-regular fa-bell-slash"></i>
-                                    </div>
-
-                                    <h4>No notifications yet</h4>
-
-                                    <p>You don't have any notifications at the moment.</p>
-
+                                <div class="empty-notification-icon">
+                                    <i class="fa-regular fa-bell-slash"></i>
                                 </div>
+
+                                <h4>No notifications yet</h4>
+
+                                <p>You don't have any notifications at the moment.</p>
+
+                            </div>
 
                             @endforelse
 
