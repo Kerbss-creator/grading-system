@@ -63,7 +63,7 @@
                 <span>Mathematics</span>
               </div>
             </td>
-            <td>Grades 7–10</td>
+            <td>Grades 7-10</td>
             <td><span class="status-badge active">Active</span></td>
             <td>
               <button type="button" class="view-btn" data-subject="Mathematics" aria-label="View Mathematics details"
@@ -82,7 +82,7 @@
                 <span>Science</span>
               </div>
             </td>
-            <td>Grades 7–10</td>
+            <td>Grades 7-10</td>
             <td><span class="status-badge active">Active</span></td>
             <td>
               <button type="button" class="view-btn" data-subject="Science" aria-label="View Science details"
@@ -120,7 +120,7 @@
                 <span>Filipino</span>
               </div>
             </td>
-            <td>Grades 7–10</td>
+            <td>Grades 7-10</td>
             <td><span class="status-badge active">Active</span></td>
             <td>
               <button type="button" class="view-btn" data-subject="Filipino" aria-label="View Filipino details"
@@ -139,7 +139,7 @@
                 <span>Araling Panlipunan</span>
               </div>
             </td>
-            <td>Grades 7–10</td>
+            <td>Grades 7-10</td>
             <td><span class="status-badge active">Active</span></td>
             <td>
               <button type="button" class="view-btn" data-subject="Araling Panlipunan"
@@ -158,7 +158,7 @@
                 <span>TLE</span>
               </div>
             </td>
-            <td>Grades 7–10</td>
+            <td>Grades 7-10</td>
             <td><span class="status-badge active">Active</span></td>
             <td>
               <button type="button" class="view-btn" data-subject="TLE" aria-label="View TLE details"
@@ -177,7 +177,7 @@
                 <span>MAPEH</span>
               </div>
             </td>
-            <td>Grades 7–10</td>
+            <td>Grades 7-10</td>
             <td><span class="status-badge active">Active</span></td>
             <td>
               <button type="button" class="view-btn" data-subject="MAPEH" aria-label="View MAPEH details"

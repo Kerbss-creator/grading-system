@@ -14,28 +14,57 @@
 
     <section class="grade-submission-container">
 
+        @if (session('success'))
+            <div class="alert alert-success">
+                <i class="fa-solid fa-circle-check"></i>
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-circle-exclamation"></i>
+
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         {{-- PAGE INTRO --}}
-        <div class="submission-intro">
-
-            <div>
-                <h2>Grade Submission</h2>
-                <p>
-                    Check grade completion and submit your final grades for administrator review.
-                </p>
-            </div>
-
-            <div class="school-info">
-                <span>School Year</span>
-                <strong>2026-2027</strong>
-            </div>
-
-            <div class="school-info">
-                <span>Term</span>
-                <strong>1st Term</strong>
-            </div>
-
+        <div class="school-info">
+            <span>School Year</span>
+            <strong>{{ $schoolYear }}</strong>
         </div>
 
+        <div class="school-info">
+            <span>Term</span>
+            <strong>{{ $term }}{{ $term === 1 ? 'st' : ($term === 2 ? 'nd' : 'rd') }} Term</strong>
+        </div>
+
+
+        {{-- TERM NAVIGATION --}}
+<div class="term-navigation">
+
+    @foreach ([1 => '1st Term', 2 => '2nd Term', 3 => '3rd Term'] as $termNumber => $termLabel)
+
+        <a
+            href="{{ route('teacher.grade-submission', [
+                'school_year' => $schoolYear,
+                'term' => $termNumber,
+            ]) }}"
+            class="term-nav-button {{ (int) $term === $termNumber ? 'active' : '' }}"
+            @if ((int) $term === $termNumber) aria-current="page" @endif
+        >
+            {{ $termLabel }}
+        </a>
+
+    @endforeach
+
+</div>
+        
 
         {{-- SUBMISSION SUMMARY --}}
         <div class="submission-summary">
@@ -49,13 +78,13 @@
 
                 <div class="summary-info">
                     <span>Assigned Classes</span>
-                    <strong>3</strong>
+                    <strong>{{ $summary['assigned_classes'] }}</strong>
                 </div>
 
             </div>
 
 
-            {{-- SUBMITTED --}}
+            {{-- COMPLETED --}}
             <div class="summary-card">
 
                 <div class="summary-icon completed-icon">
@@ -63,14 +92,14 @@
                 </div>
 
                 <div class="summary-info">
-                    <span>Submitted</span>
-                    <strong>2</strong>
+                    <span>Completed</span>
+                    <strong>{{ $summary['completed_students'] }}</strong>
                 </div>
 
             </div>
 
 
-            {{-- PENDING --}}
+            {{-- INCOMPLETE --}}
             <div class="summary-card">
 
                 <div class="summary-icon pending-icon">
@@ -78,8 +107,8 @@
                 </div>
 
                 <div class="summary-info">
-                    <span>Pending</span>
-                    <strong>1</strong>
+                    <span>Incomplete</span>
+                    <strong>{{ $summary['incomplete_students'] }}</strong>
                 </div>
 
             </div>
@@ -94,7 +123,7 @@
 
                 <div class="summary-info">
                     <span>Total Students</span>
-                    <strong>118</strong>
+                    <strong>{{ $summary['total_students'] }}</strong>
                 </div>
 
             </div>
@@ -115,19 +144,9 @@
                 <div class="submission-filter">
 
                     <select id="statusFilter">
-
-                        <option value="all">
-                            All Status
-                        </option>
-
-                        <option value="pending">
-                            Pending
-                        </option>
-
-                        <option value="submitted">
-                            Submitted
-                        </option>
-
+                        <option value="all">All Status</option>
+                        <option value="pending">Incomplete</option>
+                        <option value="completed">Completed</option>
                     </select>
 
                 </div>
@@ -138,377 +157,156 @@
             {{-- SUBMISSION LIST --}}
             <div class="submission-list">
 
+                @forelse ($assignments as $assignment)
 
-                {{-- CLASS 1 --}}
-                <div class="submission-card" data-status="pending">
+                            @php
+                                $total = $assignment->total_students;
+                                $completed = $assignment->completed_students;
+                                $incomplete = $assignment->incomplete_students;
+                                $percentage = $assignment->completion_percentage;
 
-                    <div class="submission-card-top">
+                                $className = 'Grade ' . $assignment->grade_level;
 
-                        <div class="class-details">
+                                $isComplete = $total > 0 && $completed === $total;
+                            @endphp
 
-                            <div class="class-icon">
-                                <i class="fa-solid fa-book"></i>
-                            </div>
+                            <div class="submission-card" data-status="{{ $isComplete ? 'completed' : 'pending' }}">
 
-                            <div>
+                                {{-- CARD HEADER --}}
+                                <div class="submission-card-top">
 
-                                <h4>
-                                    Grade 7 - Section A
-                                </h4>
+                                    <div class="class-details">
 
-                                <span>
-                                    Mathematics
-                                </span>
+                                        <div class="class-icon">
+                                            <i class="fa-solid fa-book"></i>
+                                        </div>
 
-                            </div>
+                                        <div>
+                                            <h4>{{ $className }}</h4>
+                                            <span>{{ $assignment->subject }}</span>
+                                        </div>
 
-                        </div>
+                                    </div>
 
+                                    <span class="status-badge {{ $isComplete ? 'submitted' : 'pending' }}">
 
-                        <span class="status-badge pending">
+                                        @if ($isComplete)
+                                            <i class="fa-solid fa-circle-check"></i>
+                                            Grades Complete
+                                        @else
+                                            <i class="fa-solid fa-clock"></i>
+                                            Incomplete
+                                        @endif
 
-                            <i class="fa-solid fa-clock"></i>
+                                    </span>
 
-                            Ready to Submit
-
-                        </span>
-
-                    </div>
-
-
-                    {{-- DETAILS --}}
-                    <div class="submission-details">
-
-                        <div class="detail-item">
-
-                            <span>
-                                Students
-                            </span>
-
-                            <strong>
-                                42
-                            </strong>
-
-                        </div>
+                                </div>
 
 
-                        <div class="detail-item">
+                                {{-- DETAILS --}}
+                                <div class="submission-details">
 
-                            <span>
-                                Grades Completed
-                            </span>
+                                    <div class="detail-item">
+                                        <span>Students</span>
+                                        <strong>{{ $total }}</strong>
+                                    </div>
 
-                            <strong>
-                                42 / 42
-                            </strong>
+                                    <div class="detail-item">
+                                        <span>Grades Completed</span>
+                                        <strong>{{ $completed }} / {{ $total }}</strong>
+                                    </div>
 
-                        </div>
+                                    <div class="detail-item">
+                                        <span>Incomplete</span>
+                                        <strong>{{ $incomplete }}</strong>
+                                    </div>
 
-
-                        <div class="detail-item">
-
-                            <span>
-                                Remarks
-                            </span>
-
-                            <strong>
-                                Completed
-                            </strong>
-
-                        </div>
-
-                    </div>
+                                </div>
 
 
-                    {{-- PROGRESS --}}
-                    <div class="submission-progress">
+                                {{-- PROGRESS --}}
+                                <div class="submission-progress">
 
-                        <div class="progress-label">
+                                    <div class="progress-label">
 
-                            <span>
-                                Grade Completion
-                            </span>
+                                        <span>Grade Completion</span>
 
-                            <strong>
-                                100%
-                            </strong>
+                                        <strong>{{ number_format($percentage, 2) }}%</strong>
 
-                        </div>
+                                    </div>
 
-                        <div class="progress-bar">
+                                    <div class="progress-bar">
 
-                            <div class="progress-fill" style="width: 100%;">
-                            </div>
+                                        <div class="progress-fill" style="width: {{ $percentage }}%;">
+                                        </div>
 
-                        </div>
+                                    </div>
 
-                    </div>
+                                </div>
 
 
-                    {{-- ACTIONS --}}
-                    <div class="submission-actions">
+                                {{-- ACTIONS --}}
+                                <div class="submission-actions">
 
-                        <button type="button" class="btn-secondary review-btn" data-class="Grade 7 - Section A"
-                            data-subject="Mathematics">
+                                    <a href="{{ route('teacher.grade-review', [
+                        'assignment' => $assignment->id,
+                        'school_year' => $schoolYear,
+                        'term' => $term
+                    ]) }}" class="btn-secondary review-btn">
+                                        <i class="fa-solid fa-eye"></i>
+                                        Review Grades
+                                    </a>
 
-                            <i class="fa-solid fa-eye"></i>
+                                    @if ($isComplete)
 
-                            Review Grades
+                                        <button type="button" class="btn-primary submit-btn" data-assignment-id="{{ $assignment->id }}"
+                                            data-school-year="{{ $schoolYear }}" data-term="{{ $term }}" data-class="{{ $className }}"
+                                            data-subject="{{ $assignment->subject }}">
+                                            <i class="fa-solid fa-paper-plane"></i>
+                                            Submit Grades
+                                        </button>
 
-                        </button>
+                                    @else
 
+                                        <button type="button" class="btn-primary" disabled>
+                                            <i class="fa-solid fa-lock"></i>
+                                            Complete All Grades First
+                                        </button>
 
-                        <button type="button" class="btn-primary submit-btn" data-class="Grade 7 - Section A"
-                            data-subject="Mathematics">
+                                    @endif
 
-                            <i class="fa-solid fa-paper-plane"></i>
-
-                            Submit Grades
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                {{-- CLASS 2 --}}
-                <div class="submission-card" data-status="submitted">
-
-                    <div class="submission-card-top">
-
-                        <div class="class-details">
-
-                            <div class="class-icon">
-                                <i class="fa-solid fa-flask"></i>
-                            </div>
-
-                            <div>
-
-                                <h4>
-                                    Grade 8 - Section A
-                                </h4>
-
-                                <span>
-                                    Science
-                                </span>
+                                </div>
 
                             </div>
 
+                @empty
+                    <div class="submission-empty">
+                        <div class="empty-icon">
+                            <i class="fa-solid fa-folder-open"></i>
                         </div>
 
+                        <h4>No Grade Submissions Yet</h4>
 
-                        <span class="status-badge submitted">
-
-                            <i class="fa-solid fa-circle-check"></i>
-
-                            Submitted
-
-                        </span>
-
+                        <p>
+                            You don't have any assigned classes or subjects yet.
+                            Your teaching assignments will appear here once they are assigned.
+                        </p>
                     </div>
 
 
-                    <div class="submission-details">
+                @endforelse
 
-                        <div class="detail-item">
-
-                            <span>
-                                Students
-                            </span>
-
-                            <strong>
-                                38
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                Grades Completed
-                            </span>
-
-                            <strong>
-                                38 / 38
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                Submitted
-                            </span>
-
-                            <strong>
-                                Oct. 5, 2026
-                            </strong>
-
-                        </div>
-
+                <div class="submission-filter-empty" id="filterEmptyState" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-filter-circle-xmark"></i>
                     </div>
 
-
-                    <div class="submission-progress">
-
-                        <div class="progress-label">
-
-                            <span>
-                                Grade Completion
-                            </span>
-
-                            <strong>
-                                100%
-                            </strong>
-
-                        </div>
-
-                        <div class="progress-bar">
-
-                            <div class="progress-fill" style="width: 100%;">
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="submission-actions">
-
-                        <button type="button" class="btn-secondary review-btn" data-class="Grade 8 - Section A"
-                            data-subject="Science">
-
-                            <i class="fa-solid fa-eye"></i>
-
-                            View Submission
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                {{-- CLASS 3 --}}
-                <div class="submission-card" data-status="submitted">
-
-                    <div class="submission-card-top">
-
-                        <div class="class-details">
-
-                            <div class="class-icon">
-                                <i class="fa-solid fa-language"></i>
-                            </div>
-
-                            <div>
-
-                                <h4>
-                                    Grade 9 - Section A
-                                </h4>
-
-                                <span>
-                                    English
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <span class="status-badge submitted">
-
-                            <i class="fa-solid fa-circle-check"></i>
-
-                            Submitted
-
-                        </span>
-
-                    </div>
-
-
-                    <div class="submission-details">
-
-                        <div class="detail-item">
-
-                            <span>
-                                Students
-                            </span>
-
-                            <strong>
-                                38
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                Grades Completed
-                            </span>
-
-                            <strong>
-                                38 / 38
-                            </strong>
-
-                        </div>
-
-
-                        <div class="detail-item">
-
-                            <span>
-                                Submitted
-                            </span>
-
-                            <strong>
-                                Oct. 4, 2026
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="submission-progress">
-
-                        <div class="progress-label">
-
-                            <span>
-                                Grade Completion
-                            </span>
-
-                            <strong>
-                                100%
-                            </strong>
-
-                        </div>
-
-                        <div class="progress-bar">
-
-                            <div class="progress-fill" style="width: 100%;">
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="submission-actions">
-
-                        <button type="button" class="btn-secondary review-btn" data-class="Grade 9 - Section A"
-                            data-subject="English">
-
-                            <i class="fa-solid fa-eye"></i>
-
-                            View Submission
-
-                        </button>
-
-                    </div>
-
+                    <h4>No Matching Submissions</h4>
+
+                    <p>
+                        There are no grade submissions matching the selected status.
+                        Try selecting another filter.
+                    </p>
                 </div>
 
             </div>
@@ -553,7 +351,7 @@
                 You are about to submit the final grades for
 
                 <strong id="modalClassName">
-                    Grade 7 - Section A
+                    Grade 7
                 </strong>
 
                 in
@@ -578,20 +376,27 @@
 
             <div class="modal-actions">
 
-                <button type="button" class="modal-cancel" id="cancelSubmission">
+                <form id="gradeSubmissionForm" method="POST" action="{{ route('teacher.grade-submission.submit') }}">
+                    @csrf
 
-                    Cancel
+                    <input type="hidden" name="assignment_id" id="submissionAssignmentId">
+                    <input type="hidden" name="school_year" id="submissionSchoolYear">
+                    <input type="hidden" name="term" id="submissionTerm">
 
-                </button>
+                    <div class="modal-actions">
 
+                        <button type="button" class="modal-cancel" id="cancelSubmission">
+                            Cancel
+                        </button>
 
-                <button type="button" class="modal-confirm" id="confirmSubmission">
+                        <button type="submit" class="modal-confirm" id="confirmSubmission">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Confirm Submission
+                        </button>
 
-                    <i class="fa-solid fa-paper-plane"></i>
+                    </div>
 
-                    Confirm Submission
-
-                </button>
+                </form>
 
             </div>
 
@@ -683,7 +488,7 @@
                         </span>
 
                         <strong id="viewClassName">
-                            Grade 8 - Section A
+                            Grade 8
                         </strong>
 
                     </div>

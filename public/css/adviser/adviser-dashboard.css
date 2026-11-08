@@ -1,9 +1,7 @@
-
-
 /* WELCOME CARD */
 
 .welcome-card {
-   width: 100%;
+    width: 100%;
     box-sizing: border-box;
     padding: 30px;
     display: flex;
@@ -81,8 +79,14 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    font-size: 55px;
+    background: rgba(244, 242, 242, 0.12);
+    overflow: hidden;
+}
+
+.welcome-icon img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
 }
 
 /* STATISTICS CARDS */
@@ -407,6 +411,378 @@
     font-size: 11px;
 }
 
+/* ========================================
+   GRADE SUBMISSION PROGRESS
+======================================== */
+
+.grade-progress-panel {
+    margin-bottom: 25px;
+}
+
+/* TERM FILTER */
+
+.grade-term-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.grade-term-filter label {
+    color: #68756d;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.grade-term-filter select {
+    min-width: 115px;
+    padding: 9px 12px;
+    border: 1px solid #dfe7e1;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #183b29;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.grade-term-filter select:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.08);
+}
+
+/* CLASS CARD */
+
+.grade-progress-class {
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #e8ece9;
+    border-radius: 11px;
+    background: #ffffff;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.grade-progress-class:last-child {
+    margin-bottom: 0;
+}
+
+.grade-progress-class:hover {
+    border-color: #c9dfd0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.035);
+}
+
+.grade-progress-class-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.grade-progress-class-info {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+}
+
+.grade-progress-class-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 43px;
+    height: 43px;
+    border-radius: 10px;
+    background: #e8f5ec;
+    color: #036f35;
+    font-size: 17px;
+}
+
+.grade-progress-class-info h4 {
+    margin: 0 0 6px;
+    color: #183b29;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.grade-progress-class-info span {
+    color: #89928c;
+    font-size: 10px;
+}
+
+.progress-dot {
+    margin: 0 5px;
+}
+
+.grade-progress-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.grade-progress-summary strong {
+    color: #036f35;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.grade-progress-summary span {
+    color: #89928c;
+    font-size: 10px;
+}
+
+/* PROGRESS BAR */
+
+.grade-progress-bar {
+    width: 100%;
+    height: 8px;
+    margin: 18px 0 13px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #edf1ee;
+}
+
+.grade-progress-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: #036f35;
+    transition: width 0.4s ease;
+}
+
+/* PROGRESS COUNTS */
+
+.grade-progress-counts {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 17px;
+}
+
+.progress-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.submitted-count {
+    color: #16834b;
+}
+
+.partial-count {
+    color: #c58218;
+}
+
+.not-submitted-count {
+    color: #89928c;
+}
+
+/* EXPANDABLE SUBJECT DETAILS */
+
+.grade-progress-details {
+    border-top: 1px solid #edf0ed;
+}
+
+.grade-progress-details summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 15px;
+    color: #036f35;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+
+.grade-progress-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.grade-progress-details summary i {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.grade-progress-details[open] summary i {
+    transform: rotate(180deg);
+}
+
+.grade-progress-subject-list {
+    padding-top: 8px;
+}
+
+.grade-progress-subject {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 14px 0;
+    border-bottom: 1px solid #edf0ed;
+}
+
+.grade-progress-subject:last-child {
+    border-bottom: none;
+}
+
+.grade-subject-info {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.grade-subject-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 37px;
+    height: 37px;
+    border-radius: 9px;
+    background: #f0f6f2;
+    color: #036f35;
+    font-size: 14px;
+}
+
+.grade-subject-info h5 {
+    margin: 0 0 5px;
+    color: #183b29;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.grade-subject-info span {
+    display: block;
+    color: #89928c;
+    font-size: 10px;
+}
+
+.grade-subject-submission {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.grade-submission-count {
+    color: #89928c;
+    font-size: 10px;
+}
+
+.grade-progress-status {
+    display: inline-block;
+    min-width: 90px;
+    padding: 6px 9px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.grade-progress-status.submitted {
+    color: #16834b;
+    background: #e6f5eb;
+}
+
+.grade-progress-status.partial {
+    color: #a76808;
+    background: #fff3d9;
+}
+
+.grade-progress-status.not-submitted {
+    color: #737d76;
+    background: #f0f2f0;
+}
+
+/* EMPTY STATE */
+
+.grade-progress-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 35px 15px;
+    text-align: center;
+}
+
+.grade-progress-empty > i {
+    margin-bottom: 12px;
+    color: #aab5ad;
+    font-size: 28px;
+}
+
+.grade-progress-empty p {
+    margin: 0 0 6px;
+    color: #183b29;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.grade-progress-empty span {
+    color: #89928c;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+/* GRADE PROGRESS DROPDOWN */
+
+.grade-progress-details {
+    margin-top: 18px;
+    border-top: 1px solid #e8eee9;
+    padding-top: 14px;
+}
+
+.grade-progress-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 5px 0;
+    border: none;
+    background: transparent;
+
+    color: #036f35;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.grade-progress-toggle i {
+    transition: transform 0.35s ease;
+}
+
+.grade-progress-toggle.active i {
+    transform: rotate(180deg);
+}
+
+/* CONTENT ANIMATION */
+
+.grade-progress-content {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+
+    transition:
+        height 0.4s ease,
+        opacity 0.3s ease;
+}
+
+.grade-progress-content.show {
+    opacity: 1;
+}
+
+.grade-progress-content-inner {
+    padding-top: 14px;
+}
 
 /* RESPONSIVE LAYOUT */
 
@@ -456,5 +832,44 @@
 
     .panel-header h3 {
         font-size: 14px;
+    }
+}
+
+/* ========================================
+   GRADE PROGRESS RESPONSIVE
+======================================== */
+
+@media (max-width: 600px) {
+    .grade-progress-panel .panel-header {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .grade-term-filter {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .grade-progress-class {
+        padding: 15px;
+    }
+
+    .grade-progress-counts {
+        gap: 10px;
+    }
+
+    .grade-progress-subject {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .grade-subject-submission {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .grade-progress-status {
+        min-width: 85px;
     }
 }

@@ -50,6 +50,7 @@
 
       </div>
 
+<<<<<<< HEAD
     </div>
 
     <div class="welcome-icon">
@@ -135,6 +136,10 @@
           Grade 7 - 10
         </small>
 
+=======
+      <div class="welcome-icon">
+        <img src="{{ asset('images/forbesologo.png') }}" alt="Forbes Academy Logo">
+>>>>>>> grading-system2
       </div>
 
     </div>

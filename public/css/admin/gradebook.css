@@ -1,0 +1,915 @@
+/* =========================================================
+   FORBES ACADEMY — ADMIN GRADEBOOK
+   Teacher Grade Management Inspired Design
+   ========================================================= */
+
+/* =========================================================
+   1. DESIGN TOKENS
+   ========================================================= */
+
+:root {
+    --grade-green: #036f35;
+    --grade-green-dark: #025c2c;
+    --grade-text: #18332a;
+    --grade-muted: #6b7d75;
+    --grade-border: #dce8e1;
+    --grade-surface: #ffffff;
+    --grade-page: #f5f8f6;
+
+    --grade-blue: #eaf3ff;
+    --grade-purple: #f1edff;
+    --grade-teal: #e8f7f1;
+
+    --grade-danger: #dc2626;
+    --grade-danger-bg: #fff1f1;
+
+    --grade-shadow: 0 8px 24px rgba(24, 62, 42, 0.06);
+}
+
+/* MAIN CONTENT - SIDEBAR HOVER */
+.main-content {
+    margin-left: 75px;
+    width: calc(100% - 75px);
+    padding: 30px;
+    box-sizing: border-box;
+
+    transition:
+        margin-left 0.3s ease,
+        width 0.3s ease;
+}
+
+.sidebar:hover ~ .main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+}
+
+/* =========================================================
+   2. BACK BUTTON
+   ========================================================= */
+
+.gradebook-back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 20px;
+    padding: 10px 16px;
+
+    color: #ffffff;
+    background: var(--grade-green);
+    border-radius: 8px;
+    text-decoration: none;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.gradebook-back-button:hover {
+    color: #ffffff;
+    background: var(--grade-green-dark);
+    transform: translateX(-2px);
+}
+
+.gradebook-back-button:focus-visible {
+    outline: 2px solid var(--grade-green);
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   3. MAIN ADMIN GRADEBOOK LAYOUT
+   ========================================================= */
+
+.admin-gradebook {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    width: 100%;
+    min-width: 0;
+
+    color: var(--grade-text);
+    font-family: "Poppins", sans-serif;
+}
+
+.admin-gradebook * {
+    box-sizing: border-box;
+}
+
+/* =========================================
+   SUBJECT INFORMATION CARD
+========================================= */
+
+.gradebook-info-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+
+    width: 100%;
+    padding: 25px 28px;
+    margin-bottom: 24px;
+
+    background: #ffffff;
+    border: 1px solid #e5eae7;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+
+    box-sizing: border-box;
+}
+
+/* SUBJECT NAME AND ICON */
+
+.gradebook-subject {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    min-width: 220px;
+}
+
+.gradebook-subject-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+
+    color: #036f35;
+    background: #eaf5ee;
+    border-radius: 12px;
+
+    font-size: 23px;
+}
+
+.gradebook-subject > div:last-child {
+    min-width: 0;
+}
+
+.info-label {
+    display: block;
+    margin-bottom: 7px;
+
+    color: #84918a;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.subject-title-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.subject-title-line h2 {
+    margin: 0;
+
+    color: #26352c;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.subject-code {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 9px;
+
+    color: #036f35;
+    background: #edf7f0;
+    border: 1px solid #d8ecdf;
+    border-radius: 6px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* INFORMATION DETAILS */
+
+.gradebook-info-details {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(110px, 1fr));
+    align-items: center;
+
+    flex: 1;
+    gap: 20px;
+
+    padding: 4px 20px;
+    border-left: 1px solid #edf0ee;
+}
+
+.gradebook-info-item {
+    min-width: 0;
+}
+
+.gradebook-info-item strong {
+    display: block;
+
+    color: #34443a;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* READ ONLY LABEL */
+
+.readonly-label {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    color: #68756d;
+    background: #f3f5f4;
+    border: 1px solid #e5eae7;
+    border-radius: 20px;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.readonly-label i {
+    font-size: 11px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+    .gradebook-info-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+    .gradebook-info-details {
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        padding: 18px 0 0;
+        border-left: none;
+        border-top: 1px solid #edf0ee;
+    }
+
+    .readonly-label {
+        top: 18px;
+        right: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    .gradebook-info-card {
+        padding: 22px 18px;
+    }
+
+    .gradebook-subject {
+        gap: 12px;
+        padding-right: 70px;
+    }
+
+    .gradebook-subject-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 19px;
+    }
+
+    .subject-title-line h2 {
+        font-size: 16px;
+    }
+
+    .gradebook-info-details {
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 12px;
+    }
+
+    .gradebook-info-item strong {
+        font-size: 12px;
+    }
+
+    .readonly-label {
+        top: 12px;
+        right: 12px;
+        padding: 5px 8px;
+        font-size: 9px;
+    }
+}
+
+/* =========================================================
+   5. GRADEBOOK TABS CARD
+   ========================================================= */
+
+.gradebook-tabs-card {
+    min-width: 0;
+    overflow: hidden;
+
+    background: var(--grade-surface);
+    border: 1px solid var(--grade-border);
+    border-radius: 16px;
+    box-shadow: var(--grade-shadow);
+}
+
+/* Tabs Navigation */
+
+.gradebook-tabs {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 12px 14px;
+
+    border-bottom: 1px solid var(--grade-border);
+    overflow-x: auto;
+}
+
+.gradebook-tab {
+    flex: 0 0 auto;
+
+    padding: 12px 20px;
+
+    color: #53695d;
+    background: transparent;
+    border: 0;
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        color 0.22s ease,
+        background 0.22s ease,
+        transform 0.22s ease;
+}
+
+.gradebook-tab:hover {
+    color: var(--grade-green);
+    background: #f0f8f2;
+}
+
+.gradebook-tab.is-active {
+    color: #ffffff;
+    background: var(--grade-green);
+    box-shadow: 0 5px 12px rgba(3, 111, 53, 0.16);
+}
+
+.gradebook-tab:focus-visible {
+    outline: 3px solid rgba(3, 111, 53, 0.24);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   6. GRADEBOOK PANELS
+   ========================================================= */
+
+.gradebook-panel {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+.gradebook-panel.is-hidden {
+    display: none !important;
+}
+
+.gradebook-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    padding: 18px 20px;
+}
+
+.gradebook-panel-heading h3 {
+    margin: 0;
+
+    color: #18382a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.gradebook-panel-heading p {
+    margin: 5px 0 0;
+
+    color: var(--grade-muted);
+    font-size: 12px;
+}
+
+/* =========================================================
+   7. MAIN GRADEBOOK TABLE
+   Teacher Grade Management Inspired
+   ========================================================= */
+
+.gradebook-table-wrapper {
+    width: 100%;
+    overflow: auto;
+
+    border-top: 1px solid var(--grade-border);
+    border-bottom: 1px solid var(--grade-border);
+
+    background: #ffffff;
+}
+
+.admin-gradebook-table {
+    width: 100%;
+    min-width: 1450px;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    color: var(--grade-text);
+    background: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+}
+
+.admin-gradebook-table th,
+.admin-gradebook-table td {
+    padding: 9px 8px;
+
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+
+    border-right: 1px solid #e5eee8;
+    border-bottom: 1px solid #e5eee8;
+}
+
+/* =========================================================
+   8. STICKY TABLE HEADERS
+   ========================================================= */
+
+.admin-gradebook-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    height: 48px;
+
+    color: #304c3d;
+    background: #f7faf8;
+
+    font-weight: 700;
+}
+
+.admin-gradebook-table thead tr:first-child th {
+    height: 48px;
+}
+
+.admin-gradebook-table thead tr:nth-child(2) th {
+    position: sticky;
+    top: 48px;
+    z-index: 2;
+
+    height: 48px;
+}
+
+/* =========================================================
+   9. STICKY FIRST TWO COLUMNS
+   ========================================================= */
+
+.admin-gradebook-table th:first-child,
+.admin-gradebook-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+
+    width: 115px;
+    min-width: 115px;
+
+    background: #f7faf8;
+}
+
+.admin-gradebook-table th:nth-child(2),
+.admin-gradebook-table td:nth-child(2) {
+    position: sticky;
+    left: 115px;
+    z-index: 5;
+
+    min-width: 185px;
+
+    text-align: left;
+    background: #f7faf8;
+}
+
+/* Sticky Header Priority */
+
+.admin-gradebook-table thead th:first-child,
+.admin-gradebook-table thead th:nth-child(2) {
+    z-index: 8;
+}
+
+/* Sticky Body Cells */
+
+.admin-gradebook-table tbody td:first-child {
+    color: #7c8d83;
+    background: #fbfdfb;
+}
+
+.admin-gradebook-table tbody td:nth-child(2) {
+    color: #2c4437;
+    background: #ffffff;
+    font-weight: 600;
+}
+
+/* =========================================================
+   10. TABLE ROW HOVER
+   ========================================================= */
+
+.admin-gradebook-table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.admin-gradebook-table tbody tr:hover td {
+    background-color: #f4faf6;
+}
+
+.admin-gradebook-table tbody tr:hover td:first-child,
+.admin-gradebook-table tbody tr:hover td:nth-child(2) {
+    background-color: #f4faf6;
+}
+
+.admin-gradebook-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* =========================================================
+   11. ASSESSMENT GROUP COLORS
+   ========================================================= */
+
+.admin-gradebook-table .group-ww {
+    background: #ffe8c2 !important;
+}
+
+.admin-gradebook-table .group-pt {
+    background: #9eb7e5 !important;
+}
+
+.admin-gradebook-table .group-ex {
+    background: #bdd2a6 !important;
+}
+
+/* Assessment Headers */
+
+.admin-gradebook-table .assessment-heading {
+    min-width: 82px;
+}
+
+.admin-gradebook-table .computed-heading {
+    min-width: 74px;
+    background: #f3f7f4 !important;
+}
+
+.admin-gradebook-table .initial-heading {
+    background: #e8f4ed !important;
+}
+
+/* =========================================================
+   12. COMPUTED GRADES
+   ========================================================= */
+
+.admin-gradebook-table .computed-cell {
+    background: #fbfdfb;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-gradebook-table .ww-ps,
+.admin-gradebook-table .ww-ws {
+    background: #f0f6ff !important;
+}
+
+.admin-gradebook-table .pt-ps,
+.admin-gradebook-table .pt-ws {
+    background: #effaf4 !important;
+}
+
+.admin-gradebook-table .ex-ps,
+.admin-gradebook-table .ex-ws {
+    background: #f6f3ff !important;
+}
+
+.admin-gradebook-table .initial-grade {
+    color: #075e32;
+    background: #edf8f0 !important;
+    font-weight: 800;
+}
+
+/* Failed Grades */
+
+.admin-gradebook-table .grade-failed {
+    color: var(--grade-danger) !important;
+    font-weight: 700;
+}
+
+/* =========================================================
+   13. GRADE STATUS
+   ========================================================= */
+
+.grade-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.grade-status.pending,
+.grade-status.status-pending {
+    color: #6b7280;
+    background: #f0f2f1;
+}
+
+.grade-status.approved {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.grade-status.rejected {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.grade-status.submitted {
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
+/* Alternative status classes */
+
+.status-pending {
+    display: inline-block;
+    padding: 5px 8px;
+
+    color: #6b7280;
+    background: #f0f2f1;
+    border-radius: 20px;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.status-failed {
+    color: var(--grade-danger) !important;
+    font-weight: 600;
+}
+
+/* =========================================================
+   14. EMPTY GRADEBOOK
+   ========================================================= */
+
+.empty-gradebook {
+    padding: 45px 20px;
+
+    color: var(--grade-muted);
+    text-align: center;
+
+    background: #ffffff;
+}
+
+.empty-gradebook i {
+    display: block;
+    margin-bottom: 12px;
+
+    color: #a5b8ab;
+    font-size: 35px;
+}
+
+.empty-gradebook h3 {
+    margin: 0 0 7px;
+
+    color: #304c3d;
+    font-size: 16px;
+}
+
+.empty-gradebook p {
+    margin: 0;
+
+    color: var(--grade-muted);
+    font-size: 12px;
+}
+
+/* =========================================================
+   15. SUMMARY TABLE
+   ========================================================= */
+
+.summary-table {
+    width: 100%;
+    min-width: 850px;
+
+    color: #222222;
+    background: #ffffff;
+
+    border-collapse: collapse;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+}
+
+.summary-table th,
+.summary-table td {
+    padding: 10px 12px;
+
+    text-align: center;
+    vertical-align: middle;
+
+    border: 1px solid #dce8e1;
+}
+
+.summary-table thead th {
+    color: #304c3d;
+    background: #f7faf8;
+
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.summary-table tbody tr:hover {
+    background: #f5faf6;
+}
+
+.summary-table .student-name {
+    min-width: 190px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.summary-table .summary-final-grade {
+    background: #f0f8f1;
+    font-weight: 700;
+}
+
+.summary-table .summary-pending {
+    color: #777777;
+    font-size: 12px;
+}
+
+.summary-table .summary-no-learners {
+    padding: 28px;
+    color: #777777;
+    text-align: center;
+}
+
+/* =========================================================
+   16. SUMMARY EMPTY STATE
+   ========================================================= */
+
+.summary-empty {
+    padding: 45px 20px;
+    text-align: center;
+    background: #ffffff;
+}
+
+.summary-empty-icon {
+    display: grid;
+    place-items: center;
+
+    width: 62px;
+    height: 62px;
+
+    margin: 0 auto 15px;
+
+    color: var(--grade-green);
+    background: #e9f7ee;
+    border-radius: 18px;
+
+    font-size: 25px;
+}
+
+.summary-empty h3 {
+    margin: 0 0 8px;
+    color: #18382a;
+    font-size: 16px;
+}
+
+.summary-empty p {
+    max-width: 480px;
+    margin: 0 auto;
+
+    color: var(--grade-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* =========================================================
+   17. SUMMARY FOOTER NOTE
+   ========================================================= */
+
+.summary-footer-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    margin: 16px 20px 20px;
+    padding: 12px 14px;
+
+    color: #555555;
+    background: #f3f8f4;
+
+    border-left: 4px solid var(--grade-green);
+    border-radius: 4px;
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.summary-footer-note i {
+    margin-top: 3px;
+    color: var(--grade-green);
+}
+
+/* =========================================================
+   18. RESPONSIVE DESIGN
+   ========================================================= */
+
+@media (max-width: 1200px) {
+    .gradebook-info-card {
+        align-items: flex-start;
+    }
+
+    .gradebook-info-details {
+        gap: 18px;
+    }
+}
+
+@media (max-width: 768px) {
+    .gradebook-info-card {
+        padding: 16px;
+    }
+
+    .gradebook-info-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 15px;
+    }
+
+    .gradebook-tabs {
+        padding: 10px;
+    }
+
+    .gradebook-tab {
+        padding: 10px 14px;
+    }
+
+    .gradebook-panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .gradebook-back-button {
+        margin-bottom: 15px;
+    }
+
+    .summary-footer-note {
+        margin: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gradebook-info-details {
+        grid-template-columns: 1fr;
+    }
+
+    .gradebook-info-item strong {
+        font-size: 13px;
+    }
+}
+
+/* =========================================================
+   19. ACCESSIBILITY — REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .gradebook-tab,
+    .admin-gradebook-table tbody tr,
+    .gradebook-back-button {
+        transition: none !important;
+    }
+}

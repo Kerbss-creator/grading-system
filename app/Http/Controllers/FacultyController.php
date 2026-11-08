@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Models\AdvisoryAssignment;
+use Illuminate\Validation\ValidationException;
 
 class FacultyController extends Controller
 {
@@ -73,7 +75,29 @@ class FacultyController extends Controller
 
         $faculty = DB::transaction(function () use ($validated, $role) {
 
+<<<<<<< HEAD
             // Create login account.
+=======
+
+            // Prevent duplicate adviser assignment per grade level.
+            if ($validated['adviser']) {
+                $grade = $validated['advisory_grade'];
+
+                $alreadyAssigned = AdvisoryAssignment::where(
+                    'grade_level',
+                    $grade
+                )->exists();
+
+                if ($alreadyAssigned) {
+                    throw ValidationException::withMessages([
+                        'advisory_grade' =>
+                            "Adviser Already Assigned. An adviser is already assigned to {$grade}. Only one adviser is allowed per grade level."
+                    ]);
+                }
+            }
+
+            // Creatde login account.
+>>>>>>> grading-system2
             $user = User::create([
                 'name' => trim(
                     $validated['first_name'] . ' ' .
@@ -192,6 +216,33 @@ class FacultyController extends Controller
                 'role' => $role,
             ]);
 
+            // Check if the requested advisory grade is already assigned.
+            if ($validated['adviser']) {
+                $grade = $validated['advisory_grade'];
+
+                $currentAdvisory = $faculty->advisoryAssignments()->first();
+
+                // Allow the faculty member to retain their existing grade.
+                $isKeepingSameGrade = $currentAdvisory
+                    && $currentAdvisory->grade_level === $grade;
+
+                if (!$isKeepingSameGrade) {
+                    $alreadyAssigned = AdvisoryAssignment::where(
+                        'grade_level',
+                        $grade
+                    )
+                        ->where('faculty_id', '!=', $faculty->id)
+                        ->exists();
+
+                    if ($alreadyAssigned) {
+                        throw ValidationException::withMessages([
+                            'advisory_grade' =>
+                                "Adviser Already Assigned. An adviser is already assigned to {$grade}. Only one adviser is allowed per grade level."
+                        ]);
+                    }
+                }
+            }
+
             // Update linked login account.
             if ($faculty->user) {
                 $faculty->user->update([
@@ -234,6 +285,7 @@ class FacultyController extends Controller
         ]);
     }
 
+<<<<<<< HEAD
     public function destroy(
         PersonRecordService $records,
         SchoolCsvSnapshotService $snapshots,
@@ -244,6 +296,74 @@ class FacultyController extends Controller
 
         // Refresh faculty CSV snapshot.
         $snapshots->refresh('faculty');
+=======
+
+    public function toggleStatus(int $id)
+    {
+        $faculty = DB::transaction(function () use ($id) {
+
+            // Lock the faculty record while updating its status.
+            $faculty = Faculty::whereKey($id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Toggle only the faculty status.
+            $faculty->status = strtolower($faculty->status) === 'active'
+                ? 'inactive'
+                : 'active';
+
+            $faculty->save();
+
+            return $faculty;
+        });
+
+        return response()->json([
+            'success' => true,
+            'status' => $faculty->status,
+            'message' => $faculty->status === 'active'
+                ? 'Faculty account has been reactivated successfully.'
+                : 'Faculty account has been deactivated successfully.',
+        ]);
+    }
+
+
+    public function destroy(int $id)
+    {
+        $faculty = Faculty::with([
+            'teachingAssignments.gradeRecords',
+            'advisoryAssignments',
+        ])->findOrFail($id);
+
+        // Check kung may existing grades.
+        $hasGrades = $faculty->teachingAssignments
+            ->contains(
+                fn($assignment) =>
+                    $assignment->gradeRecords->isNotEmpty()
+            );
+
+        if ($hasGrades) {
+            return response()->json([
+                'message' => 'This faculty member has existing grade records. Please deactivate the faculty instead.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($faculty) {
+
+            // Delete assignments without grades.
+            $faculty->teachingAssignments()->delete();
+
+            // Delete advisory assignments.
+            $faculty->advisoryAssignments()->delete();
+
+            // Delete linked login account.
+            if ($faculty->user) {
+                $faculty->user->delete();
+            }
+
+            // Delete faculty profile.
+            $faculty->delete();
+        });
+>>>>>>> grading-system2
 
         return response()->json([
             'message' => 'Faculty deleted successfully.',
