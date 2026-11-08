@@ -1,22 +1,31 @@
 {{-- EXTENDS ADVISER LAYOUT --}}
 @extends('layouts.adviser')
 
-{{-- PAGE TITLE --}}
 @section('title', 'My Students')
-
-{{-- PAGE HEADER --}}
 @section('header', 'My Students')
+@section('header-description', 'View your advisory students and their approved academic records.')
 
-{{-- PAGE HEADER DESCRIPTION --}}
-@section('header-description', 'View and manage the students assigned to your advisory class.')
-
-{{-- PAGE CSS --}}
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('css/adviser/adviser-students.css') }}">
 @endsection
 
-{{-- MAIN CONTENT --}}
 @section('content')
+
+    @php
+        $adviserName = trim(implode(' ', array_filter([
+            $faculty->first_name,
+            $faculty->middle_name,
+            $faculty->last_name,
+        ])));
+
+        $termLabel = $term === 'overall'
+            ? 'Overall'
+            : 'Term ' . $term;
+
+        $termsToDisplay = $term === 'overall'
+            ? [1, 2, 3]
+            : [(int) $term];
+    @endphp
 
     <div class="adviser-students-page">
 
@@ -24,7 +33,7 @@
         <div class="students-summary-card">
             <div class="summary-info">
                 <span class="summary-label">Total Students</span>
-                <h2 id="totalStudents">42</h2>
+                <h2 id="totalStudents">{{ $totalStudents }}</h2>
                 <p>Students in your advisory class</p>
             </div>
 
@@ -41,8 +50,12 @@
                 </div>
 
                 <div>
-                    <h3>Grade 7 - Section A</h3>
-                    <p>School Year 2026–2027 · 1st Term</p>
+                    <h3>{{ $gradeLevel }}</h3>
+                    <p>
+                        School Year {{ $schoolYear }}
+                        · {{ $termLabel }}
+                    </p>
+                    <small>Adviser: {{ $adviserName ?: 'Name unavailable' }}</small>
                 </div>
             </div>
 
@@ -52,13 +65,15 @@
             </span>
         </div>
 
-        {{-- STUDENT LIST --}}
+        {{-- ACADEMIC RECORDS TABLE --}}
         <div class="students-table-card">
 
             <div class="students-table-header">
                 <div>
-                    <h3>Student List</h3>
-                    <p>Students assigned to your advisory class</p>
+                    <h3>Advisory Class Academic Records</h3>
+                    <p>
+                        Approved academic grades of students under {{ $gradeLevel }}.
+                    </p>
                 </div>
             </div>
 
@@ -78,141 +93,165 @@
                     <option value="female">Female</option>
                 </select>
 
+                <form method="GET" action="{{ route('adviser.students') }}" class="academic-term-filter">
+
+                    <input type="hidden" name="school_year" value="{{ $schoolYear }}">
+
+                    <select name="term" aria-label="Select academic term" onchange="this.form.submit()">
+
+                        <option value="overall" {{ $term === 'overall' ? 'selected' : '' }}>
+                            Overall
+                        </option>
+
+                        <option value="1" {{ $term === '1' ? 'selected' : '' }}>
+                            Term 1
+                        </option>
+
+                        <option value="2" {{ $term === '2' ? 'selected' : '' }}>
+                            Term 2
+                        </option>
+
+                        <option value="3" {{ $term === '3' ? 'selected' : '' }}>
+                            Term 3
+                        </option>
+
+                    </select>
+                </form>
+
             </div>
 
-            {{-- STUDENT TABLE --}}
-            <div class="students-table-wrapper">
-                <table class="students-table">
+            {{-- SPREADSHEET-STYLE TABLE --}}
+            <div class="students-table-wrapper academic-records-wrapper">
+
+                <table class="students-table academic-records-table">
 
                     <thead>
-                        <tr>
-                            <th>Student ID</th>
-                            <th>Student Name</th>
-                            <th>Gender</th>
-                            <th>Grade & Section</th>
-                            <th>Action</th>
+                        <tr class="academic-subject-header">
+                            <th rowspan="2" class="student-id-column">Student ID</th>
+                            <th rowspan="2" class="student-name-column">Student Name</th>
+                            <th rowspan="2" class="student-grade-column">Grade Level</th>
+
+                            @foreach($subjects as $subject)
+                                <th colspan="{{ $term === 'overall' ? 4 : 1 }}" class="academic-subject-heading">
+                                    {{ $subject }}
+                                </th>
+                            @endforeach
+                        </tr>
+
+                        <tr class="academic-term-header">
+                            @foreach($subjects as $subject)
+                                @if($term === 'overall')
+                                    <th>Term 1</th>
+                                    <th>Term 2</th>
+                                    <th>Term 3</th>
+                                    <th>Final Grade</th>
+                                @else
+                                    <th>{{ $termLabel }}</th>
+                                @endif
+                            @endforeach
                         </tr>
                     </thead>
 
                     <tbody id="studentsTableBody">
 
-                        {{-- SAMPLE STUDENT 1 --}}
-                        <tr data-gender="male">
-                            <td>FA-2026-001</td>
-                            <td>
-                                <div class="student-name-cell">
-                                    <div class="student-avatar">JD</div>
-                                    <span>Juan Dela Cruz</span>
-                                </div>
-                            </td>
-                            <td>Male</td>
-                            <td>Grade 7 - A</td>
-                            <td>
-                                <button type="button" class="view-records-btn" data-student-id="FA-2026-001"
-                                    data-student-name="Juan Dela Cruz">
-                                    <i class="fa-regular fa-eye"></i>
-                                    View Records
-                                </button>
-                            </td>
-                        </tr>
+                        @forelse($students as $student)
 
-                        {{-- SAMPLE STUDENT 2 --}}
-                        <tr data-gender="female">
-                            <td>FA-2026-002</td>
-                            <td>
-                                <div class="student-name-cell">
-                                    <div class="student-avatar">MS</div>
-                                    <span>Maria Santos</span>
-                                </div>
-                            </td>
-                            <td>Female</td>
-                            <td>Grade 7 - A</td>
-                            <td>
-                                <button type="button" class="view-records-btn" data-student-id="FA-2026-002"
-                                    data-student-name="Maria Santos">
-                                    <i class="fa-regular fa-eye"></i>
-                                    View Records
-                                </button>
-                            </td>
-                        </tr>
+                            @php
+                                $fullName = trim(implode(' ', array_filter([
+                                    $student->first_name,
+                                    $student->middle_name,
+                                    $student->last_name,
+                                ])));
 
-                        {{-- SAMPLE STUDENT 3 --}}
-                        <tr data-gender="male">
-                            <td>FA-2026-003</td>
-                            <td>
-                                <div class="student-name-cell">
-                                    <div class="student-avatar">PR</div>
-                                    <span>Pedro Reyes</span>
-                                </div>
-                            </td>
-                            <td>Male</td>
-                            <td>Grade 7 - A</td>
-                            <td>
-                                <button type="button" class="view-records-btn" data-student-id="FA-2026-003"
-                                    data-student-name="Pedro Reyes">
-                                    <i class="fa-regular fa-eye"></i>
-                                    View Records
-                                </button>
-                            </td>
-                        </tr>
+                                $initials = strtoupper(
+                                    substr($student->first_name ?? '', 0, 1) .
+                                    substr($student->last_name ?? '', 0, 1)
+                                );
 
-                        {{-- SAMPLE STUDENT 4 --}}
-                        <tr data-gender="female">
-                            <td>FA-2026-004</td>
-                            <td>
-                                <div class="student-name-cell">
-                                    <div class="student-avatar">AG</div>
-                                    <span>Ana Garcia</span>
-                                </div>
-                            </td>
-                            <td>Female</td>
-                            <td>Grade 7 - A</td>
-                            <td>
-                                <button type="button" class="view-records-btn" data-student-id="FA-2026-004"
-                                    data-student-name="Ana Garcia">
-                                    <i class="fa-regular fa-eye"></i>
-                                    View Records
-                                </button>
-                            </td>
-                        </tr>
+                                $gender = strtolower($student->sex ?? '');
+                            @endphp
 
-                        {{-- SAMPLE STUDENT 5 --}}
-                        <tr data-gender="male">
-                            <td>FA-2026-005</td>
-                            <td>
-                                <div class="student-name-cell">
-                                    <div class="student-avatar">CR</div>
-                                    <span>Carlos Ramos</span>
-                                </div>
-                            </td>
-                            <td>Male</td>
-                            <td>Grade 7 - A</td>
-                            <td>
-                                <button type="button" class="view-records-btn" data-student-id="FA-2026-005"
-                                    data-student-name="Carlos Ramos">
-                                    <i class="fa-regular fa-eye"></i>
-                                    View Records
-                                </button>
-                            </td>
-                        </tr>
+                            <tr class="academic-student-row" data-gender="{{ $gender }}"
+                                data-search="{{ strtolower($student->student_id . ' ' . $fullName) }}">
 
-                        {{-- SAMPLE STUDENT 6 --}}
-                        <tr data-gender="female">
-                            <td>FA-2026-006</td>
-                            <td>
-                                <div class="student-name-cell">
-                                    <div class="student-avatar">LT</div>
-                                    <span>Lea Torres</span>
-                                </div>
-                            </td>
-                            <td>Female</td>
-                            <td>Grade 7 - A</td>
-                            <td>
-                                <button type="button" class="view-records-btn" data-student-id="FA-2026-006"
-                                    data-student-name="Lea Torres">
-                                    <i class="fa-regular fa-eye"></i>
-                                    View Records
-                                </button>
+                                <td class="student-id-column">
+                                    {{ $student->student_id }}
+                                </td>
+
+                                <td class="student-name-column">
+                                    <div class="student-name-cell">
+                                        <div class="student-avatar">
+                                            {{ $initials }}
+                                        </div>
+
+                                        <span>{{ $fullName }}</span>
+                                    </div>
+                                </td>
+
+                                <td class="student-grade-column">
+                                    {{ $student->grade_level }}
+                                </td>
+
+                                @foreach($subjects as $subject)
+
+                                    @foreach($termsToDisplay as $displayTerm)
+
+                                        @php
+                                            $record = $student->gradeRecords->first(
+                                                function ($gradeRecord) use ($subject, $displayTerm) {
+                                                    return $gradeRecord->teachingAssignment
+                                                        && $gradeRecord->teachingAssignment->subject === $subject
+                                                        && (int) $gradeRecord->term === $displayTerm
+                                                        && $gradeRecord->status === 'adviser_approved';
+                                                }
+                                            );
+                                        @endphp
+
+                                        <td class="academic-grade-cell">
+                                            @if($record && $record->term_grade !== null)
+                                                <span class="approved-grade">
+                                                    {{ number_format((float) $record->term_grade, 2) }}
+                                                </span>
+                                            @else
+                                                <span class="no-grade">—</span>
+                                            @endif
+                                        </td>
+
+                                    @endforeach
+
+                                    @if($term === 'overall')
+                                        <td class="academic-grade-cell final-grade-cell">
+                                            <span class="no-grade">—</span>
+                                        </td>
+                                    @endif
+
+                                @endforeach
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="{{ 3 + ($subjects->count() * ($term === 'overall' ? 4 : 1)) }}"
+                                    class="students-empty-state">
+                                    <i class="fa-solid fa-user-slash"></i>
+                                    <h4>No students found</h4>
+                                    <p>
+                                        There are no active students assigned to {{ $gradeLevel }}
+                                        for school year {{ $schoolYear }}.
+                                    </p>
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+                        {{-- EMPTY SEARCH RESULTS --}}
+                        <tr id="studentsEmpty" hidden>
+                            <td colspan="{{ 3 + ($subjects->count() * ($term === 'overall' ? 4 : 1)) }}"
+                                class="students-empty-state">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <h4>No matching students found</h4>
+                                <p>Try another student name, ID, or gender filter.</p>
                             </td>
                         </tr>
 
@@ -220,96 +259,38 @@
 
                 </table>
 
-                {{-- NO RESULTS MESSAGE --}}
-                <div class="students-empty-state" id="studentsEmpty" hidden>
-                    <i class="fa-solid fa-user-slash"></i>
-                    <h4>No students found</h4>
-                    <p>Try another student name, ID, or filter.</p>
-                </div>
             </div>
 
             <div class="students-table-footer">
-                <span id="studentCount">Showing 6 sample students</span>
-                <span>Grade 7 - Section A</span>
+                <span id="studentCount">
+                    Showing {{ $totalStudents }}
+                    {{ $totalStudents === 1 ? 'student' : 'students' }}
+                </span>
+
+                <span>
+                    {{ $gradeLevel }} · {{ $schoolYear }}
+                </span>
             </div>
 
-        </div>
-
-    </div>
-
-    {{-- STUDENT RECORDS MODAL --}}
-    <div class="student-modal" id="studentRecordsModal" hidden>
-        <div class="student-modal-backdrop" data-close-modal></div>
-
-        <div class="student-modal-content" role="dialog" aria-modal="true" aria-labelledby="modalStudentName">
-            <div class="student-modal-header">
-                <div>
-                    <span class="modal-eyebrow">STUDENT ACADEMIC RECORD</span>
-                    <h3 id="modalStudentName">Student Name</h3>
-                    <p id="modalStudentId">Student ID</p>
+            @if($subjects->isEmpty())
+                <div class="academic-no-subjects">
+                    <i class="fa-solid fa-book-open"></i>
+                    <p>No subjects have been assigned to this grade level yet.</p>
                 </div>
+            @endif
 
-                <button type="button" class="modal-close-btn" id="closeStudentModal" aria-label="Close student records">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="modal-class-badge">
-                <i class="fa-solid fa-school"></i>
-                Grade 7 - Section A
-            </div>
-
-            <div class="records-note">
+            <div class="academic-records-note">
                 <i class="fa-solid fa-circle-info"></i>
-                Sample grades for UI demonstration only.
+                Only Adviser-approved grades are displayed. Final Grade will remain blank
+                until the school's approved final-grade computation is implemented.
             </div>
 
-            <div class="records-table-wrapper">
-                <table class="records-table">
-                    <thead>
-                        <tr>
-                            <th>Subject</th>
-                            <th>Final Grade</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr>
-                            <td>Mathematics</td>
-                            <td>90</td>
-                            <td><span class="grade-passed">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Science</td>
-                            <td>88</td>
-                            <td><span class="grade-passed">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>English</td>
-                            <td>92</td>
-                            <td><span class="grade-passed">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Filipino</td>
-                            <td>89</td>
-                            <td><span class="grade-passed">Passed</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="student-modal-footer">
-                <button type="button" class="modal-done-btn" id="doneStudentModal">
-                    Close
-                </button>
-            </div>
         </div>
+
     </div>
 
 @endsection
 
-{{-- PAGE JS --}}
 @section('page-js')
     <script src="{{ asset('js/adviser/adviser-students.js') }}"></script>
 @endsection

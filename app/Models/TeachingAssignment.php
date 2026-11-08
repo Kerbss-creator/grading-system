@@ -17,4 +17,9 @@ class TeachingAssignment extends Model
     {
         return $this->belongsTo(Faculty::class);
     }
+    
+    public function gradeRecords()
+    {
+        return $this->hasMany(GradeRecord::class);
+    }
 }

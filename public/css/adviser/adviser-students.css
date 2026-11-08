@@ -58,11 +58,12 @@
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    padding: 20px 24px;
+    padding: 25px 28px;
     margin-bottom: 22px;
-    background: #f5faf6;
-    border: 1px solid #dcece0;
+    background: #ffffff;
+    border: 1px solid #e6eee8;
     border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(20, 70, 40, 0.04);
 }
 
 .class-info-left {
@@ -492,6 +493,206 @@
 
 .modal-done-btn:hover {
     background: #0d5c2d;
+}
+
+/* ==========================================
+   ADVISORY ACADEMIC RECORDS TABLE
+========================================== */
+
+.academic-records-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 1px solid #e5ebe6;
+    border-radius: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #a8b9ad #f1f5f2;
+}
+
+.academic-records-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    white-space: nowrap;
+}
+
+.academic-records-table th,
+.academic-records-table td {
+    padding: 13px 16px;
+    text-align: center;
+    border-right: 1px solid #e8eee9;
+    border-bottom: 1px solid #e8eee9;
+    font-size: 13px;
+}
+
+.academic-records-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.academic-records-table thead th {
+    background: #f3f7f4;
+    color: #31513d;
+    font-weight: 700;
+}
+
+.academic-records-table .academic-subject-heading {
+    background: #e7f1e9;
+    color: #036f35;
+    min-width: 115px;
+    border-bottom: 1px solid #d5e4d8;
+}
+
+.academic-records-table .academic-term-header th {
+    min-width: 90px;
+    font-size: 12px;
+    background: #f5f8f5;
+}
+
+.academic-records-table .student-id-column {
+    min-width: 125px;
+}
+
+.academic-records-table .student-name-column {
+    min-width: 210px;
+    text-align: left;
+}
+
+.academic-records-table .student-grade-column {
+    min-width: 115px;
+}
+
+.academic-records-table tbody td {
+    background: #fff;
+    color: #435449;
+}
+
+.academic-records-table tbody tr:hover td {
+    background: #f8fbf8;
+}
+
+.academic-records-table .student-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.academic-records-table .student-name-cell span {
+    font-weight: 600;
+    color: #263b2e;
+}
+
+.academic-records-table .student-avatar {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f3eb;
+    color: #036f35;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.academic-records-table .academic-grade-cell {
+    min-width: 90px;
+    font-weight: 600;
+}
+
+.academic-records-table .approved-grade {
+    color: #036f35;
+    font-weight: 700;
+}
+
+.academic-records-table .no-grade {
+    color: #a0aaa3;
+}
+
+.academic-records-table .final-grade-cell {
+    background: #f7faf7;
+}
+
+.academic-records-table .students-empty-state {
+    padding: 45px 20px;
+    text-align: center;
+    color: #849188;
+}
+
+.academic-records-table .students-empty-state i {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.academic-records-table .students-empty-state h4 {
+    margin: 8px 0 4px;
+    color: #405447;
+}
+
+.academic-records-table .students-empty-state p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.academic-term-filter select {
+    min-width: 145px;
+}
+
+.academic-records-note,
+.academic-no-subjects {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 16px;
+    padding: 13px 15px;
+    border-radius: 9px;
+    background: #f5f8f5;
+    color: #647368;
+    font-size: 12px;
+}
+
+.academic-records-note i,
+.academic-no-subjects i {
+    color: #036f35;
+}
+
+.academic-no-subjects {
+    justify-content: center;
+}
+
+.academic-no-subjects p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .academic-records-wrapper {
+        border-radius: 9px;
+    }
+
+    .academic-records-table th,
+    .academic-records-table td {
+        padding: 11px 12px;
+        font-size: 12px;
+    }
+
+    .academic-records-table .student-name-column {
+        min-width: 180px;
+    }
+
+    .academic-records-table .academic-subject-heading {
+        min-width: 105px;
+    }
+
+    .academic-term-filter {
+        width: 100%;
+    }
+
+    .academic-term-filter select {
+        width: 100%;
+    }
 }
 
 /* RESPONSIVE DESIGN */

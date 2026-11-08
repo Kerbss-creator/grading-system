@@ -584,7 +584,88 @@
     font-size: 11px;
 }
 
-/* RESPONSIVE DESIGN */
+/* ==========================================
+   ADVISORY CLASS ACADEMIC RECORDS
+========================================== */
+
+.advisory-records-panel {
+    min-width: 0;
+}
+
+.advisory-records-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e8eee9;
+    border-radius: 12px;
+}
+
+.advisory-records-table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.advisory-records-table th,
+.advisory-records-table td {
+    padding: 14px 16px;
+    text-align: center;
+    border-bottom: 1px solid #edf1ee;
+    font-size: 13px;
+}
+
+.advisory-records-table thead th {
+    background: #f5f8f5;
+    color: #355342;
+    font-weight: 700;
+}
+
+.advisory-records-table thead tr:first-child th {
+    border-bottom: 1px solid #dfe9e1;
+}
+
+.advisory-records-table .subject-group-heading {
+    background: #eaf3ec;
+    color: #036f35;
+}
+
+.advisory-records-table tbody td {
+    color: #526258;
+}
+
+.advisory-records-table tbody td:nth-child(2) {
+    text-align: left;
+    color: #263b2e;
+}
+
+.advisory-records-table tbody tr:hover {
+    background: #f8fbf8;
+}
+
+.advisory-records-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.advisory-records-table .empty-review-message {
+    text-align: center;
+    padding: 35px 15px;
+}
+
+@media (max-width: 768px) {
+    .advisory-records-table {
+        min-width: 850px;
+    }
+
+    .advisory-records-table th,
+    .advisory-records-table td {
+        padding: 11px 12px;
+        font-size: 12px;
+    }
+}
+
+/* ==========================================
+   RESPONSIVE STYLES
+========================================== */
 
 @media (max-width: 900px) {
     .class-details-grid {

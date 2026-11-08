@@ -9,43 +9,20 @@
 @endsection
 
 @section('content')
-    <section class="faculty-management">
 
-        {{-- SUMMARY CARDS --}}
-        <div class="faculty-summary">
-            <div class="faculty-summary-card">
-                <div>
-                    <p>Total Faculty</p>
-                    <h2 id="totalFaculty">0</h2>
-                </div>
-                <i class="fa-solid fa-users"></i>
-            </div>
-
-            <div class="faculty-summary-card">
-                <div>
-                    <p>Active Faculty</p>
-                    <h2 id="activeFaculty">0</h2>
-                </div>
-                <i class="fa-solid fa-user-check"></i>
-            </div>
-
-            <div class="faculty-summary-card">
-                <div>
-                    <p>Faculty with Advisory</p>
-                    <h2 id="adviserFaculty">0</h2>
-                </div>
-                <i class="fa-solid fa-user-tie"></i>
-            </div>
-        </div>
+    {{-- FACULTY RECORDS CONTAINER --}}
+    <section class="faculty-records-card">
 
         {{-- TOOLBAR --}}
         <div class="faculty-toolbar">
+
             <button type="button" class="add-faculty-btn" id="addFacultyBtn">
                 <i class="fa-solid fa-plus"></i>
                 Add Faculty
             </button>
 
             <div class="faculty-toolbar-right">
+
                 <div class="faculty-search">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="search" id="facultySearch" placeholder="Search faculty...">
@@ -76,11 +53,13 @@
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                 </select>
+
             </div>
         </div>
 
         {{-- FACULTY TABLE --}}
         <div class="faculty-table-container">
+
             <table class="faculty-table">
                 <thead>
                     <tr>
@@ -92,6 +71,7 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
+
                 <tbody id="facultyTableBody"></tbody>
             </table>
 
@@ -112,8 +92,11 @@
                     Add Faculty
                 </button>
             </div>
+
         </div>
+
     </section>
+
 
     {{-- ADD / EDIT FACULTY MODAL --}}
     <div class="faculty-modal-overlay" id="facultyFormModal" aria-hidden="true">
@@ -129,7 +112,7 @@
             </div>
 
             <form id="facultyForm">
-                    @csrf
+                @csrf
                 <div class="faculty-modal-body">
                     <h3 class="faculty-section-title">Basic Information</h3>
 
@@ -267,34 +250,86 @@
             </div>
         </div>
     </div>
+
+
+    {{-- DEACTIVATE / REACTIVATE CONFIRMATION MODAL --}}
+    <div class="faculty-modal-overlay" id="facultyStatusModal" aria-hidden="true">
+        <div class="faculty-modal faculty-delete-modal" role="dialog" aria-modal="true"
+            aria-labelledby="facultyStatusTitle">
+
+            <div class="faculty-delete-icon" id="facultyStatusIcon">
+                <i class="fa-solid fa-user-slash"></i>
+            </div>
+
+            <h2 id="facultyStatusTitle">Deactivate Faculty?</h2>
+
+            <p id="facultyStatusMessage">
+                Are you sure you want to deactivate this faculty member?
+            </p>
+
+            <div class="faculty-modal-footer">
+                <button type="button" class="faculty-btn-cancel" data-close-modal>
+                    Cancel
+                </button>
+
+                <button type="button" class="faculty-btn-delete" id="confirmFacultyStatus">
+                    Deactivate Faculty
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    {{-- CUSTOM ALERT MODAL --}}
+    <div class="faculty-modal-overlay" id="facultyAlertModal" aria-hidden="true">
+        <div class="faculty-modal faculty-alert-modal" role="alertdialog" aria-modal="true"
+            aria-labelledby="facultyAlertTitle">
+
+            <div class="faculty-alert-icon" id="facultyAlertIcon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+
+            <h2 id="facultyAlertTitle">Adviser Already Assigned</h2>
+
+            <p id="facultyAlertMessage">
+                An adviser is already assigned to this grade level.
+            </p>
+
+            <div class="faculty-modal-footer">
+                <button type="button" class="faculty-btn-save" data-close-modal>
+                    Okay, Got it
+                </button>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
 
 <script>
     window.facultyData = {{ Illuminate\Support\Js::from(
-        $faculty->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'facultyId' => $item->faculty_id,
-                'firstName' => $item->first_name,
-                'middleName' => $item->middle_name ?? '',
-                'lastName' => $item->last_name,
-                'email' => $item->email,
-                'status' => ucfirst($item->status),
-                'teacher' => $item->teachingAssignments->isNotEmpty(),
-                'adviser' => $item->advisoryAssignments->isNotEmpty(),
-                'advisoryGrade' => $item->advisoryAssignments->first()?->grade_level ?? '',
-                'schoolYear' => $item->advisoryAssignments->first()?->school_year ?? '',
-                'assignments' => $item->teachingAssignments->map(function ($assignment) {
-                    return [
-                        'grade' => $assignment->grade_level,
-                        'subject' => $assignment->subject,
-                    ];
-                })->values(),
-            ];
-        })->values()
-    ) }};
+    $faculty->map(function ($item) {
+        return [
+            'id' => $item->id,
+            'facultyId' => $item->faculty_id,
+            'firstName' => $item->first_name,
+            'middleName' => $item->middle_name ?? '',
+            'lastName' => $item->last_name,
+            'email' => $item->email,
+            'status' => ucfirst($item->status),
+            'teacher' => $item->teachingAssignments->isNotEmpty(),
+            'adviser' => $item->advisoryAssignments->isNotEmpty(),
+            'advisoryGrade' => $item->advisoryAssignments->first()?->grade_level ?? '',
+            'schoolYear' => $item->advisoryAssignments->first()?->school_year ?? '',
+            'assignments' => $item->teachingAssignments->map(function ($assignment) {
+                return [
+                    'grade' => $assignment->grade_level,
+                    'subject' => $assignment->subject,
+                ];
+            })->values(),
+        ];
+    })->values()
+) }};
 </script>
 
 <script src="{{ asset('js/admin/faculty-management.js') }}" defer></script>

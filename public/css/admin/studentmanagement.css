@@ -702,7 +702,6 @@
     }
 }
 
-
 /* STUDENT MODAL WITH BACKGROUND BLUR */
 
 .modal-overlay {
@@ -719,7 +718,7 @@
     padding: 20px;
 
     /* Dark transparent overlay */
-    background: rgba(0, 0, 0, 0.30);
+    background: rgba(0, 0, 0, 0.3);
 
     /* Blur the background behind the modal */
     backdrop-filter: blur(5px);
@@ -744,7 +743,6 @@
 
     animation: modalShow 0.2s ease;
 }
-
 
 /* RESPONSIVE VIEW MODAL */
 
@@ -796,4 +794,192 @@
         grid-template-columns: 1fr;
         gap: 0;
     }
+}
+
+/* =========================================
+   STUDENT MANAGEMENT - UPDATED STYLES
+========================================= */
+
+/* STATUS BADGES */
+
+.student-status {
+    display: inline-block;
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.student-status.active {
+    background: #e5f5eb;
+    color: #08763b;
+}
+
+.student-status.inactive {
+    background: #fbeaea;
+    color: #c62828;
+}
+
+/* ACTIVATE BUTTON */
+
+.activate-btn {
+    background: #e5f5eb;
+    color: #08763b;
+}
+
+.activate-btn:hover {
+    background: #ccebd8;
+}
+
+/* NO MATCHING STUDENTS */
+
+#studentNoResults[hidden] {
+    display: none !important;
+}
+
+#studentNoResults {
+    padding: 35px 20px;
+    text-align: center;
+    color: #777;
+}
+
+#studentNoResults h3 {
+    margin-bottom: 7px;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#studentNoResults p {
+    margin-bottom: 15px;
+    font-size: 12px;
+}
+
+#clearStudentFilters {
+    padding: 9px 15px;
+    border: 1px solid #036f35;
+    border-radius: 6px;
+    background: white;
+    color: #036f35;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#clearStudentFilters:hover {
+    background: #036f35;
+    color: white;
+}
+
+/* NOTIFICATION MODAL */
+
+#studentNotificationModal .student-modal {
+    width: 420px;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+}
+
+#studentNotificationModal .modal-body {
+    padding: 30px 25px;
+}
+
+#notificationIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    font-size: 25px;
+}
+
+#notificationIcon.notification-success {
+    background: #e5f5eb;
+    color: #08763b;
+}
+
+#notificationIcon.notification-error {
+    background: #fbeaea;
+    color: #c62828;
+}
+
+#notificationIcon.notification-warning {
+    background: #fff5df;
+    color: #b47b00;
+}
+
+#notificationIcon.notification-info {
+    background: #eef4ff;
+    color: #3569b8;
+}
+
+#notificationTitle {
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#notificationSubtitle {
+    margin-bottom: 10px;
+    color: #888;
+    font-size: 12px;
+}
+
+#notificationMessage {
+    color: #666;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* DISABLED / LOADING BUTTONS */
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* RESPONSIVE TOOLBAR */
+
+@media (max-width: 600px) {
+    .student-management {
+        padding: 15px;
+    }
+
+    .toolbar-right {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box,
+    .filter-select {
+        width: 100%;
+    }
+
+    .student-toolbar > .add-student-btn {
+        justify-content: center;
+    }
+}
+
+/* MODAL SCROLLING */
+
+.modal-overlay {
+    overflow-y: auto;
+}
+
+.student-modal {
+    max-height: 92vh;
+}
+
+/* STUDENT ID TEXT COLOR */
+
+.student-id-text {
+    color: #036f35;
+    font-weight: 600;
 }

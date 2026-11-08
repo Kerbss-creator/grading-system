@@ -53,7 +53,7 @@
       </div>
 
       <div class="welcome-icon">
-        <i class="fa-solid fa-graduation-cap"></i>
+        <img src="{{ asset('images/forbesologo.png') }}" alt="Forbes Academy Logo">
       </div>
 
     </div>

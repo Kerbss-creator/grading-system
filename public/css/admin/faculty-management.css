@@ -1,4 +1,6 @@
-/* FACULTY MANAGEMENT */
+/* =========================================
+   FACULTY MANAGEMENT
+========================================= */
 
 /* MAIN CONTENT */
 
@@ -61,9 +63,9 @@
 
 .faculty-summary-card > i {
     display: flex;
-    flex-shrink: 0;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     width: 43px;
     height: 43px;
     border-radius: 9px;
@@ -237,10 +239,6 @@
     background: #fafcfb;
 }
 
-.faculty-table .faculty-empty-state:hover {
-    background: #fff;
-}
-
 .faculty-id-text {
     color: #036f35;
     font-weight: 600;
@@ -395,8 +393,9 @@
     line-height: 1.8;
 }
 
-
-/* MODAL OVERLAY */
+/* =========================================
+   MODALS
+========================================= */
 
 .faculty-modal-overlay {
     position: fixed;
@@ -407,7 +406,7 @@
     justify-content: center;
     padding: 20px;
     overflow-y: auto;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
@@ -418,42 +417,68 @@
 }
 
 .faculty-modal {
+    display: flex;
+    flex-direction: column;
     width: 560px;
     max-width: 100%;
-    max-height: 92vh;
+    max-height: 90vh;
+    min-height: 0;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 13px;
     background: #fff;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
     animation: facultyModalIn 0.2s ease;
+    font-family: "Poppins", sans-serif;
+}
+
+.faculty-modal,
+.faculty-modal * {
+    box-sizing: border-box;
 }
 
 .faculty-modal-large {
-    width: 650px;
-    max-width: 100%;
+    width: 680px;
 }
+
+/* ALL MODAL TEXT: 12PX */
+
+.faculty-modal h2,
+.faculty-modal h3,
+.faculty-modal p,
+.faculty-modal label,
+.faculty-modal small,
+.faculty-modal strong,
+.faculty-modal input,
+.faculty-modal select,
+.faculty-modal button,
+.faculty-modal textarea {
+    font-size: 12px;
+}
+
+/* MODAL HEADER */
 
 .faculty-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    padding: 20px 24px;
+    flex-shrink: 0;
+    padding: 19px 23px;
     border-bottom: 1px solid #eee;
 }
 
 .faculty-modal-header h2 {
     margin: 0;
     color: #036f35;
-    font-size: 20px;
+    font-size: 12px;
     font-weight: 600;
 }
 
 .faculty-modal-header p {
-    margin: 4px 0 0;
+    margin: 5px 0 0;
     color: #888;
-    font-size: 11px;
-    line-height: 1.7;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
 .faculty-modal-close {
@@ -464,49 +489,73 @@
     width: 34px;
     height: 34px;
     border: none;
-    border-radius: 6px;
-    background: transparent;
+    border-radius: 7px;
+    background: #f5f7f5;
     color: #777;
-    font-size: 18px;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: 0.2s ease;
 }
 
 .faculty-modal-close:hover {
-    background: #f2f2f2;
-    color: #333;
+    background: #e5f5eb;
+    color: #036f35;
 }
 
+/* MODAL BODY */
+
 .faculty-modal-body {
-    max-height: calc(92vh - 145px);
-    padding: 20px 24px;
+    flex: 1;
+    min-height: 0;
+    padding: 20px 23px;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd8ce transparent;
+}
+
+.faculty-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.faculty-modal-body::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #cbd8ce;
+}
+
+/* FORM MODAL */
+
+.faculty-modal > form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* FORM SECTIONS */
 
 .faculty-section-title {
-    margin: 0 0 15px;
+    margin: 0 0 14px;
     color: #036f35;
     font-size: 12px;
     font-weight: 600;
 }
 
 .faculty-section-title:not(:first-child) {
-    margin-top: 22px;
+    margin-top: 21px;
 }
 
 .faculty-help-text {
-    margin: -7px 0 14px;
+    margin: -6px 0 14px;
     color: #777;
-    font-size: 10px;
-    line-height: 1.7;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
 .faculty-form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
+    gap: 13px;
 }
 
 .faculty-form-group {
@@ -514,12 +563,12 @@
     flex-direction: column;
     gap: 6px;
     min-width: 0;
-    margin-bottom: 15px;
+    margin-bottom: 14px;
 }
 
 .faculty-form-group label {
     color: #444;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
 }
 
@@ -538,10 +587,8 @@
     background: #fff;
     color: #333;
     font-family: "Poppins", sans-serif;
-    font-size: 11px;
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    font-size: 12px;
+    transition: 0.2s ease;
 }
 
 .faculty-form-group input:focus,
@@ -552,6 +599,7 @@
 
 .faculty-form-group input::placeholder {
     color: #aaa;
+    font-size: 12px;
 }
 
 /* RESPONSIBILITY OPTIONS */
@@ -566,14 +614,12 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 14px;
+    padding: 13px;
     border: 1px solid #e5e5e5;
     border-radius: 9px;
     background: #fff;
     cursor: pointer;
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease;
+    transition: 0.2s ease;
 }
 
 .faculty-check-option:has(input:checked) {
@@ -592,16 +638,19 @@
     gap: 5px;
 }
 
+.faculty-check-option strong,
+.faculty-check-option small {
+    font-size: 12px;
+}
+
 .faculty-check-option strong {
     color: #333;
-    font-size: 12px;
     font-weight: 600;
 }
 
 .faculty-check-option small {
     color: #888;
-    font-size: 10px;
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
 /* TEACHING AND ADVISORY ASSIGNMENTS */
@@ -620,12 +669,11 @@
 }
 
 .faculty-add-row-btn {
-    min-height: 34px;
-    padding: 8px 11px;
+    min-height: 35px;
+    padding: 8px 12px;
     border: 1px solid #cfe3d4;
     background: #f3faf5;
     color: #036f35;
-    font-size: 10px;
 }
 
 .faculty-add-row-btn:hover {
@@ -659,23 +707,34 @@
     background: #ffeded;
     color: #d32f2f;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: 0.2s ease;
 }
 
 .faculty-remove-row-btn:hover {
     background: #ffd9d9;
 }
 
-/* MODAL FOOTER AND BUTTONS */
+/* MODAL FOOTER */
 
 .faculty-modal-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
-    padding: 16px 24px;
+    flex-shrink: 0;
+    padding: 15px 23px;
     border-top: 1px solid #eee;
     background: #fafafa;
+}
+
+.faculty-btn-save,
+.faculty-btn-cancel,
+.faculty-btn-delete {
+    min-height: 38px;
+    padding: 9px 16px;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
 }
 
 .faculty-btn-cancel {
@@ -688,11 +747,6 @@
     background: #f3f3f3;
 }
 
-.faculty-btn-save {
-    padding: 10px 16px;
-    font-size: 11px;
-}
-
 .faculty-btn-delete {
     background: #d32f2f;
     color: #fff;
@@ -700,6 +754,11 @@
 
 .faculty-btn-delete:hover {
     background: #b71c1c;
+}
+
+.faculty-modal button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* VIEW FACULTY DETAILS */
@@ -722,19 +781,22 @@
     overflow-wrap: anywhere;
 }
 
+.faculty-detail-item small,
+.faculty-detail-item strong {
+    font-size: 12px;
+}
+
 .faculty-detail-item small {
     color: #888;
-    font-size: 10px;
 }
 
 .faculty-detail-item strong {
     color: #333;
-    font-size: 11px;
     font-weight: 600;
 }
 
 .faculty-detail-block {
-    margin-top: 22px;
+    margin-top: 20px;
 }
 
 .faculty-detail-block h3 {
@@ -754,32 +816,22 @@
     border: 1px solid #eee;
     border-radius: 7px;
     background: #fff;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .faculty-detail-assignment span {
     color: #666;
+    font-size: 12px;
 }
 
-/* DELETE CONFIRMATION */
+/* DELETE / DEACTIVATE / REACTIVATE */
 
 .faculty-delete-modal {
-    max-width: 470px;
-}
-
-.faculty-delete-modal h2 {
-    margin: 0 0 8px;
-    color: #333;
-    font-size: 17px;
-    font-weight: 600;
-    text-align: center;
-}
-
-.faculty-delete-modal > p {
-    margin: 0;
-    color: #777;
-    font-size: 11px;
-    line-height: 1.7;
+    align-items: center;
+    width: 430px;
+    max-width: 100%;
+    max-height: none;
+    padding: 30px 28px 0;
     text-align: center;
 }
 
@@ -787,69 +839,144 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 55px;
-    height: 55px;
-    margin: 0 auto 15px;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 16px;
     border-radius: 50%;
     background: #ffeded;
     color: #d32f2f;
-    font-size: 22px;
+}
+
+.faculty-delete-modal h2 {
+    margin: 0 0 9px;
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.faculty-delete-modal > p {
+    max-width: 340px;
+    margin: 0 auto;
+    color: #777;
+    font-size: 12px;
+    line-height: 1.8;
 }
 
 .faculty-delete-modal .faculty-modal-footer {
-    margin-top: 22px;
+    justify-content: center;
+    width: calc(100% + 56px);
+    margin: 23px -28px 0;
 }
 
-/* =========================================
-   FACULTY SUCCESS MODAL
-========================================= */
+/* CUSTOM ALERT MODAL */
+
+.faculty-alert-modal {
+    align-items: center;
+    width: 420px;
+    max-width: 100%;
+    max-height: none;
+    padding: 30px 28px 0;
+    text-align: center;
+}
+
+.faculty-alert-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 17px;
+    border-radius: 50%;
+}
+
+.faculty-alert-icon.warning {
+    background: #fff4df;
+    color: #d99016;
+}
+
+.faculty-alert-icon.error {
+    background: #feecec;
+    color: #dc3545;
+}
+
+.faculty-alert-modal h2 {
+    margin: 0 0 9px;
+    color: #183b29;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.faculty-alert-modal p {
+    max-width: 340px;
+    margin: 0 auto;
+    color: #68756d;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.faculty-alert-modal .faculty-modal-footer {
+    justify-content: center;
+    width: calc(100% + 56px);
+    margin: 23px -28px 0;
+}
+
+.faculty-alert-modal .faculty-btn-save {
+    min-width: 145px;
+}
+
+/* SUCCESS MODAL */
 
 .faculty-success-modal {
-    width: min(420px, calc(100% - 32px));
-    padding: 35px 30px;
-    background: #ffffff;
-    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(420px, 100%);
+    max-height: none;
+    padding: 32px 28px;
+    border-radius: 14px;
+    background: #fff;
     text-align: center;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.18);
     animation: facultySuccessPop 0.3s ease;
 }
 
 .faculty-success-icon {
-    width: 75px;
-    height: 75px;
-    margin: 0 auto 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 17px;
     border-radius: 50%;
     background: #e7f7ed;
     color: #036f35;
-    font-size: 32px;
 }
 
 .faculty-success-modal h2 {
     margin: 0 0 10px;
     color: #1f2937;
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .faculty-success-modal p {
-    margin: 0 0 25px;
+    margin: 0 0 22px;
     color: #6b7280;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 12px;
+    line-height: 1.7;
 }
 
 .faculty-success-modal button {
     width: 100%;
-    padding: 12px 20px;
+    min-height: 40px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 9px;
+    border-radius: 8px;
     background: #036f35;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 600;
+    color: #fff;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
     transition: background 0.2s ease;
 }
@@ -858,25 +985,12 @@
     background: #025c2c;
 }
 
-@keyframes facultySuccessPop {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
 /* ANIMATIONS */
 
 @keyframes facultyFadeIn {
     from {
         opacity: 0;
     }
-
     to {
         opacity: 1;
     }
@@ -887,10 +1001,20 @@
         opacity: 0;
         transform: translateY(-10px) scale(0.98);
     }
-
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes facultySuccessPop {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
@@ -954,32 +1078,32 @@
         padding: 15px;
     }
 
-    .faculty-form-grid,
-    .faculty-responsibility-options,
-    .faculty-detail-grid {
-        grid-template-columns: 1fr;
-    }
-
     .faculty-modal-overlay {
-        align-items: center;
         padding: 12px;
     }
 
-    .faculty-modal {
+    .faculty-modal,
+    .faculty-modal-large {
+        width: 100%;
         max-height: 94vh;
     }
 
     .faculty-modal-header {
-        padding: 18px;
+        padding: 16px;
     }
 
     .faculty-modal-body {
-        max-height: calc(94vh - 140px);
-        padding: 18px;
+        padding: 17px 16px;
     }
 
     .faculty-modal-footer {
-        padding: 15px 18px;
+        padding: 14px 16px;
+    }
+
+    .faculty-form-grid,
+    .faculty-responsibility-options,
+    .faculty-detail-grid {
+        grid-template-columns: 1fr;
     }
 
     .faculty-assignment-row {
@@ -992,5 +1116,73 @@
 
     .faculty-detail-assignment {
         flex-direction: column;
+    }
+
+    .faculty-delete-modal,
+    .faculty-alert-modal {
+        padding: 25px 20px 0;
+    }
+
+    .faculty-delete-modal .faculty-modal-footer,
+    .faculty-alert-modal .faculty-modal-footer {
+        width: calc(100% + 40px);
+        margin-right: -20px;
+        margin-left: -20px;
+    }
+
+    .faculty-success-modal {
+        padding: 27px 22px;
+    }
+}
+
+/* =========================================
+   FACULTY RECORDS WHITE CONTAINER
+========================================= */
+
+.faculty-records-card {
+    width: 100%;
+    padding: 25px;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* TOOLBAR INSIDE CONTAINER */
+
+.faculty-records-card .faculty-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+/* TABLE CONTAINER */
+
+.faculty-records-card .faculty-table-container {
+    min-height: 220px;
+    overflow-x: auto;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1250px) {
+    .faculty-records-card .faculty-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .faculty-records-card .faculty-toolbar-right {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+    .faculty-records-card {
+        padding: 15px;
     }
 }

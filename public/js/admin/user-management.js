@@ -1,918 +1,1207 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // DOM Elements
+    // =====================================================
+    // ROUTES
+    // =====================================================
+
+    const routes = window.userManagementRoutes || {};
+
+    // =====================================================
+    // DOM ELEMENTS
+    // =====================================================
 
     const userTableBody = document.getElementById("userTableBody");
-    const roleFilter = document.getElementById("roleFilter");
     const searchInput = document.getElementById("searchInput");
-    const tableResultCount = document.getElementById("tableResultCount");
+    const roleFilter = document.getElementById("roleFilter");
+    const statusFilter = document.getElementById("statusFilter");
 
     const userModal = document.getElementById("userModal");
     const userForm = document.getElementById("userForm");
-    const roleSelection = document.getElementById("roleSelection");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalDescription = document.getElementById("modalDescription");
-
-    const openAddUser = document.getElementById("openAddUser");
-    const emptyAddUser = document.getElementById("emptyAddUser");
-    const closeModalButton = document.getElementById("closeModal");
-    const cancelForm = document.getElementById("cancelForm");
-    const changeRoleBtn = document.getElementById("changeRoleBtn");
-
-    const selectedRoleInput = document.getElementById("selectedRole");
-    const selectedRoleText = document.getElementById("selectedRoleText");
-    const selectedRoleIcon = document.getElementById("selectedRoleIcon");
-
-    const userIdInput = document.getElementById("userId");
-    const firstNameInput = document.getElementById("firstName");
-    const middleNameInput = document.getElementById("middleName");
-    const lastNameInput = document.getElementById("lastName");
-    const usernameInput = document.getElementById("username");
-    const emailInput = document.getElementById("email");
-    const accountStatusInput = document.getElementById("accountStatus");
-
-    const passwordInput = document.getElementById("password");
-    const confirmPasswordInput = document.getElementById("confirmPassword");
-    const passwordFields = document.getElementById("passwordFields");
-    const saveUserText = document.getElementById("saveUserText");
+    const profileType = document.getElementById("profileType");
 
     const studentFields = document.getElementById("studentFields");
-    const teacherFields = document.getElementById("teacherFields");
-    const adviserFields = document.getElementById("adviserFields");
-    const adminFields = document.getElementById("adminFields");
+    const facultyFields = document.getElementById("facultyFields");
 
-    const gradeLevelInput = document.getElementById("gradeLevel");
-    const sectionInput = document.getElementById("section");
-    const teacherDepartmentInput = document.getElementById("teacherDepartment");
-    const adviserGradeLevelInput = document.getElementById("adviserGradeLevel");
-    const adviserSectionInput = document.getElementById("adviserSection");
+    const isTeacher = document.getElementById("isTeacher");
+    const isAdviser = document.getElementById("isAdviser");
 
-    const emptyStateRow = document.getElementById("emptyStateRow");
-    const emptyStateTitle = document.getElementById("emptyStateTitle");
-    const emptyStateMessage = document.getElementById("emptyStateMessage");
+    const teachingAssignmentSection = document.getElementById(
+        "teachingAssignmentSection",
+    );
+    const advisoryAssignmentSection = document.getElementById(
+        "advisoryAssignmentSection",
+    );
+    const teachingAssignmentsContainer = document.getElementById(
+        "teachingAssignmentsContainer",
+    );
+
+    const saveUserBtn = document.getElementById("saveUserBtn");
+    const saveUserText = document.getElementById("saveUserText");
 
     const viewUserModal = document.getElementById("viewUserModal");
     const viewUserDetails = document.getElementById("viewUserDetails");
 
-    const deleteUserModal = document.getElementById("deleteUserModal");
-    const deleteUserName = document.getElementById("deleteUserName");
-    const confirmDeleteUser = document.getElementById("confirmDeleteUser");
-
+    const statusModal = document.getElementById("deleteUserModal");
     const resetPasswordModal = document.getElementById("resetPasswordModal");
-    const resetUserName = document.getElementById("resetUserName");
-    const resetPasswordForm = document.getElementById("resetPasswordForm");
-    const newPasswordInput = document.getElementById("newPassword");
-    const confirmNewPasswordInput =
-        document.getElementById("confirmNewPassword");
 
-    const totalUsersElement = document.getElementById("totalUsers");
-    const totalStudentsElement = document.getElementById("totalStudents");
-    const totalTeachersElement = document.getElementById("totalTeachers");
-    const totalAdvisersElement = document.getElementById("totalAdvisers");
-    const totalAdminsElement = document.getElementById("totalAdmins");
+    // =====================================================
+    // STATE
+    // =====================================================
 
-    // State Variables
+    let users = [];
+    let selectedUserId = null;
+    let pendingStatus = null;
+    let editingUserId = null;
 
-    let editingRow = null;
-    let selectedDeleteRow = null;
-    let selectedResetRow = null;
+    // Temporary placeholder until the controller includes
+    // administrator accounts in the returned user collection.
+    const ADMIN_ACCOUNT_COUNT = 1;
 
-    const roleSettings = {
-        Student: {
-            icon: "fa-user-graduate",
-            prefix: "STU",
-            avatarClass: "student-avatar",
-        },
-        Teacher: {
-            icon: "fa-chalkboard-user",
-            prefix: "TCH",
-            avatarClass: "teacher-avatar",
-        },
-        Adviser: {
-            icon: "fa-user-tie",
-            prefix: "ADV",
-            avatarClass: "adviser-avatar",
-        },
-        Admin: {
-            icon: "fa-user-shield",
-            prefix: "ADM",
-            avatarClass: "admin-avatar",
-        },
-    };
-
-    // Utility Functions
+    // =====================================================
+    // HELPERS
+    // =====================================================
 
     function escapeHTML(value) {
-        return String(value ?? "").replace(/[&<>"']/g, function (character) {
-            const entities = {
+        return String(value ?? "").replace(/[&<>"']/g, function (char) {
+            return {
                 "&": "&amp;",
                 "<": "&lt;",
                 ">": "&gt;",
                 '"': "&quot;",
                 "'": "&#039;",
-            };
-
-            return entities[character];
+            }[char];
         });
     }
 
-    function getFullName(data) {
-        return [data.firstName, data.middleName, data.lastName]
-            .filter(Boolean)
-            .join(" ");
+    function normalizeRole(role) {
+        return String(role || "")
+            .toLowerCase()
+            .trim();
     }
 
-    function getRowName(row) {
-        return [
-            row.dataset.firstName,
-            row.dataset.middleName,
-            row.dataset.lastName,
-        ]
-            .filter(Boolean)
-            .join(" ");
+    function roleLabel(role) {
+        const labels = {
+            student: "Student",
+            teacher: "Teacher",
+            adviser: "Adviser",
+            teacher_adviser: "Teacher + Adviser",
+            admin: "Administrator",
+        };
+
+        return labels[normalizeRole(role)] || "Unknown";
     }
 
-    function getUserRows() {
-        if (!userTableBody) {
-            return [];
+    function statusLabel(status) {
+        const labels = {
+            active: "Active",
+            pending: "Pending",
+            inactive: "Inactive",
+        };
+
+        return labels[String(status || "").toLowerCase()] || "Unknown";
+    }
+
+    function getStatusClass(status) {
+        const value = String(status || "").toLowerCase();
+
+        if (["active", "pending", "inactive"].includes(value)) {
+            return value;
         }
 
-        return Array.from(userTableBody.querySelectorAll("tr[data-user-row]"));
+        return "inactive";
     }
 
-    function generateUserId(role) {
-        const settings = roleSettings[role];
-
-        if (!settings) {
-            return "";
-        }
-
-        const existingIds = getUserRows().map(function (row) {
-            return row.dataset.userId;
-        });
-
-        let number = 1;
-        let generatedId = "";
-
-        do {
-            generatedId = settings.prefix + String(number).padStart(3, "0");
-            number++;
-        } while (existingIds.includes(generatedId));
-
-        return generatedId;
+    function getInitials(name) {
+        return String(name || "User")
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => part.charAt(0).toUpperCase())
+            .join("");
     }
 
-    function openModal(modal) {
-        if (modal) {
-            modal.classList.add("show");
-            modal.setAttribute("aria-hidden", "false");
-        }
-    }
-
-    function closeModal(modal) {
-        if (modal) {
-            modal.classList.remove("show");
-            modal.setAttribute("aria-hidden", "true");
-        }
-    }
-
-    function closeAllModals() {
-        [userModal, viewUserModal, deleteUserModal, resetPasswordModal].forEach(
-            closeModal,
+    function getCsrfToken() {
+        return (
+            document.querySelector('meta[name="csrf-token"]')?.content ||
+            document.querySelector('input[name="_token"]')?.value ||
+            ""
         );
     }
 
-    function setFieldGroupState(container, enabled) {
-        if (!container) {
-            return;
-        }
-
-        container.hidden = !enabled;
-
-        container
-            .querySelectorAll("input, select, textarea")
-            .forEach(function (input) {
-                input.disabled = !enabled;
-            });
-    }
-
-    function setEmptyState(title, message) {
-        if (emptyStateTitle) {
-            emptyStateTitle.textContent = title;
-        }
-
-        if (emptyStateMessage) {
-            emptyStateMessage.textContent = message;
-        }
-    }
-
-    // Role Selection and Form Visibility
-
-    function selectUserRole(role) {
-        const settings = roleSettings[role];
-
-        if (!settings) {
-            return;
-        }
-
-        selectedRoleInput.value = role;
-        selectedRoleText.textContent = role;
-
-        selectedRoleIcon.className = "fa-solid " + settings.icon;
-
-        document.querySelectorAll(".role-option").forEach(function (button) {
-            const isSelected = button.dataset.role === role;
-
-            button.classList.toggle("selected", isSelected);
-            button.setAttribute("aria-pressed", String(isSelected));
+    async function request(url, options = {}) {
+        const response = await fetch(url, {
+            ...options,
+            headers: {
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": getCsrfToken(),
+                ...(options.headers || {}),
+            },
         });
 
-        // Hide role selection and show the account form
-        if (roleSelection) {
-            roleSelection.hidden = true;
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            let message = data.message || "Something went wrong.";
+
+            if (data.errors) {
+                message = Object.values(data.errors).flat().join("\n");
+            }
+
+            throw new Error(message);
         }
 
-        userForm.classList.remove("hidden");
+        return data;
+    }
 
-        // Show fields based on selected role
-        setFieldGroupState(studentFields, role === "Student");
-        setFieldGroupState(teacherFields, role === "Teacher");
-        setFieldGroupState(adviserFields, role === "Adviser");
-        setFieldGroupState(adminFields, role === "Admin");
+    function showModal(modal) {
+        if (!modal) return;
 
-        if (gradeLevelInput) {
-            gradeLevelInput.required = role === "Student";
-        }
+        modal.classList.add("active");
+        modal.style.display = "flex";
+    }
 
-        if (sectionInput) {
-            sectionInput.required = role === "Student";
-        }
+    function hideModal(modal) {
+        if (!modal) return;
 
-        if (adviserGradeLevelInput) {
-            adviserGradeLevelInput.required = role === "Adviser";
-        }
+        modal.classList.remove("active");
+        modal.style.display = "none";
+    }
 
-        if (adviserSectionInput) {
-            adviserSectionInput.required = role === "Adviser";
-        }
+    function notify(message) {
+        alert(message);
+    }
 
-        if (!editingRow && userIdInput && !userIdInput.value) {
-            userIdInput.value = generateUserId(role);
+    function setLoading(button, loading, originalText = "Save") {
+        if (!button) return;
+
+        button.disabled = loading;
+
+        if (button === saveUserBtn && saveUserText) {
+            saveUserText.textContent = loading ? "Saving..." : originalText;
         }
     }
 
-    // Reset User Form
+    function replaceUserId(url, id) {
+        return url.replace("__ID__", encodeURIComponent(id));
+    }
+
+    // =====================================================
+    // FORM FIELD HELPERS
+    // =====================================================
+
+    function setSectionVisibility(section, visible) {
+        if (!section) return;
+
+        section.hidden = !visible;
+
+        section.querySelectorAll("input, select, textarea").forEach((field) => {
+            field.disabled = !visible;
+
+            if (field.dataset.required === "true") {
+                field.required = visible;
+            }
+        });
+    }
+
+    function configureRequiredFields() {
+        document
+            .querySelectorAll("#userForm [data-required]")
+            .forEach((field) => {
+                field.required = false;
+            });
+
+        if (profileType.value === "student") {
+            [
+                "studentId",
+                "studentSex",
+                "studentGradeLevel",
+                "studentSchoolYear",
+            ].forEach((id) => {
+                const field = document.getElementById(id);
+                if (field) field.required = true;
+            });
+        }
+
+        if (profileType.value === "faculty") {
+            const facultyId = document.getElementById("facultyId");
+            if (facultyId) facultyId.required = true;
+        }
+    }
+
+    function updateProfileFields() {
+        const type = profileType.value;
+
+        setSectionVisibility(studentFields, type === "student");
+        setSectionVisibility(facultyFields, type === "faculty");
+
+        if (type !== "faculty") {
+            if (isTeacher) isTeacher.checked = false;
+            if (isAdviser) isAdviser.checked = false;
+        }
+
+        updateFacultyResponsibilities();
+        configureRequiredFields();
+    }
+
+    function updateFacultyResponsibilities() {
+        const facultySelected = profileType.value === "faculty";
+        const teacherSelected = facultySelected && isTeacher?.checked;
+        const adviserSelected = facultySelected && isAdviser?.checked;
+
+        setSectionVisibility(teachingAssignmentSection, teacherSelected);
+        setSectionVisibility(advisoryAssignmentSection, adviserSelected);
+    }
+
+    // =====================================================
+    // TEACHING ASSIGNMENTS
+    // =====================================================
+
+    function createTeachingAssignmentRow() {
+        const row = document.createElement("div");
+        row.className = "teaching-assignment-row";
+
+        row.innerHTML = `
+            <div class="form-group">
+                <label>Grade Level <span class="required">*</span></label>
+                <select class="assignment-grade" required>
+                    <option value="">Select grade level</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 10">Grade 10</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Subject <span class="required">*</span></label>
+                <select class="assignment-subject" required>
+                    <option value="">Select subject</option>
+                    <option value="Filipino">Filipino</option>
+                    <option value="English">English</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Science">Science</option>
+                    <option value="Araling Panlipunan">Araling Panlipunan</option>
+                    <option value="TLE">TLE</option>
+                    <option value="Values Education">Values Education</option>
+                    <option value="MAPEH">MAPEH</option>
+                    <option value="Computer Education">Computer Education</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-remove-assignment" title="Remove assignment">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+
+        row.querySelector(".btn-remove-assignment").addEventListener(
+            "click",
+            function () {
+                row.remove();
+            },
+        );
+
+        teachingAssignmentsContainer.appendChild(row);
+    }
+
+    function getTeachingAssignments() {
+        return Array.from(
+            teachingAssignmentsContainer.querySelectorAll(
+                ".teaching-assignment-row",
+            ),
+        ).map((row) => ({
+            grade_level: row.querySelector(".assignment-grade").value,
+            subject: row.querySelector(".assignment-subject").value,
+        }));
+    }
+
+    // =====================================================
+    // RESET AND OPEN FORM
+    // =====================================================
 
     function resetUserForm() {
-        if (!userForm) {
-            return;
-        }
-
         userForm.reset();
-        editingRow = null;
-        userForm.dataset.mode = "add";
 
-        if (modalTitle) {
-            modalTitle.textContent = "Add New User";
+        editingUserId = null;
+
+        const userId = document.getElementById("userId");
+        if (userId) userId.value = "";
+
+        // Allow profile type selection again for Add User.
+        profileType.disabled = false;
+
+        teachingAssignmentsContainer.innerHTML = "";
+
+        setSectionVisibility(studentFields, false);
+        setSectionVisibility(facultyFields, false);
+        setSectionVisibility(teachingAssignmentSection, false);
+        setSectionVisibility(advisoryAssignmentSection, false);
+
+        if (saveUserText) {
+            saveUserText.textContent = "Create Account";
         }
 
-        if (modalDescription) {
-            modalDescription.textContent = "Create a new system account.";
+        const title = document.getElementById("userModalTitle");
+        const description = document.getElementById("userModalDescription");
+
+        if (title) title.textContent = "Create New Account";
+
+        if (description) {
+            description.textContent =
+                "Create a system account and its corresponding profile.";
         }
 
-        if (roleSelection) {
-            roleSelection.hidden = false;
+        const setupNotice = document.getElementById("setupNotice");
+        if (setupNotice) setupNotice.hidden = false;
+
+        configureRequiredFields();
+    }
+
+    function openCreateModal() {
+        resetUserForm();
+        updateProfileFields();
+        showModal(userModal);
+    }
+
+    function openEditModal(user) {
+        resetUserForm();
+
+        editingUserId = user.id;
+
+        const userId = document.getElementById("userId");
+        if (userId) userId.value = user.id;
+
+        // Common information
+        profileType.value = user.profile_type || "";
+
+        document.getElementById("firstName").value = user.first_name || "";
+        document.getElementById("middleName").value = user.middle_name || "";
+        document.getElementById("lastName").value = user.last_name || "";
+        document.getElementById("email").value = user.email || "";
+
+        // Prevent changing Student into Faculty or vice versa.
+        profileType.disabled = true;
+
+        updateProfileFields();
+
+        if (user.profile_type === "student") {
+            document.getElementById("studentId").value = user.student_id || "";
+
+            document.getElementById("studentSex").value = user.sex || "";
+
+            document.getElementById("studentGradeLevel").value =
+                user.grade_level || "";
+
+            document.getElementById("studentSection").value =
+                user.section || "";
+
+            document.getElementById("studentSchoolYear").value =
+                user.school_year || "";
         }
 
-        userForm.classList.add("hidden");
+        if (user.profile_type === "faculty") {
+            document.getElementById("facultyId").value = user.faculty_id || "";
 
-        if (selectedRoleInput) {
-            selectedRoleInput.value = "";
+            isTeacher.checked = Boolean(user.is_teacher);
+            isAdviser.checked = Boolean(user.is_adviser);
+
+            updateFacultyResponsibilities();
+
+            // Restore existing teaching assignments.
+            teachingAssignmentsContainer.innerHTML = "";
+
+            if (Array.isArray(user.assignments)) {
+                user.assignments.forEach((assignment) => {
+                    createTeachingAssignmentRow();
+
+                    const rows = teachingAssignmentsContainer.querySelectorAll(
+                        ".teaching-assignment-row",
+                    );
+
+                    const row = rows[rows.length - 1];
+
+                    row.querySelector(".assignment-grade").value =
+                        assignment.grade_level || "";
+
+                    row.querySelector(".assignment-subject").value =
+                        assignment.subject || "";
+                });
+            }
+
+            // Restore the latest advisory assignment.
+            document.getElementById("advisoryGrade").value =
+                user.advisory_grade || "";
+
+            document.getElementById("advisorySchoolYear").value =
+                user.advisory_school_year || "";
         }
 
-        if (selectedRoleText) {
-            selectedRoleText.textContent = "Select Role";
-        }
+        const title = document.getElementById("userModalTitle");
+        const description = document.getElementById("userModalDescription");
 
-        if (selectedRoleIcon) {
-            selectedRoleIcon.className = "fa-solid fa-user";
-        }
+        if (title) title.textContent = "Edit User Account";
 
-        document.querySelectorAll(".role-option").forEach(function (button) {
-            button.classList.remove("selected");
-            button.setAttribute("aria-pressed", "false");
-        });
-
-        setFieldGroupState(studentFields, false);
-        setFieldGroupState(teacherFields, false);
-        setFieldGroupState(adviserFields, false);
-        setFieldGroupState(adminFields, false);
-
-        if (passwordFields) {
-            passwordFields.hidden = false;
-        }
-
-        if (passwordInput) {
-            passwordInput.disabled = false;
-            passwordInput.required = true;
-        }
-
-        if (confirmPasswordInput) {
-            confirmPasswordInput.disabled = false;
-            confirmPasswordInput.required = true;
-        }
-
-        if (userIdInput) {
-            userIdInput.readOnly = true;
-            userIdInput.value = "";
-        }
-
-        if (accountStatusInput) {
-            accountStatusInput.value = "Active";
-        }
-
-        if (gradeLevelInput) {
-            gradeLevelInput.required = false;
-        }
-
-        if (sectionInput) {
-            sectionInput.required = false;
-        }
-
-        if (adviserGradeLevelInput) {
-            adviserGradeLevelInput.required = false;
-        }
-
-        if (adviserSectionInput) {
-            adviserSectionInput.required = false;
+        if (description) {
+            description.textContent =
+                "Update the user's account information and profile details.";
         }
 
         if (saveUserText) {
-            saveUserText.textContent = "Save User";
+            saveUserText.textContent = "Update Account";
         }
+
+        // Hide the account setup notice during editing.
+        const setupNotice = document.getElementById("setupNotice");
+        if (setupNotice) setupNotice.hidden = true;
+
+        configureRequiredFields();
+
+        showModal(userModal);
     }
 
-    // Open and Close Add User Modal
+    // =====================================================
+    // ACCOUNT STATISTICS
+    // =====================================================
 
-    function showAddUserModal() {
-        resetUserForm();
-        openModal(userModal);
+    function updateStatistics() {
+        const studentCount = users.filter(
+            (user) => normalizeRole(user.role) === "student",
+        ).length;
+
+        const teacherCount = users.filter((user) =>
+            ["teacher", "teacher_adviser"].includes(normalizeRole(user.role)),
+        ).length;
+
+        const adviserCount = users.filter((user) =>
+            ["adviser", "teacher_adviser"].includes(normalizeRole(user.role)),
+        ).length;
+
+        const activeCount = users.filter(
+            (user) => String(user.status).toLowerCase() === "active",
+        ).length;
+
+        const pendingCount = users.filter(
+            (user) => String(user.status).toLowerCase() === "pending",
+        ).length;
+
+        const inactiveCount = users.filter(
+            (user) => String(user.status).toLowerCase() === "inactive",
+        ).length;
+
+        document.getElementById("totalUsers").textContent =
+            users.length + ADMIN_ACCOUNT_COUNT;
+        document.getElementById("totalStudents").textContent = studentCount;
+        document.getElementById("totalTeachers").textContent = teacherCount;
+        document.getElementById("totalAdvisers").textContent = adviserCount;
+        document.getElementById("totalAdmins").textContent =
+            ADMIN_ACCOUNT_COUNT;
+        document.getElementById("totalActive").textContent = activeCount;
+        document.getElementById("totalPending").textContent = pendingCount;
+        document.getElementById("totalInactive").textContent = inactiveCount;
     }
 
-    if (openAddUser) {
-        openAddUser.addEventListener("click", showAddUserModal);
-    }
+    // =====================================================
+    // USER TABLE
+    // =====================================================
 
-    if (emptyAddUser) {
-        emptyAddUser.addEventListener("click", showAddUserModal);
-    }
+    function renderUserRow(user) {
+        const role = normalizeRole(user.role);
+        const status = getStatusClass(user.status);
 
-    if (closeModalButton) {
-        closeModalButton.addEventListener("click", function () {
-            closeModal(userModal);
-            resetUserForm();
-        });
-    }
+        const row = document.createElement("tr");
 
-    if (cancelForm) {
-        cancelForm.addEventListener("click", function () {
-            closeModal(userModal);
-            resetUserForm();
-        });
-    }
+        // Role icons
+        const roleIcons = {
+            student: "fa-graduation-cap",
+            teacher: "fa-book-open",
+            adviser: "fa-user-check",
+            teacher_adviser: "fa-users",
+            admin: "fa-user-shield",
+        };
 
-    document.querySelectorAll(".role-option").forEach(function (button) {
-        button.addEventListener("click", function () {
-            selectUserRole(button.dataset.role);
-        });
-    });
-
-    if (changeRoleBtn) {
-        changeRoleBtn.addEventListener("click", function () {
-            if (roleSelection) {
-                roleSelection.hidden = false;
-            }
-
-            userForm.classList.add("hidden");
-        });
-    }
-
-    // Close Modal Buttons
-
-    document.querySelectorAll("[data-close-modal]").forEach(function (button) {
-        button.addEventListener("click", function () {
-            const modal = document.getElementById(button.dataset.closeModal);
-
-            closeModal(modal);
-
-            if (modal === userModal) {
-                resetUserForm();
-            }
-        });
-    });
-
-    document.querySelectorAll(".modal-overlay").forEach(function (overlay) {
-        overlay.addEventListener("click", function (event) {
-            if (event.target === overlay) {
-                closeModal(overlay);
-
-                if (overlay === userModal) {
-                    resetUserForm();
-                }
-            }
-        });
-    });
-
-    document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") {
-            closeAllModals();
-            resetUserForm();
-        }
-    });
-
-    // Render User Row
-
-    function renderRow(data, existingRow = null) {
-        const row = existingRow || document.createElement("tr");
-        const settings = roleSettings[data.role];
-        const fullName = getFullName(data);
-
-        const initials = (
-            (data.firstName.charAt(0) || "") + (data.lastName.charAt(0) || "")
-        ).toUpperCase();
-
-        row.dataset.userRow = "true";
-        row.dataset.userId = data.userId;
-        row.dataset.role = data.role;
-        row.dataset.firstName = data.firstName;
-        row.dataset.middleName = data.middleName || "";
-        row.dataset.lastName = data.lastName;
-        row.dataset.username = data.username;
-        row.dataset.email = data.email;
-        row.dataset.status = data.status || "Active";
-        row.dataset.gradeLevel = data.gradeLevel || "";
-        row.dataset.section = data.section || "";
-        row.dataset.department = data.department || "";
-        row.dataset.adviserGradeLevel = data.adviserGradeLevel || "";
-        row.dataset.adviserSection = data.adviserSection || "";
+        // Account status icons
+        const statusIcons = {
+            active: "fa-check-circle",
+            inactive: "fa-times-circle",
+            pending: "fa-clock",
+        };
 
         row.innerHTML = `
-            <td>
-                <div class="user-name">
-                    <div class="user-avatar ${settings.avatarClass}">
-                        ${escapeHTML(initials)}
-                    </div>
-                    <span>${escapeHTML(fullName)}</span>
+        <td>
+            <span class="user-id">
+                ${escapeHTML(user.profile_identifier || "—")}
+            </span>
+        </td>
+
+        <td>
+            <div class="user-info-cell">
+                <div class="user-avatar">
+                    ${escapeHTML(getInitials(user.name))}
                 </div>
-                <small>${escapeHTML(data.userId)}</small>
-            </td>
-            <td>${escapeHTML(data.username)}</td>
-            <td>${escapeHTML(data.email)}</td>
-            <td>
-                <span class="role-badge ${data.role.toLowerCase()}">
-                    ${escapeHTML(data.role)}
-                </span>
-            </td>
-            <td>
-                <span class="status-badge ${data.status.toLowerCase()}">
-                    ${escapeHTML(data.status)}
-                </span>
-            </td>
-            <td>
-                <div class="action-buttons">
-                    <button type="button" class="action-btn view" data-action="view" title="View User">
-                        <i class="fa-solid fa-eye"></i>
+                <div>
+                    <strong>${escapeHTML(user.name)}</strong>
+                </div>
+            </div>
+        </td>
+
+        <td>${escapeHTML(user.email || "—")}</td>
+
+        <td>
+            <span class="role-badge ${escapeHTML(role)}">
+                <i class="fas ${roleIcons[role] || "fa-user"}"></i>
+                ${escapeHTML(roleLabel(role))}
+            </span>
+        </td>
+
+        <td>
+            <span class="status-badge ${status}">
+                <i class="fas ${statusIcons[status] || "fa-question-circle"}"></i>
+                ${escapeHTML(statusLabel(status))}
+            </span>
+        </td>
+
+        <td>
+            <div class="user-actions-menu">
+                <button type="button"
+                    class="btn-user-menu"
+                    aria-label="User actions"
+                    aria-expanded="false">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+
+                <div class="user-dropdown-menu">
+                    <button type="button" data-action="view">
+                        <i class="fas fa-eye"></i> View Details
                     </button>
-                    <button type="button" class="action-btn edit" data-action="edit" title="Edit User">
-                        <i class="fa-solid fa-pen"></i>
+
+                    <button type="button" data-action="edit">
+                        <i class="fas fa-edit"></i> Edit
                     </button>
-                    <button type="button" class="action-btn reset" data-action="reset" title="Reset Password">
-                        <i class="fa-solid fa-key"></i>
+
+                    <button type="button" data-action="reset">
+                        <i class="fas fa-key"></i> Reset Password
                     </button>
-                    <button type="button" class="action-btn delete" data-action="delete" title="Delete User">
-                        <i class="fa-solid fa-trash"></i>
+
+                    <button type="button" data-action="role">
+                        <i class="fas fa-user-tag"></i> Assigned Role
+                    </button>
+
+                    <button type="button" data-action="setup" disabled
+                        title="Available in a future update">
+                        <i class="fas fa-envelope"></i> Resend Setup Link
+                        <small>Coming soon</small>
+                    </button>
+
+                    <div class="dropdown-divider"></div>
+
+                    <button type="button" data-action="status"
+                        class="${status === "active" ? "danger-action" : "success-action"}">
+                        <i class="fas ${status === "active" ? "fa-user-slash" : "fa-user-check"}"></i>
+                        ${status === "active" ? "Disable Account" : "Activate Account"}
                     </button>
                 </div>
-            </td>
-        `;
+            </div>
+        </td>
+    `;
+
+        const menuButton = row.querySelector(".btn-user-menu");
+        const dropdown = row.querySelector(".user-dropdown-menu");
+
+        menuButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+
+            document
+                .querySelectorAll(".user-dropdown-menu.open")
+                .forEach((menu) => {
+                    if (menu !== dropdown) {
+                        menu.classList.remove("open");
+                        menu.previousElementSibling?.setAttribute(
+                            "aria-expanded",
+                            "false",
+                        );
+                    }
+                });
+
+            dropdown.classList.toggle("open");
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                dropdown.classList.contains("open") ? "true" : "false",
+            );
+        });
+
+        dropdown.querySelectorAll("[data-action]").forEach((button) => {
+            button.addEventListener("click", function () {
+                dropdown.classList.remove("open");
+                menuButton.setAttribute("aria-expanded", "false");
+
+                handleUserAction(button.dataset.action, user);
+            });
+        });
 
         return row;
     }
 
-    // Update Statistics
+    function renderUsers() {
+        if (!userTableBody) return;
 
-    function updateStatistics() {
-        const rows = getUserRows();
+        userTableBody.innerHTML = "";
 
-        const counts = {
-            Student: 0,
-            Teacher: 0,
-            Adviser: 0,
-            Admin: 0,
-        };
+        const filteredUsers = getFilteredUsers();
 
-        rows.forEach(function (row) {
-            if (
-                Object.prototype.hasOwnProperty.call(counts, row.dataset.role)
-            ) {
-                counts[row.dataset.role]++;
-            }
+        if (filteredUsers.length === 0) {
+            userTableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h4>No Accounts Found</h4>
+                        <p>Try changing your search or filter selection.</p>
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        filteredUsers.forEach((user) => {
+            userTableBody.appendChild(renderUserRow(user));
         });
-
-        if (totalUsersElement) totalUsersElement.textContent = rows.length;
-        if (totalStudentsElement)
-            totalStudentsElement.textContent = counts.Student;
-        if (totalTeachersElement)
-            totalTeachersElement.textContent = counts.Teacher;
-        if (totalAdvisersElement)
-            totalAdvisersElement.textContent = counts.Adviser;
-        if (totalAdminsElement) totalAdminsElement.textContent = counts.Admin;
     }
 
-    // Search, Filter, and Empty State
-
-    function filterUsers() {
-        const searchTerm = (searchInput?.value || "").trim().toLowerCase();
+    function getFilteredUsers() {
+        const search = (searchInput?.value || "").toLowerCase().trim();
         const selectedRole = roleFilter?.value || "all";
-        const rows = getUserRows();
+        const selectedStatus = statusFilter?.value || "all";
 
-        let visibleCount = 0;
-
-        rows.forEach(function (row) {
-            const rowText = [
-                row.dataset.userId,
-                row.dataset.firstName,
-                row.dataset.middleName,
-                row.dataset.lastName,
-                row.dataset.username,
-                row.dataset.email,
-                row.dataset.role,
-                row.dataset.status,
-            ]
-                .join(" ")
-                .toLowerCase();
-
-            const matchesSearch = rowText.includes(searchTerm);
-            const matchesRole =
-                selectedRole === "all" ||
-                row.dataset.role.toLowerCase() === selectedRole.toLowerCase();
-
-            row.hidden = !(matchesSearch && matchesRole);
-
-            if (!row.hidden) {
-                visibleCount++;
-            }
-        });
-
-        if (tableResultCount) {
-            tableResultCount.textContent = `Showing ${visibleCount} of ${rows.length} users`;
-        }
-
-        if (emptyStateRow) {
-            emptyStateRow.hidden = visibleCount > 0;
-        }
-
-        if (visibleCount === 0) {
-            if (rows.length === 0) {
-                setEmptyState(
-                    "No Users Yet",
-                    "There are no user accounts available. Add your first user to get started.",
-                );
-            } else {
-                setEmptyState(
-                    "No Users Found",
-                    "No users match your search or selected role. Try changing your filters.",
-                );
-            }
-        }
-
-        if (emptyAddUser) {
-            emptyAddUser.hidden = rows.length > 0 && visibleCount > 0;
-        }
-
-        updateStatistics();
-    }
-
-    if (roleFilter) {
-        roleFilter.addEventListener("change", filterUsers);
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener("input", filterUsers);
-    }
-
-    // Duplicate Checking
-
-    function hasDuplicate(data) {
-        return getUserRows().some(function (row) {
-            if (row === editingRow) {
-                return false;
-            }
-
-            return (
-                row.dataset.userId.toLowerCase() ===
-                    data.userId.toLowerCase() ||
-                row.dataset.username.toLowerCase() ===
-                    data.username.toLowerCase() ||
-                row.dataset.email.toLowerCase() === data.email.toLowerCase()
+        return users.filter((user) => {
+            const matchesSearch = [
+                user.name,
+                user.email,
+                user.profile_identifier,
+            ].some((value) =>
+                String(value || "")
+                    .toLowerCase()
+                    .includes(search),
             );
+            const role = normalizeRole(user.role);
+            const status = String(user.status || "").toLowerCase();
+
+            const matchesRole = selectedRole === "all" || role === selectedRole;
+
+            const matchesStatus =
+                selectedStatus === "all" || status === selectedStatus;
+
+            return matchesSearch && matchesRole && matchesStatus;
         });
     }
 
-    // Get Form Data
+    // =====================================================
+    // LOAD USERS
+    // =====================================================
 
-    function getFormData() {
-        return {
-            userId: userIdInput.value.trim(),
-            role: selectedRoleInput.value,
-            firstName: firstNameInput.value.trim(),
-            middleName: middleNameInput.value.trim(),
-            lastName: lastNameInput.value.trim(),
-            username: usernameInput.value.trim(),
-            email: emailInput.value.trim(),
-            status: accountStatusInput.value,
-            gradeLevel: gradeLevelInput?.value || "",
-            section: sectionInput?.value || "",
-            department: teacherDepartmentInput?.value || "",
-            adviserGradeLevel: adviserGradeLevelInput?.value || "",
-            adviserSection: adviserSectionInput?.value || "",
-        };
-    }
-
-    // Save New User or Update Existing User
-
-    if (userForm) {
-        userForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            if (!userForm.reportValidity()) {
-                return;
-            }
-
-            const data = getFormData();
-            const wasEditing = Boolean(editingRow);
-
-            if (!data.role || !roleSettings[data.role]) {
-                alert("Please select a user role.");
-                return;
-            }
-
-            if (!wasEditing) {
-                if (!passwordInput.value || !confirmPasswordInput.value) {
-                    alert("Please enter and confirm the password.");
-                    return;
-                }
-
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    alert("Passwords do not match.");
-                    confirmPasswordInput.focus();
-                    return;
-                }
-            }
-
-            if (hasDuplicate(data)) {
-                alert("User ID, username, or email already exists.");
-                return;
-            }
-
-            const row = renderRow(data, editingRow);
-
-            if (!wasEditing) {
-                userTableBody.appendChild(row);
-            }
-
-            closeModal(userModal);
-            resetUserForm();
-            filterUsers();
-
-            alert(
-                wasEditing
-                    ? "User updated in this demo."
-                    : "User added in this demo.",
-            );
-        });
-    }
-
-    // Edit User
-
-    function editUser(row) {
-        resetUserForm();
-        editingRow = row;
-
-        const data = {
-            userId: row.dataset.userId,
-            role: row.dataset.role,
-            firstName: row.dataset.firstName,
-            middleName: row.dataset.middleName,
-            lastName: row.dataset.lastName,
-            username: row.dataset.username,
-            email: row.dataset.email,
-            status: row.dataset.status,
-            gradeLevel: row.dataset.gradeLevel,
-            section: row.dataset.section,
-            department: row.dataset.department,
-            adviserGradeLevel: row.dataset.adviserGradeLevel,
-            adviserSection: row.dataset.adviserSection,
-        };
-
-        modalTitle.textContent = "Edit User";
-        modalDescription.textContent =
-            "Update the selected user's account information.";
-
-        selectUserRole(data.role);
-
-        userIdInput.value = data.userId;
-        firstNameInput.value = data.firstName;
-        middleNameInput.value = data.middleName;
-        lastNameInput.value = data.lastName;
-        usernameInput.value = data.username;
-        emailInput.value = data.email;
-        accountStatusInput.value = data.status;
-
-        if (gradeLevelInput) gradeLevelInput.value = data.gradeLevel;
-        if (sectionInput) sectionInput.value = data.section;
-        if (teacherDepartmentInput)
-            teacherDepartmentInput.value = data.department;
-        if (adviserGradeLevelInput)
-            adviserGradeLevelInput.value = data.adviserGradeLevel;
-        if (adviserSectionInput)
-            adviserSectionInput.value = data.adviserSection;
-
-        if (passwordFields) {
-            passwordFields.hidden = true;
+    async function loadUsers() {
+        if (!routes.data) {
+            console.error("User Management data route is missing.");
+            return;
         }
 
-        passwordInput.disabled = true;
-        passwordInput.required = false;
-        confirmPasswordInput.disabled = true;
-        confirmPasswordInput.required = false;
+        try {
+            const data = await request(routes.data);
 
-        if (saveUserText) {
-            saveUserText.textContent = "Save Changes";
+            users = Array.isArray(data.users) ? data.users : [];
+
+            updateStatistics();
+            renderUsers();
+        } catch (error) {
+            console.error("Unable to load users:", error);
+            notify(error.message || "Unable to load user accounts.");
         }
-
-        openModal(userModal);
     }
 
-    // View User
+    // =====================================================
+    // VIEW USER DETAILS
+    // =====================================================
 
-    function viewUser(row) {
-        const data = {
-            userId: row.dataset.userId,
-            role: row.dataset.role,
-            fullName: getRowName(row),
-            username: row.dataset.username,
-            email: row.dataset.email,
-            status: row.dataset.status,
-            gradeLevel: row.dataset.gradeLevel,
-            section: row.dataset.section,
-            department: row.dataset.department,
-            adviserGradeLevel: row.dataset.adviserGradeLevel,
-            adviserSection: row.dataset.adviserSection,
-        };
+    function viewUser(user) {
+        const role = normalizeRole(user.role);
 
         const details = [
-            ["User ID", data.userId],
-            ["Full Name", data.fullName],
-            ["Username", data.username],
-            ["Email Address", data.email],
-            ["Role", data.role],
-            ["Account Status", data.status],
+            ["Full Name", user.name],
+            ["Email Address", user.email],
+            ["Username", user.username || "—"],
+            ["Role", roleLabel(role)],
+            ["Account Status", statusLabel(user.status)],
+            ["Profile Type", user.profile_type || "—"],
+            ["Profile ID", user.profile_identifier || "—"],
+            ["Grade Level", user.grade_level || "—"],
+            ["Section", user.section || "—"],
+            ["School Year", user.school_year || "—"],
         ];
 
-        if (data.role === "Student") {
-            details.push(
-                ["Grade Level", data.gradeLevel || "Not assigned"],
-                ["Section", data.section || "Not assigned"],
+        viewUserDetails.innerHTML = `
+            <div class="view-user-details-grid">
+                ${details
+                    .map(
+                        ([label, value]) => `
+                    <div class="view-user-detail-item">
+                        <small>${escapeHTML(label)}</small>
+                        <strong>${escapeHTML(value || "—")}</strong>
+                    </div>
+                `,
+                    )
+                    .join("")}
+            </div>
+        `;
+
+        showModal(viewUserModal);
+    }
+
+    // =====================================================
+    // ASSIGNED ROLE
+    // =====================================================
+
+    function showAssignedRole(user) {
+        notify(
+            `Assigned Role: ${roleLabel(user.role)}\n\n` +
+                "Role changes are managed through the user's profile responsibilities.",
+        );
+    }
+
+    // =====================================================
+    // STATUS MODAL
+    // =====================================================
+
+    function openStatusModal(user) {
+        selectedUserId = user.id;
+
+        const currentlyActive = String(user.status).toLowerCase() === "active";
+        pendingStatus = currentlyActive ? "inactive" : "active";
+
+        document.getElementById("statusModalHeading").textContent =
+            currentlyActive ? "Disable Account?" : "Activate Account?";
+
+        document.getElementById("statusModalDescription").textContent =
+            currentlyActive
+                ? "Are you sure you want to disable this account?"
+                : "Are you sure you want to activate this account?";
+
+        document.getElementById("deleteUserName").textContent = user.name;
+
+        document.getElementById("statusModalWarning").textContent =
+            currentlyActive
+                ? "The user will no longer be able to access the system."
+                : "The user will be able to access the system if their profile is also active.";
+
+        document.getElementById("confirmStatusText").textContent =
+            currentlyActive ? "Disable Account" : "Activate Account";
+
+        showModal(statusModal);
+    }
+
+    async function confirmStatusChange() {
+        if (!selectedUserId || !routes.toggleStatus) return;
+
+        const button = document.getElementById("confirmDeleteUser");
+        const originalText =
+            document.getElementById("confirmStatusText").textContent;
+
+        button.disabled = true;
+        document.getElementById("confirmStatusText").textContent =
+            "Updating...";
+
+        try {
+            await request(replaceUserId(routes.toggleStatus, selectedUserId), {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    status: pendingStatus,
+                }),
+            });
+
+            hideModal(statusModal);
+            await loadUsers();
+
+            notify("Account status updated successfully.");
+        } catch (error) {
+            notify(error.message || "Unable to update account status.");
+        } finally {
+            button.disabled = false;
+            document.getElementById("confirmStatusText").textContent =
+                originalText;
+            selectedUserId = null;
+            pendingStatus = null;
+        }
+    }
+
+    // =====================================================
+    // RESET PASSWORD
+    // =====================================================
+
+    function openResetPasswordModal(user) {
+        selectedUserId = user.id;
+
+        document.getElementById("resetUserName").textContent = user.name;
+        document.getElementById("resetPasswordForm").reset();
+
+        showModal(resetPasswordModal);
+    }
+
+    async function submitResetPassword(event) {
+        event.preventDefault();
+
+        if (!selectedUserId || !routes.resetPassword) return;
+
+        const password = document.getElementById("newPassword").value;
+        const confirmation =
+            document.getElementById("confirmNewPassword").value;
+
+        if (password.length < 8) {
+            notify("Password must contain at least 8 characters.");
+            return;
+        }
+
+        if (password !== confirmation) {
+            notify("Password confirmation does not match.");
+            return;
+        }
+
+        const button = document.getElementById("confirmResetPassword");
+        button.disabled = true;
+        button.textContent = "Updating...";
+
+        try {
+            await request(replaceUserId(routes.resetPassword, selectedUserId), {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    password,
+                    password_confirmation: confirmation,
+                }),
+            });
+
+            hideModal(resetPasswordModal);
+            notify("Password reset successfully.");
+        } catch (error) {
+            notify(error.message || "Unable to reset password.");
+        } finally {
+            button.disabled = false;
+            button.textContent = "Reset Password";
+            selectedUserId = null;
+        }
+    }
+
+    // =====================================================
+    // USER ACTION HANDLER
+    // =====================================================
+
+    function handleUserAction(action, user) {
+        switch (action) {
+            case "view":
+                viewUser(user);
+                break;
+
+            case "edit":
+                openEditModal(user);
+                break;
+
+            case "reset":
+                openResetPasswordModal(user);
+                break;
+
+            case "role":
+                showAssignedRole(user);
+                break;
+
+            case "setup":
+                notify(
+                    "Account Setup Link will be available in a future update.",
+                );
+                break;
+
+            case "status":
+                openStatusModal(user);
+                break;
+        }
+    }
+
+    // =====================================================
+    // CREATE ACCOUNT
+    // =====================================================
+
+    function collectFormData() {
+        const type = profileType.value;
+
+        const payload = {
+            profile_type: type,
+            first_name: document.getElementById("firstName").value.trim(),
+            middle_name: document.getElementById("middleName").value.trim(),
+            last_name: document.getElementById("lastName").value.trim(),
+            email: document.getElementById("email").value.trim(),
+        };
+
+        if (type === "student") {
+            payload.student_id = document
+                .getElementById("studentId")
+                .value.trim();
+            payload.sex = document.getElementById("studentSex").value;
+            payload.grade_level =
+                document.getElementById("studentGradeLevel").value;
+            payload.section = document
+                .getElementById("studentSection")
+                .value.trim();
+            payload.school_year = document
+                .getElementById("studentSchoolYear")
+                .value.trim();
+        }
+
+        if (type === "faculty") {
+            payload.faculty_id = document
+                .getElementById("facultyId")
+                .value.trim();
+            payload.is_teacher = isTeacher.checked;
+            payload.is_adviser = isAdviser.checked;
+
+            payload.assignments = isTeacher.checked
+                ? getTeachingAssignments()
+                : [];
+
+            payload.advisory_grade = isAdviser.checked
+                ? document.getElementById("advisoryGrade").value
+                : null;
+
+            payload.advisory_school_year = isAdviser.checked
+                ? document.getElementById("advisorySchoolYear").value.trim()
+                : null;
+        }
+
+        return payload;
+    }
+
+    function validateForm(payload) {
+        if (!payload.profile_type) {
+            return "Please select a profile type.";
+        }
+
+        if (!payload.first_name || !payload.last_name) {
+            return "First name and last name are required.";
+        }
+
+        if (payload.profile_type === "student") {
+            if (
+                !payload.student_id ||
+                !payload.sex ||
+                !payload.grade_level ||
+                !payload.school_year
+            ) {
+                return "Please complete all required student information.";
+            }
+        }
+
+        if (payload.profile_type === "faculty") {
+            if (!payload.faculty_id) {
+                return "Faculty ID is required.";
+            }
+
+            if (!payload.is_teacher && !payload.is_adviser) {
+                return "Please select at least one faculty responsibility.";
+            }
+
+            if (payload.is_teacher) {
+                if (payload.assignments.length === 0) {
+                    return "Please add at least one teaching assignment.";
+                }
+
+                const incompleteAssignment = payload.assignments.some(
+                    (assignment) =>
+                        !assignment.grade_level || !assignment.subject,
+                );
+
+                if (incompleteAssignment) {
+                    return "Please complete all teaching assignments.";
+                }
+            }
+
+            if (payload.is_adviser) {
+                if (!payload.advisory_grade || !payload.advisory_school_year) {
+                    return "Please complete the advisory assignment.";
+                }
+            }
+        }
+
+        return null;
+    }
+
+    async function submitUserForm(event) {
+        event.preventDefault();
+
+        const isEditing = Boolean(editingUserId);
+
+        const payload = collectFormData();
+        const validationError = validateForm(payload);
+
+        if (validationError) {
+            notify(validationError);
+            return;
+        }
+
+        let url = routes.store;
+        let method = "POST";
+        let buttonText = "Create Account";
+
+        if (isEditing) {
+            if (!routes.update) {
+                notify("The account update route is missing.");
+                return;
+            }
+
+            url = replaceUserId(routes.update, editingUserId);
+            method = "PUT";
+            buttonText = "Update Account";
+        } else if (!routes.store) {
+            notify("The account creation route is missing.");
+            return;
+        }
+
+        setLoading(saveUserBtn, true, buttonText);
+
+        try {
+            const data = await request(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            hideModal(userModal);
+            resetUserForm();
+
+            await loadUsers();
+
+            notify(
+                data.message ||
+                    (isEditing
+                        ? "Account updated successfully."
+                        : "Account created successfully."),
             );
+        } catch (error) {
+            notify(error.message || "Unable to save account.");
+        } finally {
+            setLoading(saveUserBtn, false, "Create Account");
         }
-
-        if (data.role === "Teacher") {
-            details.push(["Department", data.department || "Not specified"]);
-        }
-
-        if (data.role === "Adviser") {
-            details.push(
-                ["Advisory Grade", data.adviserGradeLevel || "Not assigned"],
-                ["Advisory Section", data.adviserSection || "Not assigned"],
-            );
-        }
-
-        viewUserDetails.innerHTML = details
-            .map(function (item) {
-                return `
-                <div class="info-group">
-                    <span>${escapeHTML(item[0])}</span>
-                    <strong>${escapeHTML(item[1])}</strong>
-                </div>
-            `;
-            })
-            .join("");
-
-        openModal(viewUserModal);
     }
 
-    // Delete User
+    // =====================================================
+    // EVENT LISTENERS
+    // =====================================================
 
-    function deleteUser(row) {
-        selectedDeleteRow = row;
+    document
+        .getElementById("openAddUser")
+        ?.addEventListener("click", openCreateModal);
 
-        if (deleteUserName) {
-            deleteUserName.textContent = getRowName(row);
-        }
+    document.getElementById("closeUserModal")?.addEventListener("click", () => {
+        hideModal(userModal);
+    });
 
-        openModal(deleteUserModal);
-    }
-
-    if (confirmDeleteUser) {
-        confirmDeleteUser.addEventListener("click", function () {
-            if (!selectedDeleteRow) {
-                return;
-            }
-
-            selectedDeleteRow.remove();
-            selectedDeleteRow = null;
-
-            closeModal(deleteUserModal);
-            filterUsers();
-
-            alert("User deleted in this demo.");
+    document
+        .getElementById("cancelUserModal")
+        ?.addEventListener("click", () => {
+            hideModal(userModal);
         });
-    }
 
-    // Reset Password
-
-    function showResetPasswordModal(row) {
-        selectedResetRow = row;
-
-        if (resetUserName) {
-            resetUserName.textContent = getRowName(row);
-        }
-
-        if (resetPasswordForm) {
-            resetPasswordForm.reset();
-        }
-
-        openModal(resetPasswordModal);
-    }
-
-    if (resetPasswordForm) {
-        resetPasswordForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            if (!resetPasswordForm.reportValidity()) {
-                return;
-            }
-
-            if (newPasswordInput.value !== confirmNewPasswordInput.value) {
-                alert("Passwords do not match.");
-                confirmNewPasswordInput.focus();
-                return;
-            }
-
-            closeModal(resetPasswordModal);
-            resetPasswordForm.reset();
-            selectedResetRow = null;
-
-            alert(
-                "Password reset preview completed. Connect Laravel to save the password.",
-            );
+    document
+        .getElementById("closeViewUserModal")
+        ?.addEventListener("click", () => {
+            hideModal(viewUserModal);
         });
-    }
 
-    // Table Action Buttons
-
-    if (userTableBody) {
-        userTableBody.addEventListener("click", function (event) {
-            const actionButton = event.target.closest("[data-action]");
-
-            if (!actionButton) {
-                return;
-            }
-
-            const row = actionButton.closest("tr[data-user-row]");
-
-            if (!row) {
-                return;
-            }
-
-            switch (actionButton.dataset.action) {
-                case "view":
-                    viewUser(row);
-                    break;
-                case "edit":
-                    editUser(row);
-                    break;
-                case "delete":
-                    deleteUser(row);
-                    break;
-                case "reset":
-                    showResetPasswordModal(row);
-                    break;
-            }
+    document
+        .getElementById("closeViewUserButton")
+        ?.addEventListener("click", () => {
+            hideModal(viewUserModal);
         });
-    }
 
-    // Initial Page Setup
+    document
+        .getElementById("closeStatusModal")
+        ?.addEventListener("click", () => {
+            hideModal(statusModal);
+        });
 
-    filterUsers();
+    document
+        .getElementById("cancelStatusModal")
+        ?.addEventListener("click", () => {
+            hideModal(statusModal);
+        });
+
+    document
+        .getElementById("closeResetPasswordModal")
+        ?.addEventListener("click", () => {
+            hideModal(resetPasswordModal);
+        });
+
+    document
+        .getElementById("cancelResetPassword")
+        ?.addEventListener("click", () => {
+            hideModal(resetPasswordModal);
+        });
+
+    document
+        .getElementById("confirmDeleteUser")
+        ?.addEventListener("click", confirmStatusChange);
+
+    profileType?.addEventListener("change", updateProfileFields);
+
+    isTeacher?.addEventListener("change", updateFacultyResponsibilities);
+    isAdviser?.addEventListener("change", updateFacultyResponsibilities);
+
+    document
+        .getElementById("addTeachingAssignment")
+        ?.addEventListener("click", () => {
+            createTeachingAssignmentRow();
+        });
+
+    userForm?.addEventListener("submit", submitUserForm);
+
+    document
+        .getElementById("resetPasswordForm")
+        ?.addEventListener("submit", submitResetPassword);
+
+    searchInput?.addEventListener("input", renderUsers);
+    roleFilter?.addEventListener("change", renderUsers);
+    statusFilter?.addEventListener("change", renderUsers);
+
+    // Close dropdowns when clicking outside.
+    document.addEventListener("click", function (event) {
+        if (!event.target.closest(".user-actions-menu")) {
+            document
+                .querySelectorAll(".user-dropdown-menu.open")
+                .forEach((menu) => {
+                    menu.classList.remove("open");
+                    menu.previousElementSibling?.setAttribute(
+                        "aria-expanded",
+                        "false",
+                    );
+                });
+        }
+    });
+
+    // Close modals when clicking their backdrop.
+    [userModal, viewUserModal, statusModal, resetPasswordModal].forEach(
+        (modal) => {
+            modal?.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                    hideModal(modal);
+                }
+            });
+        },
+    );
+
+    // =====================================================
+    // INITIALIZATION
+    // =====================================================
+
+    loadUsers();
 });

@@ -1,122 +1,117 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const tabs = document.querySelectorAll(".review-tab");
 
-document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.review-tab');
-    const pendingPanel = document.getElementById('pendingPanel');
-    const historyPanel = document.getElementById('historyPanel');
+    const pendingPanel = document.getElementById("pendingPanel");
+    const historyPanel = document.getElementById("historyPanel");
 
-    const searchInput = document.getElementById('reviewSearch');
-    const termFilter = document.getElementById('termFilter');
+    const searchInput = document.getElementById("reviewSearch");
+    const termFilter = document.getElementById("termFilter");
 
-    const modal = document.getElementById('reviewModal');
-    const closeButtons = document.querySelectorAll('[data-close-modal]');
-    const reviewButtons = document.querySelectorAll('.view-review-btn');
+    /*
+    |--------------------------------------------------------------------------
+    | TAB SWITCHING
+    |--------------------------------------------------------------------------
+    */
 
-    let activeTab = 'pending';
+    tabs.forEach((tab) => {
+        tab.addEventListener("click", function () {
+            const selectedTab = this.dataset.tab;
 
-    // SWITCH BETWEEN PENDING REVIEWS AND REVIEW HISTORY
-    tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-            activeTab = this.dataset.tab;
-
-            tabs.forEach(function (item) {
-                item.classList.toggle('active', item === tab);
+            tabs.forEach((item) => {
+                item.classList.remove("active");
             });
 
-            pendingPanel.hidden = activeTab !== 'pending';
-            historyPanel.hidden = activeTab !== 'history';
+            this.classList.add("active");
+
+            if (selectedTab === "pending") {
+                pendingPanel?.classList.remove("hidden");
+                historyPanel?.classList.add("hidden");
+            } else {
+                historyPanel?.classList.remove("hidden");
+                pendingPanel?.classList.add("hidden");
+            }
 
             filterSubmissions();
         });
     });
 
-    // SEARCH AND TERM FILTER
-    function filterSubmissions() {
-        const searchValue = searchInput.value.trim().toLowerCase();
-        const selectedTerm = termFilter.value;
+    /*
+    |--------------------------------------------------------------------------
+    | SEARCH AND TERM FILTER
+    |--------------------------------------------------------------------------
+    */
 
-        const activePanel = activeTab === 'pending'
-            ? pendingPanel
-            : historyPanel;
+    function filterTable(tbody) {
+        if (!tbody) return;
 
-        const rows = activePanel.querySelectorAll(
-            'tbody tr:not(.empty-row)'
-        );
+        const searchValue = searchInput?.value.toLowerCase().trim() || "";
 
-        const emptyRow = activePanel.querySelector('.empty-row');
+        const selectedTerm = termFilter?.value || "all";
+
+        const rows = Array.from(tbody.querySelectorAll("tr:not(.empty-row)"));
+
+        const emptyRows = tbody.querySelectorAll(".empty-row");
+
         let visibleCount = 0;
 
-        rows.forEach(function (row) {
-            const searchableText = row.dataset.search || '';
-            const rowTerm = row.dataset.term || '';
+        rows.forEach((row) => {
+            const rowText = row.textContent.toLowerCase();
 
-            const matchesSearch = searchableText.includes(searchValue);
-            const matchesTerm = selectedTerm === 'all' ||
-                rowTerm === selectedTerm;
+            const rowTerm = (row.dataset.term || rowText).toLowerCase();
+
+            const matchesSearch = rowText.includes(searchValue);
+
+            const matchesTerm =
+                selectedTerm === "all" ||
+                rowTerm.includes(selectedTerm.toLowerCase());
 
             const shouldShow = matchesSearch && matchesTerm;
 
-            row.hidden = !shouldShow;
+            row.style.display = shouldShow ? "" : "none";
 
             if (shouldShow) {
                 visibleCount++;
             }
         });
 
-        if (emptyRow) {
-            emptyRow.hidden = visibleCount > 0;
-        }
-    }
+        /*
+         * Show only one empty-state row when no
+         * submission matches the current filters.
+         */
 
-    searchInput.addEventListener('input', filterSubmissions);
-    termFilter.addEventListener('change', filterSubmissions);
-
-    // OPEN REVIEW DETAILS MODAL
-    reviewButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            document.getElementById('modalSubject').textContent =
-                this.dataset.subject || '—';
-
-            document.getElementById('modalTeacher').textContent =
-                this.dataset.teacher || '—';
-
-            document.getElementById('modalSection').textContent =
-                this.dataset.section || '—';
-
-            document.getElementById('modalTerm').textContent =
-                this.dataset.term || '—';
-
-            document.getElementById('modalDate').textContent =
-                this.dataset.date || '—';
-
-            document.getElementById('modalStatus').textContent =
-                this.dataset.status || '—';
-
-            modal.classList.add('is-open');
-            modal.setAttribute('aria-hidden', 'false');
-
-            document.body.style.overflow = 'hidden';
+        emptyRows.forEach((emptyRow, index) => {
+            emptyRow.style.display =
+                visibleCount === 0 && index === 0 ? "" : "none";
         });
-    });
-
-    // CLOSE REVIEW DETAILS MODAL
-    function closeModal() {
-        modal.classList.remove('is-open');
-        modal.setAttribute('aria-hidden', 'true');
-
-        document.body.style.overflow = '';
     }
 
-    closeButtons.forEach(function (button) {
-        button.addEventListener('click', closeModal);
-    });
+    /*
+    |--------------------------------------------------------------------------
+    | FILTER BOTH TABLES
+    |--------------------------------------------------------------------------
+    */
 
-    // CLOSE MODAL USING THE ESCAPE KEY
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
-            closeModal();
-        }
-    });
+    function filterSubmissions() {
+        filterTable(document.getElementById("pendingTableBody"));
 
-    // INITIALIZE THE PAGE
+        filterTable(document.getElementById("historyTableBody"));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILTER EVENTS
+    |--------------------------------------------------------------------------
+    */
+
+    searchInput?.addEventListener("input", filterSubmissions);
+
+    termFilter?.addEventListener("change", filterSubmissions);
+
+    /*
+    |--------------------------------------------------------------------------
+    | INITIALIZE
+    |--------------------------------------------------------------------------
+    */
+
     filterSubmissions();
 });

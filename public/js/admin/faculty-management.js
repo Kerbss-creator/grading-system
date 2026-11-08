@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let editingRecordId = null;
     let deletingRecordId = null;
+    let pendingStatusId = null;
 
     const tableBody = document.getElementById("facultyTableBody");
     const emptyState = document.getElementById("facultyEmptyState");
@@ -30,6 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const formModal = document.getElementById("facultyFormModal");
     const viewModal = document.getElementById("viewFacultyModal");
     const deleteModal = document.getElementById("deleteFacultyModal");
+    const alertModal = document.getElementById("facultyAlertModal");
+    const statusModal = document.getElementById("facultyStatusModal");
+    const statusTitle = document.getElementById("facultyStatusTitle");
+    const statusMessage = document.getElementById("facultyStatusMessage");
+    const statusIcon = document.getElementById("facultyStatusIcon");
+    const confirmStatusBtn = document.getElementById("confirmFacultyStatus");
 
     const form = document.getElementById("facultyForm");
     const assignmentsList = document.getElementById("teachingAssignmentsList");
@@ -55,14 +62,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const facultyTable = tableBody ? tableBody.closest("table") : null;
 
-    // Check that the required HTML elements exist.
+    // Check required HTML elements.
     if (
         !tableBody ||
         !emptyState ||
         !emptyTitle ||
         !emptyMessage ||
         !facultyTable ||
-        !form
+        !form ||
+        !teacherCheckbox ||
+        !adviserCheckbox ||
+        !assignmentsList
     ) {
         console.error(
             "Faculty Management: A required HTML element is missing. Check the Blade IDs.",
@@ -70,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Escape text before placing user-entered values into HTML.
+    // Escape text before inserting user-entered values into HTML.
     function escapeHTML(value) {
         return String(value ?? "").replace(
             /[&<>"']/g,
@@ -102,6 +112,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return "No Role";
     }
 
+    function getCsrfToken() {
+        return (
+            form.querySelector('input[name="_token"]')?.value ||
+            document.querySelector('meta[name="csrf-token"]')?.content ||
+            ""
+        );
+    }
+
     function openModal(modal) {
         if (!modal) return;
 
@@ -122,10 +140,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function closeAllModals() {
-        [formModal, viewModal, deleteModal].forEach(closeModal);
+        [formModal, viewModal, deleteModal, alertModal, statusModal].forEach(
+            closeModal,
+        );
+
+        const successModal = document.getElementById("facultySuccessModal");
+
+        if (successModal) {
+            closeModal(successModal);
+        }
     }
 
-    // Show success state after creating, updating, or deleting faculty.
+    // Custom alert modal.
+    function showFacultyAlert(title, message, type = "warning") {
+        if (!alertModal) {
+            window.alert(`${title}\n\n${message}`);
+            return;
+        }
+
+        const alertTitle = document.getElementById("facultyAlertTitle");
+        const alertMessage = document.getElementById("facultyAlertMessage");
+        const alertIcon = document.getElementById("facultyAlertIcon");
+
+        if (alertTitle) alertTitle.textContent = title;
+        if (alertMessage) alertMessage.textContent = message;
+
+        if (alertIcon) {
+            alertIcon.className = `faculty-alert-icon ${type}`;
+
+            alertIcon.innerHTML =
+                type === "warning"
+                    ? '<i class="fa-solid fa-triangle-exclamation"></i>'
+                    : '<i class="fa-solid fa-circle-exclamation"></i>';
+        }
+
+        openModal(alertModal);
+    }
+
+    // Success modal.
     function showSuccessState(title, message) {
         document.getElementById("facultySuccessModal")?.remove();
 
@@ -133,7 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         successModal.id = "facultySuccessModal";
         successModal.className = "faculty-modal-overlay show";
-
         successModal.setAttribute("aria-hidden", "false");
 
         successModal.innerHTML = `
@@ -195,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Show the correct empty state or the faculty table.
+    // Empty state.
     function updateEmptyState(filteredRecords) {
         if (filteredRecords.length === 0) {
             facultyTable.style.display = "none";
@@ -218,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
         emptyState.hidden = true;
     }
 
-    // Render the faculty table using the current search and filters.
+    // Render faculty table.
     function renderTable() {
         const search = searchInput
             ? searchInput.value.trim().toLowerCase()
@@ -317,8 +368,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                     class="faculty-action-btn toggle"
                                     data-action="toggle"
                                     data-id="${record.id}"
-                                    title="${record.status === "Active" ? "Deactivate" : "Activate"} Faculty"
-                                    aria-label="Toggle status for ${escapeHTML(fullName(record))}">
+                                    title="${record.status === "Active" ? "Deactivate" : "Reactivate"} Faculty"
+                                    aria-label="${record.status === "Active" ? "Deactivate" : "Reactivate"} ${escapeHTML(fullName(record))}">
                                     <i class="fa-solid fa-power-off"></i>
                                 </button>
 
@@ -342,10 +393,8 @@ document.addEventListener("DOMContentLoaded", () => {
         updateSummaryCards();
     }
 
-    // Create one teaching assignment row.
+    // Create teaching assignment row.
     function createAssignmentRow(assignment = {}) {
-        if (!assignmentsList) return;
-
         const row = document.createElement("div");
         row.className = "faculty-assignment-row";
 
@@ -413,37 +462,33 @@ document.addEventListener("DOMContentLoaded", () => {
         updateResponsibilityFields();
     }
 
-    // Show or hide fields based on selected responsibilities.
+    // Show/hide responsibility fields.
     function updateResponsibilityFields() {
-        if (teachingSection && teacherCheckbox) {
+        if (teachingSection) {
             teachingSection.hidden = !teacherCheckbox.checked;
         }
 
-        if (advisorySection && adviserCheckbox) {
+        if (advisorySection) {
             advisorySection.hidden = !adviserCheckbox.checked;
         }
 
-        if (assignmentsList && teacherCheckbox) {
-            assignmentsList.querySelectorAll("select").forEach((select) => {
-                select.required = teacherCheckbox.checked;
-            });
-        }
+        assignmentsList.querySelectorAll("select").forEach((select) => {
+            select.required = teacherCheckbox.checked;
+        });
 
         const advisoryGrade = document.getElementById("advisoryGrade");
 
-        if (advisoryGrade && adviserCheckbox) {
+        if (advisoryGrade) {
             advisoryGrade.required = adviserCheckbox.checked;
         }
     }
 
-    // Reset the Add/Edit form.
+    // Reset Add/Edit form.
     function resetForm() {
         form.reset();
         editingRecordId = null;
 
-        if (assignmentsList) {
-            assignmentsList.innerHTML = "";
-        }
+        assignmentsList.innerHTML = "";
 
         document.getElementById("facultyFormTitle").textContent = "Add Faculty";
 
@@ -464,7 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
         openModal(formModal);
     }
 
-    // Open an existing record for editing.
+    // Edit faculty.
     function openEditForm(id) {
         const record = facultyRecords.find(
             (item) => Number(item.id) === Number(id),
@@ -475,21 +520,30 @@ document.addEventListener("DOMContentLoaded", () => {
         resetForm();
         editingRecordId = id;
 
-        document.getElementById("facultyId").value = record.facultyId;
-        document.getElementById("facultyEmail").value = record.email;
-        document.getElementById("facultyFirstName").value = record.firstName;
-        document.getElementById("facultyMiddleName").value = record.middleName;
-        document.getElementById("facultyLastName").value = record.lastName;
-        document.getElementById("facultyStatus").value = record.status;
+        document.getElementById("facultyId").value = record.facultyId || "";
 
-        teacherCheckbox.checked = record.teacher;
-        adviserCheckbox.checked = record.adviser;
+        document.getElementById("facultyEmail").value = record.email || "";
+
+        document.getElementById("facultyFirstName").value =
+            record.firstName || "";
+
+        document.getElementById("facultyMiddleName").value =
+            record.middleName || "";
+
+        document.getElementById("facultyLastName").value =
+            record.lastName || "";
+
+        document.getElementById("facultyStatus").value =
+            record.status || "Active";
+
+        teacherCheckbox.checked = Boolean(record.teacher);
+        adviserCheckbox.checked = Boolean(record.adviser);
 
         assignmentsList.innerHTML = "";
 
         if (record.assignments.length) {
             record.assignments.forEach(createAssignmentRow);
-        } else {
+        } else if (record.teacher) {
             createAssignmentRow();
         }
 
@@ -574,7 +628,7 @@ document.addEventListener("DOMContentLoaded", () => {
         openModal(viewModal);
     }
 
-    // Collect teaching assignments from the form.
+    // Collect teaching assignments.
     function collectAssignments() {
         if (!teacherCheckbox.checked) return [];
 
@@ -617,7 +671,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return true;
     }
 
-    // Open Add Faculty using either Add button.
+    // Add Faculty buttons.
     const addFacultyBtn = document.getElementById("addFacultyBtn");
     const emptyAddFacultyBtn = document.getElementById("emptyAddFacultyBtn");
 
@@ -629,7 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
         emptyAddFacultyBtn.addEventListener("click", openAddForm);
     }
 
-    // Add another teaching assignment.
+    // Add assignment button.
     const addAssignmentBtn = document.getElementById("addAssignmentBtn");
 
     if (addAssignmentBtn) {
@@ -639,9 +693,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     teacherCheckbox.addEventListener("change", updateResponsibilityFields);
+
     adviserCheckbox.addEventListener("change", updateResponsibilityFields);
 
-    // Save new or edited faculty record.
+    // Save new or edited faculty.
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -696,8 +751,7 @@ document.addEventListener("DOMContentLoaded", () => {
             : "/admin/faculty-management";
 
         const method = isEditing ? "PUT" : "POST";
-
-        const csrfToken = form.querySelector('input[name="_token"]')?.value;
+        const csrfToken = getCsrfToken();
 
         if (!csrfToken) {
             alert("CSRF token not found. Check that @csrf is inside the form.");
@@ -712,7 +766,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await fetch(url, {
-                method: method,
+                method,
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",
@@ -728,28 +782,44 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? Object.values(result.errors).flat().join("\n")
                     : result.message || "Unable to save faculty.";
 
-                alert(validationMessages);
+                const isAdviserError = validationMessages.includes(
+                    "Adviser Already Assigned",
+                );
+
+                if (isAdviserError) {
+                    showFacultyAlert(
+                        "Adviser Already Assigned",
+                        validationMessages.replace(
+                            "Adviser Already Assigned. ",
+                            "",
+                        ),
+                        "warning",
+                    );
+                } else {
+                    showFacultyAlert(
+                        "Unable to Save Faculty",
+                        validationMessages,
+                        "error",
+                    );
+                }
+
                 return;
             }
 
-            // Close the form and display the correct success state.
             closeModal(formModal);
 
-            if (isEditing) {
-                showSuccessState(
-                    "Faculty Updated Successfully!",
-                    result.message ||
-                        "The faculty information has been updated successfully.",
-                );
-            } else {
-                showSuccessState(
-                    "Faculty Created Successfully!",
-                    result.message ||
-                        "The new faculty account has been created successfully.",
-                );
-            }
+            showSuccessState(
+                isEditing
+                    ? "Faculty Updated Successfully!"
+                    : "Faculty Created Successfully!",
+                result.message ||
+                    (isEditing
+                        ? "The faculty information has been updated successfully."
+                        : "The new faculty account has been created successfully."),
+            );
         } catch (error) {
             console.error("Faculty save error:", error);
+
             alert(
                 "Unable to connect to the server. Check the browser console and Laravel log.",
             );
@@ -757,6 +827,139 @@ document.addEventListener("DOMContentLoaded", () => {
             if (saveButton) saveButton.disabled = false;
         }
     });
+
+    // Open custom Deactivate / Reactivate confirmation modal.
+    function openFacultyStatusModal(id) {
+        const faculty = facultyRecords.find(
+            (record) => Number(record.id) === Number(id),
+        );
+
+        if (!faculty) {
+            showFacultyAlert(
+                "Faculty Not Found",
+                "Unable to find the selected faculty member.",
+            );
+            return;
+        }
+
+        pendingStatusId = id;
+
+        const isActive = faculty.status === "Active";
+        const name = fullName(faculty);
+
+        if (isActive) {
+            statusTitle.textContent = "Deactivate Faculty?";
+
+            statusMessage.textContent =
+                `Are you sure you want to deactivate ${name}? ` +
+                "This faculty member will no longer be able to access their account. " +
+                "Existing assignments and grade records will be preserved.";
+
+            statusIcon.innerHTML = '<i class="fa-solid fa-user-slash"></i>';
+
+            confirmStatusBtn.textContent = "Deactivate Faculty";
+            confirmStatusBtn.className = "faculty-btn-delete";
+        } else {
+            statusTitle.textContent = "Reactivate Faculty?";
+
+            statusMessage.textContent =
+                `Are you sure you want to reactivate ${name}? ` +
+                "This faculty member will regain access to their account.";
+
+            statusIcon.innerHTML = '<i class="fa-solid fa-user-check"></i>';
+
+            confirmStatusBtn.textContent = "Reactivate Faculty";
+            confirmStatusBtn.className = "faculty-btn-save";
+        }
+
+        openModal(statusModal);
+    }
+
+    // Confirm Deactivate / Reactivate.
+    if (confirmStatusBtn) {
+        confirmStatusBtn.addEventListener("click", async () => {
+            if (pendingStatusId === null) return;
+
+            const id = pendingStatusId;
+            const faculty = facultyRecords.find(
+                (record) => Number(record.id) === Number(id),
+            );
+
+            if (!faculty) return;
+
+            const csrfToken = getCsrfToken();
+
+            if (!csrfToken) {
+                closeModal(statusModal);
+
+                showFacultyAlert(
+                    "Security Error",
+                    "CSRF token not found. Please check the form's @csrf.",
+                    "error",
+                );
+
+                return;
+            }
+
+            confirmStatusBtn.disabled = true;
+
+            try {
+                const response = await fetch(
+                    `/admin/faculty-management/${id}/toggle-status`,
+                    {
+                        method: "PATCH",
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": csrfToken,
+                        },
+                    },
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.message || "Unable to update faculty status.",
+                    );
+                }
+
+                // Normalize status returned by Laravel.
+                const returnedStatus = String(
+                    data.status ||
+                        (faculty.status === "Active" ? "inactive" : "active"),
+                ).toLowerCase();
+
+                faculty.status =
+                    returnedStatus === "active" ? "Active" : "Inactive";
+
+                pendingStatusId = null;
+
+                closeModal(statusModal);
+
+                // Refresh table and summary cards.
+                renderTable();
+
+                showSuccessState(
+                    "Faculty Status Updated!",
+                    data.message ||
+                        `Faculty status successfully changed to ${faculty.status}.`,
+                );
+            } catch (error) {
+                console.error("Faculty status update error:", error);
+
+                closeModal(statusModal);
+
+                showFacultyAlert(
+                    "Update Failed",
+                    error.message ||
+                        "Something went wrong while updating faculty status.",
+                    "error",
+                );
+            } finally {
+                confirmStatusBtn.disabled = false;
+            }
+        });
+    }
 
     // Handle View, Edit, Toggle, and Delete buttons.
     tableBody.addEventListener("click", (event) => {
@@ -777,7 +980,7 @@ document.addEventListener("DOMContentLoaded", () => {
             deletingRecordId = id;
             openModal(deleteModal);
         } else if (action === "toggle") {
-            toggleFacultyStatus(id);
+            openFacultyStatusModal(id);
         }
     });
 
@@ -789,7 +992,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (deletingRecordId === null) return;
 
             const id = deletingRecordId;
-            const csrfToken = form.querySelector('input[name="_token"]')?.value;
+            const csrfToken = getCsrfToken();
 
             if (!csrfToken) {
                 alert("CSRF token not found. Please check the form's @csrf.");
@@ -813,7 +1016,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const result = await response.json();
 
                 if (!response.ok) {
-                    alert(result.message || "Unable to delete faculty.");
+                    showFacultyAlert(
+                        "Unable to Delete Faculty",
+                        result.message || "Unable to delete faculty.",
+                        "warning",
+                    );
                     return;
                 }
 
@@ -824,7 +1031,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 deletingRecordId = null;
                 closeModal(deleteModal);
 
-                // Display the success modal after successful deletion.
+                renderTable();
+
                 showSuccessState(
                     "Faculty Deleted Successfully!",
                     result.message ||
@@ -832,6 +1040,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             } catch (error) {
                 console.error("Faculty delete error:", error);
+
                 alert(
                     "Unable to connect to the server. The faculty record was not confirmed deleted.",
                 );
@@ -870,15 +1079,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Close modal when clicking the dark overlay.
-    [formModal, viewModal, deleteModal].forEach((modal) => {
-        if (!modal) return;
+    [formModal, viewModal, deleteModal, alertModal, statusModal].forEach(
+        (modal) => {
+            if (!modal) return;
 
-        modal.addEventListener("click", (event) => {
-            if (event.target === modal) {
-                closeModal(modal);
-            }
-        });
-    });
+            modal.addEventListener("click", (event) => {
+                if (event.target === modal) {
+                    closeModal(modal);
+                }
+            });
+        },
+    );
 
     // Escape key closes open modals.
     document.addEventListener("keydown", (event) => {

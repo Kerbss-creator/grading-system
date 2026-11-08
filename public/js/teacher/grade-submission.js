@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Submission Modal
-
     const modal = document.getElementById("submissionModal");
     const closeModal = document.getElementById("closeSubmissionModal");
     const cancelSubmission = document.getElementById("cancelSubmission");
@@ -13,37 +12,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalClassName = document.getElementById("modalClassName");
     const modalSubjectName = document.getElementById("modalSubjectName");
 
-    // View Submission Modal
-
-    const viewSubmissionModal = document.getElementById("viewSubmissionModal");
-
-    const closeViewSubmissionModal = document.getElementById(
-        "closeViewSubmissionModal",
-    );
-
-    const viewCloseButton = document.getElementById("viewCloseButton");
-
-    const viewModalOverlay = document.querySelector(
-        "#viewSubmissionModal .view-modal-overlay",
-    );
-
-    const viewClassName = document.getElementById("viewClassName");
-    const viewSubjectName = document.getElementById("viewSubjectName");
+    // Submission Form
+    const submissionForm = document.getElementById("gradeSubmissionForm");
+    const assignmentInput = document.getElementById("submissionAssignmentId");
+    const schoolYearInput = document.getElementById("submissionSchoolYear");
+    const termInput = document.getElementById("submissionTerm");
 
     // Submission Buttons
-
     const submitButtons = document.querySelectorAll(".submit-btn");
     const reviewButtons = document.querySelectorAll(".review-btn");
 
     // Status Filter
-
     const statusFilter = document.getElementById("statusFilter");
     const submissionCards = document.querySelectorAll(".submission-card");
+    const filterEmptyState = document.getElementById("filterEmptyState");
 
     // Open Submission Modal
-
     submitButtons.forEach(function (button) {
         button.addEventListener("click", function () {
+            if (!modal || !submissionForm) return;
+
             const className = button.dataset.class;
             const subjectName = button.dataset.subject;
 
@@ -55,15 +43,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 modalSubjectName.textContent = subjectName;
             }
 
-            if (modal) {
-                modal.classList.add("active");
-                document.body.style.overflow = "hidden";
+            if (assignmentInput) {
+                assignmentInput.value = button.dataset.assignmentId;
             }
+
+            if (schoolYearInput) {
+                schoolYearInput.value = button.dataset.schoolYear;
+            }
+
+            if (termInput) {
+                termInput.value = button.dataset.term;
+            }
+
+            modal.classList.add("active");
+            document.body.style.overflow = "hidden";
         });
     });
 
     // Close Submission Modal
-
     function closeSubmissionModal() {
         if (modal) {
             modal.classList.remove("active");
@@ -84,113 +81,61 @@ document.addEventListener("DOMContentLoaded", function () {
         modalOverlay.addEventListener("click", closeSubmissionModal);
     }
 
-    // Confirm Grade Submission
+    // Confirm Submission
+    if (confirmSubmission && submissionForm) {
+        submissionForm.addEventListener("submit", function () {
+            confirmSubmission.disabled = true;
 
-    if (confirmSubmission) {
-        confirmSubmission.addEventListener("click", function () {
-            const className = modalClassName ? modalClassName.textContent : "";
-
-            const subjectName = modalSubjectName
-                ? modalSubjectName.textContent
-                : "";
-
-            // UI demonstration only
-            // This will later send the submission request to Laravel
-
-            alert(
-                "Grades for " +
-                    className +
-                    " - " +
-                    subjectName +
-                    " have been submitted successfully.",
-            );
-
-            closeSubmissionModal();
+            confirmSubmission.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Submitting...
+            `;
         });
     }
 
-    // Open View Submission Modal
-
+    // Review Grades - Navigate to separate page
     reviewButtons.forEach(function (button) {
         button.addEventListener("click", function () {
-            const className = button.dataset.class;
-            const subjectName = button.dataset.subject;
+            const reviewUrl = button.dataset.reviewUrl;
 
-            if (viewClassName) {
-                viewClassName.textContent = className;
-            }
-
-            if (viewSubjectName) {
-                viewSubjectName.textContent = subjectName;
-            }
-
-            if (viewSubmissionModal) {
-                viewSubmissionModal.classList.add("active");
-                document.body.style.overflow = "hidden";
+            if (reviewUrl) {
+                window.location.href = reviewUrl;
             }
         });
     });
 
-    // Close View Submission Modal
-
-    function closeViewSubmission() {
-        if (viewSubmissionModal) {
-            viewSubmissionModal.classList.remove("active");
-        }
-
-        document.body.style.overflow = "";
-    }
-
-    if (closeViewSubmissionModal) {
-        closeViewSubmissionModal.addEventListener("click", closeViewSubmission);
-    }
-
-    if (viewCloseButton) {
-        viewCloseButton.addEventListener("click", closeViewSubmission);
-    }
-
-    if (viewModalOverlay) {
-        viewModalOverlay.addEventListener("click", closeViewSubmission);
-    }
-
     // Status Filter
-
     if (statusFilter) {
         statusFilter.addEventListener("change", function () {
             const selectedStatus = statusFilter.value;
+            let visibleCards = 0;
 
             submissionCards.forEach(function (card) {
                 const cardStatus = card.dataset.status;
 
-                if (selectedStatus === "all" || selectedStatus === cardStatus) {
-                    card.style.display = "";
-                } else {
-                    card.style.display = "none";
+                const shouldShow =
+                    selectedStatus === "all" || selectedStatus === cardStatus;
+
+                card.style.display = shouldShow ? "" : "none";
+
+                if (shouldShow) {
+                    visibleCards++;
                 }
             });
+
+            if (filterEmptyState) {
+                filterEmptyState.style.display =
+                    visibleCards === 0 ? "flex" : "none";
+            }
         });
     }
 
     // Escape Key
-
     document.addEventListener("keydown", function (event) {
-        if (event.key !== "Escape") {
-            return;
-        }
-
-        // Close Submission Modal
+        if (event.key !== "Escape") return;
 
         if (modal && modal.classList.contains("active")) {
             closeSubmissionModal();
-        }
-
-        // Close View Submission Modal
-
-        if (
-            viewSubmissionModal &&
-            viewSubmissionModal.classList.contains("active")
-        ) {
-            closeViewSubmission();
         }
     });
 });
