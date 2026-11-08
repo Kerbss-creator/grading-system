@@ -82,20 +82,11 @@
 
                 <i class="fa-solid fa-chalkboard"></i>
 
-                <span>My Classes</span>
+                <span>My Advisory Class</span>
 
             </a>
 
-            {{-- MY STUDENTS --}}
 
-            <a href="{{ url('/adviser/students') }}"
-                class="adviser-nav-link {{ request()->is('adviser/students*') ? 'active' : '' }}">
-
-                <i class="fa-solid fa-users"></i>
-
-                <span>My Students</span>
-
-            </a>
 
 
             {{-- ACADEMIC --}}
@@ -184,7 +175,7 @@
 
                 <i class="fa-solid fa-file-lines"></i>
 
-                <span>Grade Submission History</span>
+                <span>Grade Review</span>
 
             </a>
 

@@ -1,22 +1,16 @@
 {{-- EXTENDS ADVISER LAYOUT --}}
 @extends('layouts.adviser')
 
-{{-- PAGE TITLE --}}
 @section('title', 'Grade Review')
-
-{{-- PAGE HEADER --}}
 @section('header', 'Grade Review')
-
-{{-- PAGE HEADER DESCRIPTION --}}
 @section('header-description', 'Review and monitor grade submissions from teachers.')
 
-{{-- PAGE CSS --}}
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('css/adviser/adviser-grade-review.css') }}">
 @endsection
 
-{{-- MAIN CONTENT --}}
 @section('content')
+
 
     <div class="grade-review-page">
 
@@ -29,7 +23,7 @@
                 </div>
                 <div class="summary-info">
                     <p>Pending Reviews</p>
-                    <h3 id="pendingCount">2</h3>
+                    <h3 id="pendingCount">{{ $pendingCount }}</h3>
                 </div>
             </div>
 
@@ -38,8 +32,8 @@
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div class="summary-info">
-                    <p>Approved Reviews</p>
-                    <h3 id="approvedCount">1</h3>
+                    <p>Forwarded to Admin</p>
+                    <h3 id="forwardedCount">{{ $forwardedCount }}</h3>
                 </div>
             </div>
 
@@ -49,7 +43,7 @@
                 </div>
                 <div class="summary-info">
                     <p>Returned Submissions</p>
-                    <h3 id="returnedCount">1</h3>
+                    <h3 id="returnedCount">{{ $returnedCount }}</h3>
                 </div>
             </div>
 
@@ -58,38 +52,66 @@
         {{-- REVIEW CONTENT --}}
         <div class="review-container">
 
-            {{-- PAGE TITLE AND ASSIGNED SECTION --}}
+            {{-- PAGE TITLE AND ASSIGNED GRADE LEVEL --}}
             <div class="review-header">
                 <div>
                     <h2>Grade Submissions</h2>
                     <p>Review submitted grades before forwarding them to the administrator.</p>
                 </div>
 
+
+                {{-- ASSIGNED GRADE LEVEL --}}
                 <div class="assigned-grade-box">
+
                     <div class="assigned-grade-icon">
-                        <i class="fa-solid fa-users"></i>
+                        <i class="fa-solid fa-graduation-cap"></i>
                     </div>
 
                     <div class="assigned-grade-info">
-                        <span>Assigned Grade Level</span>
-                        <strong>Grade 7-A</strong>
-                        <small>School Year 2026–2027</small>
+
+                        <span class="assigned-label">YOUR ADVISORY ASSIGNMENT</span>
+
+                        <strong class="assigned-grade-value">
+                            @forelse($assignedGradeLevels as $gradeLevel)
+                                <span class="grade-level-tag">
+                                    {{ $gradeLevel }}
+                                </span>
+                            @empty
+                                <span class="no-assignment">
+                                    No Assigned Grade Level
+                                </span>
+                            @endforelse
+                        </strong>
+
+                        <div class="assigned-school-year">
+                            <i class="fa-regular fa-calendar"></i>
+                            <span>School Year</span>
+                            <b>{{ $schoolYear }}</b>
+                        </div>
+
                     </div>
+
                 </div>
+
             </div>
 
             {{-- TABS --}}
             <div class="review-tabs">
+
                 <button type="button" class="review-tab active" data-tab="pending">
+
                     <i class="fa-solid fa-inbox"></i>
                     Pending Reviews
-                    <span class="tab-count">2</span>
+
+                    <span class="tab-count">{{ $pendingCount }}</span>
                 </button>
 
                 <button type="button" class="review-tab" data-tab="history">
+
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     Review History
                 </button>
+
             </div>
 
             {{-- FILTERS --}}
@@ -97,12 +119,14 @@
 
                 <div class="review-search">
                     <i class="fa-solid fa-magnifying-glass"></i>
+
                     <input type="text" id="reviewSearch" placeholder="Search subject or teacher..."
                         aria-label="Search subject or teacher">
                 </div>
 
                 <div class="filter-group">
                     <label for="termFilter">Academic Term</label>
+
                     <select id="termFilter">
                         <option value="all">All Terms</option>
                         <option value="1st Term">1st Term</option>
@@ -122,11 +146,12 @@
                 </div>
 
                 <table class="review-table">
+
                     <thead>
                         <tr>
                             <th>Subject</th>
                             <th>Teacher</th>
-                            <th>Section</th>
+                            <th>Grade Level</th>
                             <th>Term</th>
                             <th>Date Submitted</th>
                             <th>Status</th>
@@ -136,66 +161,100 @@
 
                     <tbody id="pendingTableBody">
 
-                        <tr data-search="mathematics maria santos" data-term="1st Term">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-calculator"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Mathematics</strong>
-                                        <small>Grade 7</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Maria Santos</td>
-                            <td>Grade 7-A</td>
-                            <td>1st Term</td>
-                            <td>Oct 15, 2026</td>
-                            <td><span class="status-badge status-pending">Pending</span></td>
-                            <td>
-                                <button type="button" class="view-review-btn" data-subject="Mathematics"
-                                    data-teacher="Maria Santos" data-section="Grade 7-A" data-term="1st Term"
-                                    data-date="Oct 15, 2026" data-status="Pending">
-                                    <i class="fa-regular fa-eye"></i>
-                                    Review
-                                </button>
-                            </td>
-                        </tr>
+                        @forelse($pendingReviews as $submission)
 
-                        <tr data-search="science juan dela cruz" data-term="1st Term">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon science-icon">
-                                        <i class="fa-solid fa-flask"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Science</strong>
-                                        <small>Grade 7</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Juan Dela Cruz</td>
-                            <td>Grade 7-A</td>
-                            <td>1st Term</td>
-                            <td>Oct 16, 2026</td>
-                            <td><span class="status-badge status-pending">Pending</span></td>
-                            <td>
-                                <button type="button" class="view-review-btn" data-subject="Science"
-                                    data-teacher="Juan Dela Cruz" data-section="Grade 7-A" data-term="1st Term"
-                                    data-date="Oct 16, 2026" data-status="Pending">
-                                    <i class="fa-regular fa-eye"></i>
-                                    Review
-                                </button>
-                            </td>
-                        </tr>
+                                            @php
+                                                $subject = $submission->teachingAssignment?->subject ?? 'Unknown Subject';
+
+                                                $faculty = $submission->faculty;
+
+                                                $teacherName = $faculty
+                                                    ? trim(
+                                                        $faculty->first_name . ' ' .
+                                                        ($faculty->middle_name ? $faculty->middle_name . ' ' : '') .
+                                                        $faculty->last_name
+                                                    )
+                                                    : 'Unknown Teacher';
+
+                                                $gradeLevel = $submission->grade_level ?? '—';
+
+                                                $termLabel = match ((int) $submission->term) {
+                                                    1 => '1st Term',
+                                                    2 => '2nd Term',
+                                                    3 => '3rd Term',
+                                                    default => 'Unknown Term',
+                                                };
+
+                                                $submittedDate = $submission->submitted_at
+                                                    ? \Carbon\Carbon::parse($submission->submitted_at)->format('M d, Y')
+                                                    : '—';
+                                            @endphp
+
+                                            <tr data-search="{{ strtolower($subject . ' ' . $teacherName . ' ' . $gradeLevel) }}"
+                                                data-term="{{ $termLabel }}">
+
+                                                <td>
+                                                    <div class="subject-cell">
+
+                                                        <div class="subject-icon">
+                                                            <i class="fa-solid fa-book-open"></i>
+                                                        </div>
+
+                                                        <div>
+                                                            <strong>{{ $subject }}</strong>
+                                                            <small>{{ $gradeLevel }}</small>
+                                                        </div>
+
+                                                    </div>
+                                                </td>
+
+                                                <td>{{ $teacherName }}</td>
+
+                                                <td>{{ $gradeLevel }}</td>
+
+                                                <td>{{ $termLabel }}</td>
+
+                                                <td>{{ $submittedDate }}</td>
+
+                                                <td>
+                                                    <span class="status-badge status-pending">
+                                                        Pending
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    <a href="{{ route('adviser.grade-review.show', [
+                                'assignmentId' => $submission->teaching_assignment_id,
+                                'schoolYear' => $submission->school_year,
+                                'term' => $submission->term,
+                            ]) }}" class="view-review-btn">
+                                                        <i class="fas fa-eye"></i>
+                                                        Review
+                                                    </a>
+                                                </td>
+
+                                            </tr>
+
+                        @empty
+
+                            <tr class="empty-row">
+                                <td colspan="7">
+                                    No pending grade submissions found.
+                                </td>
+                            </tr>
+
+                        @endforelse
 
                         <tr class="empty-row" hidden>
-                            <td colspan="7">No matching submissions found.</td>
+                            <td colspan="7">
+                                No matching submissions found.
+                            </td>
                         </tr>
 
                     </tbody>
+
                 </table>
+
             </div>
 
             {{-- REVIEW HISTORY TABLE --}}
@@ -207,13 +266,14 @@
                 </div>
 
                 <table class="review-table">
+
                     <thead>
                         <tr>
                             <th>Subject</th>
                             <th>Teacher</th>
-                            <th>Section</th>
+                            <th>Grade Level</th>
                             <th>Term</th>
-                            <th>Date Reviewed</th>
+                            <th>Date Submitted</th>
                             <th>Review Status</th>
                             <th>Action</th>
                         </tr>
@@ -221,66 +281,114 @@
 
                     <tbody id="historyTableBody">
 
-                        <tr data-search="english ana reyes" data-term="1st Term">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon english-icon">
-                                        <i class="fa-solid fa-book-open"></i>
-                                    </div>
-                                    <div>
-                                        <strong>English</strong>
-                                        <small>Grade 7</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Ana Reyes</td>
-                            <td>Grade 7-A</td>
-                            <td>1st Term</td>
-                            <td>Oct 12, 2026</td>
-                            <td><span class="status-badge status-approved">Forwarded</span></td>
-                            <td>
-                                <button type="button" class="view-review-btn" data-subject="English"
-                                    data-teacher="Ana Reyes" data-section="Grade 7-A" data-term="1st Term"
-                                    data-date="Oct 12, 2026" data-status="Forwarded">
-                                    <i class="fa-regular fa-eye"></i>
-                                    View
-                                </button>
-                            </td>
-                        </tr>
+                        @forelse($reviewHistory as $submission)
 
-                        <tr data-search="filipino pedro garcia" data-term="1st Term">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon filipino-icon">
-                                        <i class="fa-solid fa-book"></i>
+                            @php
+                                $subject = $submission->teachingAssignment?->subject ?? 'Unknown Subject';
+
+                                $faculty = $submission->faculty;
+
+                                $teacherName = $faculty
+                                    ? trim(
+                                        $faculty->first_name . ' ' .
+                                        ($faculty->middle_name ? $faculty->middle_name . ' ' : '') .
+                                        $faculty->last_name
+                                    )
+                                    : 'Unknown Teacher';
+
+                                $gradeLevel = $submission->grade_level ?? '—';
+
+                                $termLabel = match ((int) $submission->term) {
+                                    1 => '1st Term',
+                                    2 => '2nd Term',
+                                    3 => '3rd Term',
+                                    default => 'Unknown Term',
+                                };
+
+                                $submittedDate = $submission->submitted_at
+                                    ? \Carbon\Carbon::parse($submission->submitted_at)->format('M d, Y')
+                                    : '—';
+
+                                $statusLabel = match ($submission->status) {
+                                    'forwarded_to_admin' => 'Forwarded',
+                                    'approved' => 'Approved',
+                                    'returned' => 'Returned',
+                                    default => ucfirst($submission->status),
+                                };
+
+                                $statusClass = match ($submission->status) {
+                                    'forwarded_to_admin', 'approved' => 'status-approved',
+                                    'returned' => 'status-returned',
+                                    default => 'status-pending',
+                                };
+                            @endphp
+
+                            <tr data-search="{{ strtolower($subject . ' ' . $teacherName . ' ' . $gradeLevel) }}"
+                                data-term="{{ $termLabel }}">
+
+                                <td>
+                                    <div class="subject-cell">
+
+                                        <div class="subject-icon">
+                                            <i class="fa-solid fa-book-open"></i>
+                                        </div>
+
+                                        <div>
+                                            <strong>{{ $subject }}</strong>
+                                            <small>{{ $gradeLevel }}</small>
+                                        </div>
+
                                     </div>
-                                    <div>
-                                        <strong>Filipino</strong>
-                                        <small>Grade 7</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Pedro Garcia</td>
-                            <td>Grade 7-A</td>
-                            <td>1st Term</td>
-                            <td>Oct 10, 2026</td>
-                            <td><span class="status-badge status-returned">Returned</span></td>
-                            <td>
-                                <button type="button" class="view-review-btn" data-subject="Filipino"
-                                    data-teacher="Pedro Garcia" data-section="Grade 7-A" data-term="1st Term"
-                                    data-date="Oct 10, 2026" data-status="Returned">
-                                    <i class="fa-regular fa-eye"></i>
-                                    View
-                                </button>
-                            </td>
-                        </tr>
+                                </td>
+
+                                <td>{{ $teacherName }}</td>
+
+                                <td>{{ $gradeLevel }}</td>
+
+                                <td>{{ $termLabel }}</td>
+
+                                <td>{{ $submittedDate }}</td>
+
+                                <td>
+                                    <span class="status-badge {{ $statusClass }}">
+                                        {{ $statusLabel }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <button type="button" class="view-review-btn" data-subject="{{ $subject }}"
+                                        data-teacher="{{ $teacherName }}" data-section="{{ $gradeLevel }}"
+                                        data-term="{{ $termLabel }}" data-date="{{ $submittedDate }}"
+                                        data-status="{{ $statusLabel }}">
+
+                                        <i class="fa-regular fa-eye"></i>
+                                        View
+
+                                    </button>
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr class="empty-row">
+                                <td colspan="7">
+                                    No review history found.
+                                </td>
+                            </tr>
+
+                        @endforelse
 
                         <tr class="empty-row" hidden>
-                            <td colspan="7">No matching submissions found.</td>
+                            <td colspan="7">
+                                No matching submissions found.
+                            </td>
                         </tr>
 
                     </tbody>
+
                 </table>
+
             </div>
 
         </div>
@@ -289,22 +397,28 @@
 
     {{-- REVIEW DETAILS MODAL --}}
     <div class="review-modal" id="reviewModal" aria-hidden="true">
+
         <div class="review-modal-backdrop" data-close-modal></div>
 
         <div class="review-modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 
             <div class="modal-header">
+
                 <div>
                     <h3 id="modalTitle">Submission Details</h3>
                     <p>Review the information below.</p>
                 </div>
 
                 <button type="button" class="modal-close" data-close-modal aria-label="Close modal">
+
                     <i class="fa-solid fa-xmark"></i>
+
                 </button>
+
             </div>
 
             <div class="modal-body">
+
                 <div class="detail-item">
                     <span>Subject</span>
                     <strong id="modalSubject">—</strong>
@@ -316,7 +430,7 @@
                 </div>
 
                 <div class="detail-item">
-                    <span>Assigned Section</span>
+                    <span>Assigned Grade Level</span>
                     <strong id="modalSection">—</strong>
                 </div>
 
@@ -326,7 +440,7 @@
                 </div>
 
                 <div class="detail-item">
-                    <span>Date</span>
+                    <span>Date Submitted</span>
                     <strong id="modalDate">—</strong>
                 </div>
 
@@ -334,20 +448,23 @@
                     <span>Status</span>
                     <strong id="modalStatus">—</strong>
                 </div>
+
             </div>
 
             <div class="modal-footer">
+
                 <button type="button" class="modal-done-btn" data-close-modal>
                     Close
                 </button>
+
             </div>
 
         </div>
+
     </div>
 
 @endsection
 
-{{-- PAGE JS --}}
 @section('page-js')
     <script src="{{ asset('js/adviser/adviser-grade-review.js') }}"></script>
 @endsection

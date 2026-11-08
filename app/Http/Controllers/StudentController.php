@@ -8,7 +8,9 @@ use App\Services\PersonRecordService;
 use App\Services\SchoolCsvSnapshotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class StudentController extends Controller
 {
@@ -23,41 +25,46 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
-        // Generate an account email if the student has no email.
-        $accountEmail = $request->input('email')
-            ?: $request->input('student_id') . '@forbes.edu';
-
-        $request->merge([
-            'account_email' => $accountEmail,
-        ]);
-
         $validated = $request->validate([
-            'student_id' => 'required|string|unique:students,student_id',
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'grade_level' => 'required|string|max:255',
-            'sex' => 'required|string|max:255',
-            'school_year' => 'required|string|max:255',
-            'email' => 'nullable|email',
-            'account_email' => 'required|email|unique:users,email',
-            'status' => 'required|in:active,inactive',
+            'student_id' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:students,student_id',
+            ],
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'grade_level' => ['required', 'string', 'max:255'],
+            'sex' => ['required', 'string', 'max:255'],
+            'school_year' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                'unique:students,email',
+                'unique:users,email',
+            ],
+            'status' => [
+                'required',
+                Rule::in(['active', 'inactive']),
+            ],
         ]);
 
         DB::transaction(function () use ($validated) {
+            $fullName = $this->buildFullName($validated);
 
-            // Create login account.
+            // Create a pending login account.
+            // The User model's hashed cast hashes this random password.
             $user = User::create([
-                'name' => trim(
-                    $validated['first_name'] . ' ' .
-                    $validated['last_name']
-                ),
-                'email' => $validated['account_email'],
-                'password' => 'password123',
+                'name' => $fullName,
+                'email' => $validated['email'],
+                'password' => Str::random(64),
                 'role' => 'student',
+                'account_status' => 'pending',
             ]);
 
-            // Create student record and connect its login account.
+            // Create the Student record and link its login account.
             Student::create([
                 'user_id' => $user->id,
                 'student_id' => $validated['student_id'],
@@ -67,73 +74,81 @@ class StudentController extends Controller
                 'grade_level' => $validated['grade_level'],
                 'sex' => $validated['sex'],
                 'school_year' => $validated['school_year'],
-                'email' => $validated['email'] ?? null,
+                'email' => $validated['email'],
                 'status' => $validated['status'],
             ]);
         });
 
         return response()->json([
             'success' => true,
-            'message' => 'Student and login account created successfully.'
-        ]);
+            'message' => 'Student and pending login account created successfully.',
+        ], 201);
     }
 
     public function update(Request $request, $id)
     {
         $student = Student::with('user')->findOrFail($id);
 
-        $accountEmail = $request->input('email')
-            ?: $request->input('student_id') . '@forbes.edu';
-
-        $request->merge([
-            'account_email' => $accountEmail,
-        ]);
-
-        $userId = $student->user_id;
-
         $validated = $request->validate([
             'student_id' => [
                 'required',
                 'string',
+                'max:255',
                 Rule::unique('students', 'student_id')->ignore($student->id),
             ],
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'grade_level' => 'required|string|max:255',
-            'sex' => 'required|string|max:255',
-            'school_year' => 'required|string|max:255',
-            'email' => 'nullable|email',
-            'account_email' => [
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'grade_level' => ['required', 'string', 'max:255'],
+            'sex' => ['required', 'string', 'max:255'],
+            'school_year' => ['required', 'string', 'max:255'],
+            'email' => [
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($userId),
+                'max:255',
+                Rule::unique('students', 'email')->ignore($student->id),
+                Rule::unique('users', 'email')->ignore($student->user_id),
             ],
-            'status' => 'required|in:active,inactive',
+            'status' => [
+                'required',
+                Rule::in(['active', 'inactive']),
+            ],
         ]);
 
         DB::transaction(function () use ($student, $validated) {
+            // Lock the Student record while updating it.
+            $student = Student::whereKey($student->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            // Update existing account or create one if missing.
-            $user = $student->user;
+            // Lock the linked User account, if one exists.
+            $user = $student->user()
+                ->lockForUpdate()
+                ->first();
+
+            $fullName = $this->buildFullName($validated);
+
+            if ($user && $user->role !== 'student') {
+                throw ValidationException::withMessages([
+                    'email' => 'The linked account is not a student account. Please contact the administrator.',
+                ]);
+            }
 
             if (!$user) {
+                // Create a pending account if the Student has no linked account.
                 $user = User::create([
-                    'name' => trim(
-                        $validated['first_name'] . ' ' .
-                        $validated['last_name']
-                    ),
-                    'email' => $validated['account_email'],
-                    'password' => 'password123',
+                    'name' => $fullName,
+                    'email' => $validated['email'],
+                    'password' => Str::random(64),
                     'role' => 'student',
+                    'account_status' => 'pending',
                 ]);
             } else {
+                // Update account details without changing its password,
+                // role, or account activation status.
                 $user->update([
-                    'name' => trim(
-                        $validated['first_name'] . ' ' .
-                        $validated['last_name']
-                    ),
-                    'email' => $validated['account_email'],
+                    'name' => $fullName,
+                    'email' => $validated['email'],
                 ]);
             }
 
@@ -146,14 +161,14 @@ class StudentController extends Controller
                 'grade_level' => $validated['grade_level'],
                 'sex' => $validated['sex'],
                 'school_year' => $validated['school_year'],
-                'email' => $validated['email'] ?? null,
+                'email' => $validated['email'],
                 'status' => $validated['status'],
             ]);
         });
 
         return response()->json([
             'success' => true,
-            'message' => 'Student and login account updated successfully.'
+            'message' => 'Student and login account updated successfully.',
         ]);
     }
 
@@ -162,32 +177,49 @@ class StudentController extends Controller
         SchoolCsvSnapshotService $snapshots,
         $id
     ) {
-        // Soft-delete student record and linked login account.
+        // Soft-delete the Student record and linked login account.
         $records->delete('students', [$id]);
 
-        // Refresh the students CSV snapshot.
+        // Refresh the Students CSV snapshot.
         $snapshots->refresh('students');
 
         return response()->json([
             'success' => true,
-            'message' => 'Student deleted successfully.'
+            'message' => 'Student deleted successfully.',
         ]);
     }
 
     public function toggleStatus($id)
     {
-        $student = Student::findOrFail($id);
+        $student = DB::transaction(function () use ($id) {
+            $student = Student::whereKey($id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $student->status = $student->status === 'active'
-            ? 'inactive'
-            : 'active';
+            $student->status = $student->status === 'active'
+                ? 'inactive'
+                : 'active';
 
-        $student->save();
+            $student->save();
+
+            return $student;
+        });
 
         return response()->json([
             'success' => true,
             'status' => $student->status,
-            'message' => 'Student status updated.'
+            'message' => $student->status === 'active'
+                ? 'Student status activated successfully.'
+                : 'Student status deactivated successfully.',
         ]);
+    }
+
+    private function buildFullName(array $data): string
+    {
+        return trim(implode(' ', array_filter([
+            $data['first_name'],
+            $data['middle_name'] ?? null,
+            $data['last_name'],
+        ])));
     }
 }

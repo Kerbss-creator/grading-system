@@ -1,22 +1,31 @@
 {{-- EXTENDS ADVISER LAYOUT --}}
 @extends('layouts.adviser')
 
-{{-- PAGE TITLE --}}
 @section('title', 'My Classes')
-
-{{-- PAGE HEADER --}}
 @section('header', 'My Classes')
-
-{{-- PAGE HEADER DESCRIPTION --}}
 @section('header-description', 'View your advisory class and monitor student records and grade submissions.')
 
-{{-- PAGE CSS --}}
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('css/adviser/adviser-classes.css') }}">
 @endsection
 
-{{-- MAIN CONTENT --}}
 @section('content')
+
+    @php
+        $adviserName = trim(implode(' ', array_filter([
+            $faculty->first_name,
+            $faculty->middle_name,
+            $faculty->last_name,
+        ])));
+
+        $termLabel = $term === 'overall'
+            ? 'Overall'
+            : 'Term ' . $term;
+
+        $visibleReviews = $recentGradeReviews->unique(function ($review) {
+            return $review->teaching_assignment_id . '-' . $review->term;
+        });
+    @endphp
 
     <div class="adviser-classes-page">
 
@@ -31,8 +40,8 @@
 
                 <div class="class-profile-info">
                     <span class="class-profile-label">MY ADVISORY CLASS</span>
-                    <h2>Grade 7 - Section A</h2>
-                    <p>School Year 2026–2027</p>
+                    <h2>{{ $gradeLevel }}</h2>
+                    <p>School Year {{ $schoolYear }}</p>
                 </div>
 
                 <div class="class-status">
@@ -54,7 +63,7 @@
 
                     <div>
                         <span class="detail-label">Grade Level</span>
-                        <h4>Grade 7</h4>
+                        <h4>{{ $gradeLevel }}</h4>
                     </div>
                 </div>
 
@@ -64,8 +73,8 @@
                     </span>
 
                     <div>
-                        <span class="detail-label">Class Adviser</span>
-                        <h4>Assigned Adviser</h4>
+                        <span class="detail-label">Assigned Adviser</span>
+                        <h4>{{ $adviserName ?: 'Name unavailable' }}</h4>
                     </div>
                 </div>
 
@@ -75,8 +84,8 @@
                     </span>
 
                     <div>
-                        <span class="detail-label">Academic Term</span>
-                        <h4>1st Term</h4>
+                        <span class="detail-label">Academic Period</span>
+                        <h4>{{ $termLabel }}</h4>
                     </div>
                 </div>
 
@@ -97,7 +106,7 @@
                     <span class="summary-caption">My Class</span>
                 </div>
 
-                <h3>42</h3>
+                <h3>{{ $totalStudents }}</h3>
                 <p>Total Students</p>
 
                 <a href="{{ url('/adviser/students') }}" class="summary-card-link">
@@ -117,7 +126,7 @@
                     <span class="summary-caption">Needs Attention</span>
                 </div>
 
-                <h3>2</h3>
+                <h3>{{ $pendingReviews }}</h3>
                 <p>Pending Grade Reviews</p>
 
                 <a href="{{ url('/adviser/grade-submissions') }}" class="summary-card-link">
@@ -175,6 +184,175 @@
 
         </section>
 
+        {{-- ADVISORY CLASS ACADEMIC RECORDS --}}
+        <section class="adviser-panel advisory-records-panel">
+
+            <div class="panel-heading">
+                <div>
+                    <h3>Advisory Class Academic Records</h3>
+                    <p>View the academic records of students in your assigned grade level.</p>
+                </div>
+            </div>
+
+            {{-- TERM FILTER --}}
+            <form method="GET" action="{{ route('adviser.classes') }}" class="grade-review-toolbar">
+
+                <input type="hidden" name="school_year" value="{{ $schoolYear }}">
+
+                <div class="grade-filter-box">
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                    <select name="term" aria-label="Select academic term" onchange="this.form.submit()">
+
+                        <option value="overall" {{ $term === 'overall' ? 'selected' : '' }}>
+                            Overall
+                        </option>
+
+                        <option value="1" {{ $term === '1' ? 'selected' : '' }}>
+                            Term 1
+                        </option>
+
+                        <option value="2" {{ $term === '2' ? 'selected' : '' }}>
+                            Term 2
+                        </option>
+
+                        <option value="3" {{ $term === '3' ? 'selected' : '' }}>
+                            Term 3
+                        </option>
+
+                    </select>
+                </div>
+
+            </form>
+
+            <div class="advisory-records-table-wrapper">
+
+                <table class="advisory-records-table">
+
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Student ID</th>
+                            <th rowspan="2">Student Name</th>
+                            <th rowspan="2">Grade Level</th>
+
+                            @forelse($subjects as $subject)
+                                <th colspan="{{ $term === 'overall' ? 4 : 1 }}" class="subject-group-heading">
+                                    {{ $subject }}
+                                </th>
+                            @empty
+                                <th rowspan="2">Subjects</th>
+                            @endforelse
+                        </tr>
+
+                        <tr>
+                            @foreach($subjects as $subject)
+                                @if($term === 'overall')
+                                    <th>Term 1</th>
+                                    <th>Term 2</th>
+                                    <th>Term 3</th>
+                                    <th>Final Grade</th>
+                                @else
+                                    <th>{{ $termLabel }}</th>
+                                @endif
+                            @endforeach
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @forelse($students as $student)
+
+                            <tr>
+                                <td>{{ $student->student_id }}</td>
+
+                                <td>
+                                    <strong>
+                                        {{ $student->last_name }},
+                                        {{ $student->first_name }}
+                                        {{ $student->middle_name }}
+                                    </strong>
+                                </td>
+
+                                <td>{{ $student->grade_level }}</td>
+
+                                @forelse($subjects as $subject)
+
+                                    @php
+                                        $termsToDisplay = $term === 'overall'
+                                            ? [1, 2, 3]
+                                            : [(int) $term];
+                                    @endphp
+
+                                    @foreach($termsToDisplay as $displayTerm)
+
+                                        @php
+                                            $record = $student->gradeRecords->first(
+                                                function ($gradeRecord) use ($subject, $displayTerm) {
+                                                    return $gradeRecord->teachingAssignment
+                                                        && $gradeRecord->teachingAssignment->subject === $subject
+                                                        && (int) $gradeRecord->term === $displayTerm
+                                                        && (
+                                                            $gradeRecord->status === 'submitted'
+                                                            || $gradeRecord->adviser_reviewed_at !== null
+                                                        );
+                                                }
+                                            );
+                                        @endphp
+
+                                        <td>
+                                            @if($record && $record->term_grade !== null)
+                                                {{ number_format((float) $record->term_grade, 2) }}
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+
+                                    @endforeach
+
+                                    @if($term === 'overall')
+                                        <td>—</td>
+                                    @endif
+
+                                @empty
+                                    <td>—</td>
+                                @endforelse
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="{{ 3 + ($subjects->count() * ($term === 'overall' ? 4 : 1)) }}"
+                                    class="empty-review-message">
+                                    <i class="fa-solid fa-users"></i>
+                                    <p>No active students found for {{ $gradeLevel }}.</p>
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+                        @if($students->isNotEmpty() && $subjects->isEmpty())
+                            <tr>
+                                <td colspan="4" class="empty-review-message">
+                                    <i class="fa-solid fa-book-open"></i>
+                                    <p>No subjects are assigned to this grade level yet.</p>
+                                </td>
+                            </tr>
+                        @endif
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="grade-review-footer">
+                <span>{{ $totalStudents }} students</span>
+                <span>Final Grade is pending the approved computation policy.</span>
+            </div>
+
+        </section>
+
         {{-- RECENT GRADE REVIEWS --}}
         <section class="adviser-panel grade-review-panel">
 
@@ -223,6 +401,7 @@
                         <tr>
                             <th>Subject</th>
                             <th>Subject Teacher</th>
+                            <th>Term</th>
                             <th>Date Submitted</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -231,79 +410,86 @@
 
                     <tbody id="gradeReviewTableBody">
 
-                        {{-- SAMPLE PENDING SUBMISSION --}}
-                        <tr class="grade-review-row" data-search="mathematics assigned teacher" data-status="pending">
+                        @forelse($visibleReviews as $review)
 
-                            <td>
-                                <div class="subject-cell">
-                                    <span class="subject-icon">
-                                        <i class="fa-solid fa-calculator"></i>
-                                    </span>
+                                        @php
+                                            $isReviewed = $review->adviser_reviewed_at !== null;
+                                            $reviewStatus = $isReviewed ? 'reviewed' : 'pending';
 
-                                    <div>
-                                        <strong>Mathematics</strong>
-                                        <small>Grade 7 - Section A</small>
-                                    </div>
-                                </div>
-                            </td>
+                                            $teacher = $review->teachingAssignment?->faculty;
 
-                            <td>Assigned Teacher</td>
+                                            $teacherName = $teacher
+                                                ? trim(implode(' ', array_filter([
+                                                    $teacher->first_name,
+                                                    $teacher->middle_name,
+                                                    $teacher->last_name,
+                                                ])))
+                                                : 'Unknown Teacher';
 
-                            <td>October 15, 2026</td>
+                                            $subjectName = $review->teachingAssignment?->subject ?? 'Unknown Subject';
+                                        @endphp
 
-                            <td>
-                                <span class="grade-status status-pending">
-                                    <span></span>
-                                    Pending Review
-                                </span>
-                            </td>
+                                        <tr class="grade-review-row" data-search="{{ strtolower($subjectName . ' ' . $teacherName) }}"
+                                            data-status="{{ $reviewStatus }}">
 
-                            <td>
-                                <a href="{{ url('/adviser/grade-submissions') }}" class="review-action-link">
-                                    Review
-                                </a>
-                            </td>
+                                            <td>
+                                                <div class="subject-cell">
+                                                    <span class="subject-icon">
+                                                        <i class="fa-solid fa-book"></i>
+                                                    </span>
 
-                        </tr>
+                                                    <div>
+                                                        <strong>{{ $subjectName }}</strong>
+                                                        <small>{{ $gradeLevel }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
 
-                        {{-- SAMPLE REVIEWED SUBMISSION --}}
-                        <tr class="grade-review-row" data-search="science assigned teacher" data-status="reviewed">
+                                            <td>{{ $teacherName }}</td>
 
-                            <td>
-                                <div class="subject-cell">
-                                    <span class="subject-icon science-icon">
-                                        <i class="fa-solid fa-flask"></i>
-                                    </span>
+                                            <td>Term {{ $review->term }}</td>
 
-                                    <div>
-                                        <strong>Science</strong>
-                                        <small>Grade 7 - Section A</small>
-                                    </div>
-                                </div>
-                            </td>
+                                            <td>
+                                                {{ $review->submitted_at
+                            ? $review->submitted_at->format('M d, Y')
+                            : '—' }}
+                                            </td>
 
-                            <td>Assigned Teacher</td>
+                                            <td>
+                                                @if($isReviewed)
+                                                    <span class="grade-status status-reviewed">
+                                                        <span></span>
+                                                        Reviewed
+                                                    </span>
+                                                @else
+                                                    <span class="grade-status status-pending">
+                                                        <span></span>
+                                                        Pending Review
+                                                    </span>
+                                                @endif
+                                            </td>
 
-                            <td>October 14, 2026</td>
+                                            <td>
+                                                <a href="{{ url('/adviser/grade-submissions') }}" class="review-action-link">
+                                                    {{ $isReviewed ? 'View' : 'Review' }}
+                                                </a>
+                                            </td>
 
-                            <td>
-                                <span class="grade-status status-reviewed">
-                                    <span></span>
-                                    Reviewed
-                                </span>
-                            </td>
+                                        </tr>
 
-                            <td>
-                                <a href="{{ url('/adviser/grade-submissions') }}" class="review-action-link">
-                                    View
-                                </a>
-                            </td>
+                        @empty
 
-                        </tr>
+                            <tr>
+                                <td colspan="6" class="empty-review-message">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                    <p>No grade submissions found for this advisory class.</p>
+                                </td>
+                            </tr>
 
-                        {{-- EMPTY SEARCH RESULTS --}}
+                        @endforelse
+
                         <tr id="gradeReviewEmpty" style="display: none;">
-                            <td colspan="5" class="empty-review-message">
+                            <td colspan="6" class="empty-review-message">
                                 <i class="fa-solid fa-folder-open"></i>
                                 <p>No matching grade submissions found.</p>
                             </td>
@@ -316,7 +502,10 @@
             </div>
 
             <div class="grade-review-footer">
-                <span id="gradeReviewCount">Showing 2 submissions</span>
+                <span id="gradeReviewCount">
+                    Showing {{ $visibleReviews->count() }}
+                    {{ $visibleReviews->count() === 1 ? 'submission' : 'submissions' }}
+                </span>
             </div>
 
         </section>
@@ -325,7 +514,6 @@
 
 @endsection
 
-{{-- PAGE JAVASCRIPT --}}
 @section('page-js')
     <script src="{{ asset('js/adviser/adviser-classes.js') }}"></script>
 @endsection

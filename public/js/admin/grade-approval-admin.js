@@ -23,472 +23,351 @@ const reviewReturnBtn = document.getElementById("reviewReturnBtn");
 
 const returnReason = document.getElementById("returnReason");
 
+const approveForm = document.getElementById("approveForm");
+const returnForm = document.getElementById("returnForm");
+const returnReasonInput = document.getElementById("returnReasonInput");
+
 let selectedRow = null;
+
+/* Get the actual table row from a clicked button */
+
+function getApprovalRow(element) {
+    return element instanceof Element ? element.closest(".approval-row") : null;
+}
+
+/* Build the correct Laravel endpoint */
+
+function getApprovalUrl(row, action) {
+    if (!row) {
+        return null;
+    }
+
+    const assignmentId = row.dataset.assignment;
+    const schoolYear = row.dataset.schoolYear;
+    const term = row.dataset.term;
+
+    if (!assignmentId || !schoolYear || !term) {
+        alert(
+            "Unable to identify this grade submission. Please refresh the page.",
+        );
+        return null;
+    }
+
+    const baseUrl =
+        approveForm?.dataset.baseUrl ||
+        returnForm?.dataset.baseUrl ||
+        "/admin/grade-approval";
+
+    return `${baseUrl}/${encodeURIComponent(assignmentId)}/${encodeURIComponent(schoolYear)}/${encodeURIComponent(term)}/${action}`;
+}
 
 /* Update summary counts */
 
 function updateSummary() {
-  const rows = document.querySelectorAll(".approval-row");
+    const rows = document.querySelectorAll(".approval-row");
 
-  let pending = 0;
-  let approved = 0;
-  let returned = 0;
+    let pending = 0;
+    let approved = 0;
+    let returned = 0;
 
-  rows.forEach((row) => {
-    const status = row.dataset.status;
+    rows.forEach((row) => {
+        const status = row.dataset.status;
 
-    if (status === "Pending") {
-      pending++;
-    }
+        if (status === "Pending") pending++;
+        if (status === "Approved") approved++;
+        if (status === "Returned") returned++;
+    });
 
-    if (status === "Approved") {
-      approved++;
-    }
+    const pendingCount = document.getElementById("pendingCount");
+    const approvedCount = document.getElementById("approvedCount");
+    const returnedCount = document.getElementById("returnedCount");
 
-    if (status === "Returned") {
-      returned++;
-    }
-  });
-
-  const pendingCount = document.getElementById("pendingCount");
-  const approvedCount = document.getElementById("approvedCount");
-  const returnedCount = document.getElementById("returnedCount");
-
-  if (pendingCount) {
-    pendingCount.textContent = pending;
-  }
-
-  if (approvedCount) {
-    approvedCount.textContent = approved;
-  }
-
-  if (returnedCount) {
-    returnedCount.textContent = returned;
-  }
+    if (pendingCount) pendingCount.textContent = pending;
+    if (approvedCount) approvedCount.textContent = approved;
+    if (returnedCount) returnedCount.textContent = returned;
 }
 
 /* Open review modal */
 
-function openReview(row) {
-  if (!row) {
-    return;
-  }
+function openReview(element) {
+    const row = getApprovalRow(element);
 
-  selectedRow = row;
+    if (!row || !reviewModal) return;
 
-  const grade = row.dataset.grade || "";
-  const subject = row.dataset.subject || "";
-  const teacher = row.dataset.teacher || "";
-  const students = row.dataset.students || "";
-  const schoolYear = row.dataset.schoolYear || "";
-  const status = row.dataset.status || "";
+    selectedRow = row;
 
-  document.getElementById("reviewGrade").textContent = grade;
-  document.getElementById("reviewSubject").textContent = subject;
-  document.getElementById("reviewTeacher").textContent = teacher;
-  document.getElementById("reviewStudents").textContent = students;
-  document.getElementById("reviewStatus").textContent = status;
+    const grade = row.dataset.grade || "N/A";
+    const subject = row.dataset.subject || "N/A";
+    const teacher = row.dataset.teacher || "N/A";
+    const students = row.dataset.students || "0";
+    const schoolYear = row.dataset.schoolYear || "N/A";
+    const submitted = row.dataset.submitted || "N/A";
+    const status = row.dataset.status || "N/A";
 
-  const schoolYearElement = document.querySelector(
-    ".review-details div:nth-child(3) strong"
-  );
+    document.getElementById("reviewGrade").textContent = `Grade ${grade}`;
+    document.getElementById("reviewSubject").textContent = subject;
+    document.getElementById("reviewTeacher").textContent = teacher;
+    document.getElementById("reviewStudents").textContent = students;
+    document.getElementById("reviewSchoolYear").textContent = schoolYear;
+    document.getElementById("reviewDate").textContent = submitted;
 
-  if (schoolYearElement) {
-    schoolYearElement.textContent = schoolYear;
-  }
+    const reviewStatus = document.getElementById("reviewStatus");
 
-  if (status === "Pending") {
-    reviewApproveBtn.style.display = "";
-    reviewReturnBtn.style.display = "";
-  } else {
-    reviewApproveBtn.style.display = "none";
-    reviewReturnBtn.style.display = "none";
-  }
+    reviewStatus.textContent = status;
 
-  if (status === "Approved") {
-    document.getElementById("reviewStatus").style.color = "#087a3e";
-  } else if (status === "Returned") {
-    document.getElementById("reviewStatus").style.color = "#c0392b";
-  } else {
-    document.getElementById("reviewStatus").style.color = "#c88800";
-  }
+    if (status === "Approved") {
+        reviewStatus.style.color = "#087a3e";
+    } else if (status === "Returned") {
+        reviewStatus.style.color = "#c0392b";
+    } else {
+        reviewStatus.style.color = "#c88800";
+    }
 
-  reviewModal.classList.add("show");
+    const isPending = status === "Pending";
+
+    if (reviewApproveBtn) {
+        reviewApproveBtn.style.display = isPending ? "" : "none";
+    }
+
+    if (reviewReturnBtn) {
+        reviewReturnBtn.style.display = isPending ? "" : "none";
+    }
+
+    reviewModal.classList.add("show");
 }
 
 /* Close review modal */
 
 function closeReview() {
-  if (!reviewModal) {
-    return;
-  }
-
-  reviewModal.classList.remove("show");
+    reviewModal?.classList.remove("show");
 }
 
 /* Open approve confirmation modal */
 
-function openApproveModal(row) {
-  if (!row || !approveModal) {
-    return;
-  }
+function openApproveModal(element) {
+    const row = getApprovalRow(element);
 
-  selectedRow = row;
+    if (!row || !approveModal) return;
 
-  const grade = row.dataset.grade || "";
+    if (row.dataset.status !== "Pending") {
+        alert("Only pending submissions can be approved.");
+        return;
+    }
 
-  const approveGradeName = document.getElementById("approveGradeName");
+    selectedRow = row;
 
-  if (approveGradeName) {
-    approveGradeName.textContent = grade;
-  }
+    document.getElementById("approveGradeName").textContent =
+        `Grade ${row.dataset.grade || "N/A"}`;
 
-  approveModal.classList.add("show");
+    document.getElementById("approveSubject").textContent =
+        row.dataset.subject || "N/A";
+
+    document.getElementById("approveTeacher").textContent =
+        row.dataset.teacher || "N/A";
+
+    document.getElementById("approveStudents").textContent =
+        row.dataset.students || "0";
+
+    approveModal.classList.add("show");
 }
 
 /* Close approve confirmation modal */
 
 function closeApproveModal() {
-  if (!approveModal) {
-    return;
-  }
-
-  approveModal.classList.remove("show");
+    approveModal?.classList.remove("show");
 }
 
 /* Open return modal */
 
-function openReturn(row) {
-  if (!row) {
-    return;
-  }
+function openReturn(element) {
+    const row = getApprovalRow(element);
 
-  selectedRow = row;
+    if (!row || !returnModal) return;
 
-  returnReason.value = "";
+    if (row.dataset.status !== "Pending") {
+        alert("Only pending submissions can be returned.");
+        return;
+    }
 
-  returnModal.classList.add("show");
+    selectedRow = row;
+
+    if (returnReason) {
+        returnReason.value = "";
+    }
+
+    returnModal.classList.add("show");
 }
 
 /* Close return modal */
 
 function closeReturn() {
-  if (!returnModal) {
-    return;
-  }
+    returnModal?.classList.remove("show");
 
-  returnModal.classList.remove("show");
-
-  returnReason.value = "";
+    if (returnReason) {
+        returnReason.value = "";
+    }
 }
 
-/* Approve grade */
+/* Submit approval to Laravel */
 
-function approveGrade(row) {
-  if (!row) {
-    return;
-  }
+function approveGrade() {
+    if (!selectedRow || !approveForm) return;
 
-  const grade = row.dataset.grade || "";
+    if (selectedRow.dataset.status !== "Pending") {
+        alert("This submission is no longer pending.");
+        return;
+    }
 
-  row.dataset.status = "Approved";
+    const actionUrl = getApprovalUrl(selectedRow, "approve");
 
-  const status = row.querySelector(".status");
+    if (!actionUrl) return;
 
-  if (status) {
-    status.textContent = "Approved";
-    status.className = "status approved";
-  }
+    approveForm.action = actionUrl;
+    confirmApproveBtn.disabled = true;
+    confirmApproveBtn.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
 
-  const icon = row.querySelector(".table-icon");
-
-  if (icon) {
-    icon.innerHTML = '<i class="fa-solid fa-file-circle-check"></i>';
-    icon.classList.remove("returned-table-icon");
-    icon.classList.add("approved-table-icon");
-  }
-
-  const actions = row.querySelector(".table-actions");
-
-  if (actions) {
-    actions.innerHTML = `
-      <button class="review-btn" title="View">
-        <i class="fa-solid fa-eye"></i>
-      </button>
-    `;
-  }
-
-  addRowEvents(row);
-
-  updateSummary();
-  filterRows();
-
-  selectedRow = null;
-
-  alert(`${grade} grades have been approved successfully.`);
+    approveForm.submit();
 }
 
-/* Return grade */
+/* Submit return request to Laravel */
 
-function returnGrade(row) {
-  if (!row) {
-    return;
-  }
+function returnGrade() {
+    if (!selectedRow || !returnForm || !returnReason || !returnReasonInput) {
+        return;
+    }
 
-  const reason = returnReason.value.trim();
+    if (selectedRow.dataset.status !== "Pending") {
+        alert("This submission is no longer pending.");
+        return;
+    }
 
-  if (reason === "") {
-    alert("Please provide a reason for returning the grades.");
-    return;
-  }
+    const reason = returnReason.value.trim();
 
-  const grade = row.dataset.grade || "";
+    if (!reason) {
+        alert("Please provide a reason for returning the grades.");
+        returnReason.focus();
+        return;
+    }
 
-  row.dataset.status = "Returned";
-  row.dataset.returnReason = reason;
+    const actionUrl = getApprovalUrl(selectedRow, "return");
 
-  const status = row.querySelector(".status");
+    if (!actionUrl) return;
 
-  if (status) {
-    status.textContent = "Returned";
-    status.className = "status returned";
-  }
+    returnReasonInput.value = reason;
+    returnForm.action = actionUrl;
 
-  const icon = row.querySelector(".table-icon");
+    submitReturnBtn.disabled = true;
+    submitReturnBtn.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
 
-  if (icon) {
-    icon.innerHTML = '<i class="fa-solid fa-file-circle-xmark"></i>';
-    icon.classList.remove("approved-table-icon");
-    icon.classList.add("returned-table-icon");
-  }
-
-  const actions = row.querySelector(".table-actions");
-
-  if (actions) {
-    actions.innerHTML = `
-      <button class="review-btn" title="View">
-        <i class="fa-solid fa-eye"></i>
-      </button>
-    `;
-  }
-
-  addRowEvents(row);
-
-  closeReturn();
-
-  updateSummary();
-  filterRows();
-
-  selectedRow = null;
-
-  alert(`${grade} has been returned to the teacher.`);
-}
-
-/* Add row button events */
-
-function addRowEvents(row) {
-  if (!row) {
-    return;
-  }
-
-  const reviewBtn = row.querySelector(".review-btn");
-
-  if (reviewBtn) {
-    reviewBtn.onclick = () => {
-      openReview(row);
-    };
-  }
-
-  const approveBtn = row.querySelector(".approve-btn");
-
-  if (approveBtn) {
-    approveBtn.onclick = () => {
-      openApproveModal(row);
-    };
-  }
-
-  const returnBtn = row.querySelector(".return-btn");
-
-  if (returnBtn) {
-    returnBtn.onclick = () => {
-      openReturn(row);
-    };
-  }
+    returnForm.submit();
 }
 
 /* Search and filter */
 
 function filterRows() {
-  const search = searchApproval.value.toLowerCase().trim();
-  const selectedStatus = statusFilter.value;
+    if (!searchApproval || !statusFilter) return;
 
-  const rows = document.querySelectorAll(".approval-row");
+    const search = searchApproval.value.toLowerCase().trim();
+    const selectedStatus = statusFilter.value;
 
-  rows.forEach((row) => {
-    const grade = (row.dataset.grade || "").toLowerCase();
-    const subject = (row.dataset.subject || "").toLowerCase();
-    const teacher = (row.dataset.teacher || "").toLowerCase();
-    const status = row.dataset.status || "";
+    document.querySelectorAll(".approval-row").forEach((row) => {
+        const grade = (row.dataset.grade || "").toLowerCase();
+        const subject = (row.dataset.subject || "").toLowerCase();
+        const teacher = (row.dataset.teacher || "").toLowerCase();
+        const status = row.dataset.status || "";
 
-    const matchesSearch =
-      grade.includes(search) ||
-      subject.includes(search) ||
-      teacher.includes(search);
+        const matchesSearch =
+            grade.includes(search) ||
+            subject.includes(search) ||
+            teacher.includes(search);
 
-    const matchesStatus =
-      selectedStatus === "all" || status === selectedStatus;
+        const matchesStatus =
+            selectedStatus === "all" || status === selectedStatus;
 
-    row.style.display = matchesSearch && matchesStatus ? "" : "none";
-  });
+        row.style.display = matchesSearch && matchesStatus ? "" : "none";
+    });
 }
 
 /* Search */
 
-if (searchApproval) {
-  searchApproval.addEventListener("input", filterRows);
-}
+searchApproval?.addEventListener("input", filterRows);
 
 /* Status filter */
 
-if (statusFilter) {
-  statusFilter.addEventListener("change", filterRows);
-}
+statusFilter?.addEventListener("change", filterRows);
 
 /* Approve from review modal */
 
-if (reviewApproveBtn) {
-  reviewApproveBtn.addEventListener("click", () => {
-    if (!selectedRow) {
-      return;
-    }
+reviewApproveBtn?.addEventListener("click", () => {
+    if (!selectedRow) return;
 
     const row = selectedRow;
 
     closeReview();
     openApproveModal(row);
-  });
-}
+});
 
 /* Return from review modal */
 
-if (reviewReturnBtn) {
-  reviewReturnBtn.addEventListener("click", () => {
-    if (!selectedRow) {
-      return;
-    }
+reviewReturnBtn?.addEventListener("click", () => {
+    if (!selectedRow) return;
 
     const row = selectedRow;
 
     closeReview();
     openReturn(row);
-  });
-}
+});
 
 /* Confirm approval */
 
-if (confirmApproveBtn) {
-  confirmApproveBtn.addEventListener("click", () => {
-    if (!selectedRow) {
-      return;
-    }
-
-    const row = selectedRow;
-
-    closeApproveModal();
-    approveGrade(row);
-  });
-}
+confirmApproveBtn?.addEventListener("click", approveGrade);
 
 /* Cancel approval */
 
-if (cancelApproveBtn) {
-  cancelApproveBtn.addEventListener("click", closeApproveModal);
-}
-
-/* Close approval modal */
-
-if (closeApproveModalBtn) {
-  closeApproveModalBtn.addEventListener("click", closeApproveModal);
-}
+cancelApproveBtn?.addEventListener("click", closeApproveModal);
+closeApproveModalBtn?.addEventListener("click", closeApproveModal);
 
 /* Submit return */
 
-if (submitReturnBtn) {
-  submitReturnBtn.addEventListener("click", () => {
-    if (selectedRow) {
-      returnGrade(selectedRow);
-    }
-  });
-}
+submitReturnBtn?.addEventListener("click", returnGrade);
 
 /* Close review modal */
 
-if (closeReviewModalBtn) {
-  closeReviewModalBtn.addEventListener("click", closeReview);
-}
-
-if (closeReviewButton) {
-  closeReviewButton.addEventListener("click", closeReview);
-}
+closeReviewModalBtn?.addEventListener("click", closeReview);
+closeReviewButton?.addEventListener("click", closeReview);
 
 /* Close return modal */
 
-if (closeReturnModalBtn) {
-  closeReturnModalBtn.addEventListener("click", closeReturn);
-}
-
-if (cancelReturnBtn) {
-  cancelReturnBtn.addEventListener("click", closeReturn);
-}
+closeReturnModalBtn?.addEventListener("click", closeReturn);
+cancelReturnBtn?.addEventListener("click", closeReturn);
 
 /* Click outside modals */
 
-if (reviewModal) {
-  reviewModal.addEventListener("click", (event) => {
-    if (event.target === reviewModal) {
-      closeReview();
-    }
-  });
-}
+reviewModal?.addEventListener("click", (event) => {
+    if (event.target === reviewModal) closeReview();
+});
 
-if (returnModal) {
-  returnModal.addEventListener("click", (event) => {
-    if (event.target === returnModal) {
-      closeReturn();
-    }
-  });
-}
+returnModal?.addEventListener("click", (event) => {
+    if (event.target === returnModal) closeReturn();
+});
 
-if (approveModal) {
-  approveModal.addEventListener("click", (event) => {
-    if (event.target === approveModal) {
-      closeApproveModal();
-    }
-  });
-}
+approveModal?.addEventListener("click", (event) => {
+    if (event.target === approveModal) closeApproveModal();
+});
 
 /* Escape key */
 
 document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape") {
-    return;
-  }
-
-  closeReview();
-  closeReturn();
-  closeApproveModal();
+    if (event.key === "Escape") {
+        closeReview();
+        closeReturn();
+        closeApproveModal();
+    }
 });
 
-/* Initialize table rows */
-
-document.querySelectorAll(".approval-row").forEach((row) => {
-  addRowEvents(row);
-});
-
-/* Initialize summary */
+/* Initialize page */
 
 updateSummary();
-
-/* Initialize filters */
-
 filterRows();

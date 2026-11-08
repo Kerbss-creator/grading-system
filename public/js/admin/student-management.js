@@ -1,397 +1,657 @@
-const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+document.addEventListener("DOMContentLoaded", () => {
+    // ==========================================
+    // CSRF TOKEN
+    // ==========================================
 
-// ==========================================
-// MODAL LOGIC (Add Student)
-// ==========================================
-const studentModal = document.getElementById("studentModal");
-const addStudentBtn = document.getElementById("addStudentBtn");
-const closeStudentModal = document.getElementById("closeStudentModal");
-const cancelStudentModal = document.getElementById("cancelStudentModal");
-const saveStudentBtn = document.getElementById("saveStudentBtn");
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content");
 
-function openStudentModal() { 
-  if (studentModal) studentModal.classList.add("show"); 
-}
+    // ==========================================
+    // ELEMENT REFERENCES
+    // ==========================================
 
-function closeModal() { 
-  if (studentModal) studentModal.classList.remove("show"); 
-}
+    const studentModal = document.getElementById("studentModal");
+    const editStudentModal = document.getElementById("editStudentModal");
+    const viewStudentModal = document.getElementById("viewStudentModal");
+    const deleteStudentModal = document.getElementById("deleteStudentModal");
+    const notificationModal = document.getElementById(
+        "studentNotificationModal",
+    );
 
-if (addStudentBtn) addStudentBtn.addEventListener("click", openStudentModal);
-if (closeStudentModal) closeStudentModal.addEventListener("click", closeModal);
-if (cancelStudentModal) cancelStudentModal.addEventListener("click", closeModal);
+    const addStudentBtn = document.getElementById("addStudentBtn");
+    const saveStudentBtn = document.getElementById("saveStudentBtn");
+    const saveEditStudentBtn = document.getElementById("saveEditStudent");
 
-if (studentModal) {
-  studentModal.addEventListener("click", (event) => {
-    if (event.target === studentModal) closeModal();
-  });
-}
+    const studentTableBody = document.getElementById("studentTableBody");
 
-// ==========================================
-// EDIT MODAL CLOSE/CANCEL
-// ==========================================
-const closeEditModal = document.getElementById("closeEditModal");
-const cancelEditModal = document.getElementById("cancelEditModal");
-const editStudentModal = document.getElementById("editStudentModal");
+    const studentSearch = document.getElementById("studentSearch");
+    const gradeFilter = document.getElementById("gradeFilter");
+    const sexFilter = document.getElementById("sexFilter");
+    const statusFilter = document.getElementById("statusFilter");
 
-if (closeEditModal) {
-  closeEditModal.addEventListener("click", () => {
-    editStudentModal.classList.remove("show");
-  });
-}
+    const studentNoResults = document.getElementById("studentNoResults");
+    const clearStudentFilters = document.getElementById("clearStudentFilters");
 
-if (cancelEditModal) {
-  cancelEditModal.addEventListener("click", () => {
-    editStudentModal.classList.remove("show");
-  });
-}
+    let selectedStudentId = null;
 
-if (editStudentModal) {
-  editStudentModal.addEventListener("click", (event) => {
-    if (event.target === editStudentModal) {
-      editStudentModal.classList.remove("show");
+    // ==========================================
+    // MODAL FUNCTIONS
+    // ==========================================
+
+    function openModal(modal) {
+        if (modal) {
+            modal.classList.add("show");
+        }
     }
-  });
-}
 
-// ==========================================
-// DELETE MODAL CLOSE/CANCEL
-// ==========================================
-const closeDeleteModal = document.getElementById("closeDeleteModal");
-const cancelDeleteModal = document.getElementById("cancelDeleteModal");
-const deleteStudentModal = document.getElementById("deleteStudentModal");
-
-if (closeDeleteModal) {
-  closeDeleteModal.addEventListener("click", () => {
-    deleteStudentModal.classList.remove("show");
-  });
-}
-
-if (cancelDeleteModal) {
-  cancelDeleteModal.addEventListener("click", () => {
-    deleteStudentModal.classList.remove("show");
-  });
-}
-
-if (deleteStudentModal) {
-  deleteStudentModal.addEventListener("click", (event) => {
-    if (event.target === deleteStudentModal) {
-      deleteStudentModal.classList.remove("show");
+    function closeModal(modal) {
+        if (modal) {
+            modal.classList.remove("show");
+        }
     }
-  });
-}
 
-// ==========================================
-// VIEW STUDENT MODAL CLOSE/CANCEL
-// ==========================================
-const closeViewModal = document.getElementById("closeViewModal");
-const closeViewModalBtn = document.getElementById("closeViewModalBtn");
-const viewStudentModal = document.getElementById("viewStudentModal");
-
-if (closeViewModal) {
-  closeViewModal.addEventListener("click", () => {
-    viewStudentModal.classList.remove("show");
-  });
-}
-
-if (closeViewModalBtn) {
-  closeViewModalBtn.addEventListener("click", () => {
-    viewStudentModal.classList.remove("show");
-  });
-}
-
-if (viewStudentModal) {
-  viewStudentModal.addEventListener("click", (event) => {
-    if (event.target === viewStudentModal) {
-      viewStudentModal.classList.remove("show");
+    function closeAllModals() {
+        [
+            studentModal,
+            editStudentModal,
+            viewStudentModal,
+            deleteStudentModal,
+            notificationModal,
+        ].forEach(closeModal);
     }
-  });
-}
 
-// ==========================================
-// GLOBAL ESCAPE KEY
-// ==========================================
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeModal();
-    if (editStudentModal) editStudentModal.classList.remove("show");
-    if (deleteStudentModal) deleteStudentModal.classList.remove("show");
-    if (viewStudentModal) viewStudentModal.classList.remove("show");
-  }
-});
+    // ==========================================
+    // NOTIFICATION MODAL
+    // ==========================================
 
-// ==========================================
-// ADD STUDENT
-// ==========================================
-if (saveStudentBtn) {
-  saveStudentBtn.addEventListener("click", async function (e) {
-    e.preventDefault();
+    window.showModal = function (message, type = "info") {
+        if (!notificationModal) {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            return;
+        }
 
-    const formData = {
-      student_id: document.getElementById("studentId").value.trim(),
-      first_name: document.getElementById("firstName").value.trim(),
-      middle_name: document.getElementById("middleName").value.trim(),
-      last_name: document.getElementById("lastName").value.trim(),
-      grade_level: document.getElementById("gradeLevel").value,
-      sex: document.getElementById("sex").value,
-      school_year: document.getElementById("schoolYear").value,
-      email: document.getElementById("email").value.trim(),
-      status: document.getElementById("studentStatus").value,
+        const title = document.getElementById("notificationTitle");
+        const subtitle = document.getElementById("notificationSubtitle");
+        const messageElement = document.getElementById("notificationMessage");
+        const iconContainer = document.getElementById("notificationIcon");
+
+        const notificationTypes = {
+            success: {
+                title: "Success",
+                subtitle: "Your action was completed successfully.",
+                icon: "fa-circle-check",
+            },
+            error: {
+                title: "Something Went Wrong",
+                subtitle: "Please check the information and try again.",
+                icon: "fa-circle-exclamation",
+            },
+            warning: {
+                title: "Warning",
+                subtitle: "Please review this action.",
+                icon: "fa-triangle-exclamation",
+            },
+            info: {
+                title: "Information",
+                subtitle: "Student Management",
+                icon: "fa-circle-info",
+            },
+        };
+
+        const config = notificationTypes[type] || notificationTypes.info;
+
+        if (title) title.textContent = config.title;
+        if (subtitle) subtitle.textContent = config.subtitle;
+        if (messageElement) messageElement.textContent = message;
+
+        if (iconContainer) {
+            iconContainer.className = `delete-icon notification-${type}`;
+            iconContainer.innerHTML = `<i class="fa-solid ${config.icon}"></i>`;
+        }
+
+        openModal(notificationModal);
     };
 
-    try {
-      const response = await fetch("/admin/students", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json", 
-          "X-CSRF-TOKEN": csrfToken, 
-          "Accept": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
-        },
-        body: JSON.stringify(formData),
-      });
+    // ==========================================
+    // NOTIFICATION CLOSE BUTTONS
+    // ==========================================
 
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        showModal(data.message || "Student added successfully!", 'success');
-        closeModal();
-        document.getElementById("studentId").value = "";
-        document.getElementById("firstName").value = "";
-        document.getElementById("middleName").value = "";
-        document.getElementById("lastName").value = "";
-        document.getElementById("gradeLevel").value = "";
-        document.getElementById("sex").value = "";
-        document.getElementById("schoolYear").value = "";
-        document.getElementById("email").value = "";
-        document.getElementById("studentStatus").value = "active";
-        
-        // DELAY RELOAD SO USER CAN SEE THE MODAL
-        setTimeout(() => { window.location.reload(); }, 1000);
-      } else {
-        let errorMsg = "Error saving student:\n";
-        if (data.errors) {
-          for (const field in data.errors) {
-            const fieldName = field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-            errorMsg += `- ${fieldName}: ${data.errors[field][0]}\n`;
-          }
-        } else {
-          errorMsg += data.message || "Check required fields.";
-        }
-        showModal(errorMsg, 'error');
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);
-      showModal("An unexpected error occurred while saving.", 'error');
-    }
-  }); 
-}
+    document
+        .getElementById("closeNotificationModal")
+        ?.addEventListener("click", () => closeModal(notificationModal));
 
-// ==========================================
-// VIEW STUDENT
-// ==========================================
-window.viewStudent = function (id) {
-  const row = document.querySelector(`tr[data-id="${id}"]`);
-  if (!row) return;
+    document
+        .getElementById("closeNotificationBtn")
+        ?.addEventListener("click", () => closeModal(notificationModal));
 
-  const setId = document.getElementById("viewStudentId");
-  const setName = document.getElementById("viewStudentName");
-  const setGrade = document.getElementById("viewGradeLevel");
-  const setSex = document.getElementById("viewSex");
-  const setYear = document.getElementById("viewSchoolYear");
-  const setGmail = document.getElementById("viewGmail");
+    // ==========================================
+    // MODAL OPEN/CLOSE EVENTS
+    // ==========================================
 
-  if (setId) setId.textContent = row.dataset.studentId || "-";
-  if (setName) setName.textContent = `${row.dataset.firstName || ""} ${row.dataset.middleName || ""} ${row.dataset.lastName || ""}`.trim() || "-";
-  if (setGrade) setGrade.textContent = row.dataset.gradeLevel || "-";
-  if (setSex) setSex.textContent = row.dataset.sex || "-";
-  if (setYear) setYear.textContent = row.dataset.schoolYear || "-";
-  if (setGmail) setGmail.textContent = row.dataset.email || "-";
+    addStudentBtn?.addEventListener("click", () => {
+        openModal(studentModal);
+    });
 
-  if (viewStudentModal) viewStudentModal.classList.add("show");
-};
+    document
+        .getElementById("closeStudentModal")
+        ?.addEventListener("click", () => closeModal(studentModal));
 
-// ==========================================
-// EDIT STUDENT
-// ==========================================
-window.editStudent = function (id) {
-  const row = document.querySelector(`tr[data-id="${id}"]`);
-  if (!row) return;
+    document
+        .getElementById("cancelStudentModal")
+        ?.addEventListener("click", () => closeModal(studentModal));
 
-  const setId = document.getElementById("editStudentId");
-  const setName = document.getElementById("editStudentName");
-  const setGrade = document.getElementById("editGradeLevel");
-  const setSex = document.getElementById("editSex");
-  const setYear = document.getElementById("editSchoolYear");
-  const setGmail = document.getElementById("editGmail");
+    document
+        .getElementById("closeEditModal")
+        ?.addEventListener("click", () => closeModal(editStudentModal));
 
-  if (setId) setId.value = row.dataset.studentId || "";
-  if (setName) setName.value = `${row.dataset.firstName || ""} ${row.dataset.middleName || ""} ${row.dataset.lastName || ""}`.trim();
-  if (setGrade) setGrade.value = row.dataset.gradeLevel || "";
-  if (setSex) setSex.value = row.dataset.sex || "";
-  if (setYear) setYear.value = row.dataset.schoolYear || "";
-  if (setGmail) setGmail.value = row.dataset.email || "";
+    document
+        .getElementById("cancelEditModal")
+        ?.addEventListener("click", () => closeModal(editStudentModal));
 
-  if (editStudentModal) editStudentModal.classList.add("show");
+    document
+        .getElementById("closeViewModal")
+        ?.addEventListener("click", () => closeModal(viewStudentModal));
 
-  const saveEditBtn = document.getElementById("saveEditStudent");
-  if (saveEditBtn) {
-    const newBtn = saveEditBtn.cloneNode(true);
-    saveEditBtn.parentNode.replaceChild(newBtn, saveEditBtn);
+    document
+        .getElementById("closeViewModalBtn")
+        ?.addEventListener("click", () => closeModal(viewStudentModal));
 
-    newBtn.addEventListener("click", async function () {
-      const fullName = document.getElementById("editStudentName").value.split(" ");
-      const updateData = {
-        student_id: document.getElementById("editStudentId").value.trim(),
-        first_name: fullName[0] || "",
-        middle_name: fullName.length > 2 ? fullName.slice(1, -1).join(" ") : "",
-        last_name: fullName[fullName.length - 1] || "",
-        grade_level: document.getElementById("editGradeLevel").value,
-        sex: document.getElementById("editSex").value,
-        school_year: document.getElementById("editSchoolYear").value,
-        email: document.getElementById("editGmail").value.trim(),
-        status: "active",
-        _method: "PUT",
-      };
+    document
+        .getElementById("closeDeleteModal")
+        ?.addEventListener("click", () => closeModal(deleteStudentModal));
 
-      try {
-        const response = await fetch(`/admin/students/${id}`, {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json", 
-            "X-CSRF-TOKEN": csrfToken, 
-            "Accept": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-          },
-          body: JSON.stringify(updateData),
-        });
+    document
+        .getElementById("cancelDeleteModal")
+        ?.addEventListener("click", () => closeModal(deleteStudentModal));
 
-        const data = await response.json();
-        if (response.ok && data.success) {
-          showModal(data.message || "Student updated successfully!", 'success');
-          if (editStudentModal) editStudentModal.classList.remove("show");
-          
-          // DELAY RELOAD SO USER CAN SEE THE MODAL
-          setTimeout(() => { window.location.reload(); }, 1000);
-        } else {
-          let errorMsg = "Error updating student:\n";
-          if (data.errors) {
-            for (const field in data.errors) {
-              errorMsg += `- ${field}: ${data.errors[field][0]}\n`;
+    // Close modal when clicking its background.
+    [
+        studentModal,
+        editStudentModal,
+        viewStudentModal,
+        deleteStudentModal,
+        notificationModal,
+    ].forEach((modal) => {
+        modal?.addEventListener("click", (event) => {
+            if (event.target === modal) {
+                closeModal(modal);
             }
-          }
-          showModal(errorMsg, 'error');
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
-        showModal("An unexpected error occurred while updating.", 'error');
-      }
+        });
     });
-  }
-};
 
-// ==========================================
-// DELETE STUDENT
-// ==========================================
-window.deleteStudent = function (id) {
-  const row = document.querySelector(`tr[data-id="${id}"]`);
-  if (!row) return;
+    // Close modals using Escape.
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeAllModals();
+        }
+    });
 
-  const studentName = `${row.dataset.firstName || ""} ${row.dataset.lastName || ""}`.trim();
-  document.getElementById("deleteStudentName").textContent = studentName || "this student";
-  if (deleteStudentModal) deleteStudentModal.classList.add("show");
+    // ==========================================
+    // API REQUEST HELPER
+    // ==========================================
 
-  const confirmDeleteBtn = document.getElementById("confirmDeleteStudent");
-  if (confirmDeleteBtn) {
-    const newConfirmBtn = confirmDeleteBtn.cloneNode(true);
-    confirmDeleteBtn.parentNode.replaceChild(newConfirmBtn, confirmDeleteBtn);
+    async function sendRequest(url, method, body = null) {
+        const headers = {
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRF-TOKEN": csrfToken,
+        };
 
-    newConfirmBtn.addEventListener("click", async function () {
-      try {
-        const response = await fetch(`/admin/students/${id}`, {
-          method: "DELETE",
-          headers: { 
-            "X-CSRF-TOKEN": csrfToken, 
-            "Accept": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-          },
+        const options = {
+            method,
+            headers,
+        };
+
+        if (body !== null) {
+            headers["Content-Type"] = "application/json";
+            options.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(url, options);
+
+        let data = {};
+
+        try {
+            data = await response.json();
+        } catch (error) {
+            throw new Error(
+                "The server returned an unexpected response. Please refresh the page and try again.",
+            );
+        }
+
+        if (!response.ok) {
+            const error = new Error(
+                data.message || "The request could not be completed.",
+            );
+            error.data = data;
+            error.status = response.status;
+            throw error;
+        }
+
+        return data;
+    }
+
+    // ==========================================
+    // VALIDATION ERROR MESSAGE
+    // ==========================================
+
+    function getErrorMessage(error, defaultMessage) {
+        const errors = error.data?.errors;
+
+        if (errors) {
+            return Object.entries(errors)
+                .map(([field, messages]) => {
+                    const fieldName = field
+                        .replaceAll("_", " ")
+                        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+                    return `${fieldName}: ${messages[0]}`;
+                })
+                .join("\n");
+        }
+
+        return error.message || defaultMessage;
+    }
+
+    // ==========================================
+    // FORM RESET
+    // ==========================================
+
+    function resetAddStudentForm() {
+        const fields = [
+            "studentId",
+            "firstName",
+            "middleName",
+            "lastName",
+            "gradeLevel",
+            "sex",
+            "schoolYear",
+            "email",
+        ];
+
+        fields.forEach((id) => {
+            const field = document.getElementById(id);
+            if (field) field.value = "";
         });
 
-        const data = await response.json();
-        if (response.ok && data.success) {
-          showModal(data.message || "Student deleted successfully!", 'success');
-          if (deleteStudentModal) deleteStudentModal.classList.remove("show");
-          
-          // DELAY RELOAD SO USER CAN SEE THE MODAL
-          setTimeout(() => { window.location.reload(); }, 1000);
-        } else {
-          showModal("Error deleting student.", 'error');
+        const status = document.getElementById("studentStatus");
+
+        if (status) {
+            status.value = "active";
         }
-      } catch (error) {
-        console.error("Fetch error:", error);
-        showModal("An unexpected error occurred while deleting.", 'error');
-      }
-    });
-  }
-};
-
-// ==========================================
-// HIDE / UNHIDE (Toggle Status)
-// ==========================================
-window.toggleStatus = async function (id) {
-  try {
-    const response = await fetch(`/admin/students/${id}/toggle-status`, {
-      method: "PATCH",
-      headers: { 
-        "X-CSRF-TOKEN": csrfToken, 
-        "Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest"
-      },
-    });
-
-    const data = await response.json();
-    if (response.ok && data.success) {
-      showModal(`Student is now ${data.status}.`, 'success');
-      
-      // DELAY RELOAD SO USER CAN SEE THE MODAL
-      setTimeout(() => { window.location.reload(); }, 1000);
-    } else {
-      showModal("Error updating status.", 'error');
     }
-  } catch (error) {
-    console.error("Fetch error:", error);
-    showModal("An unexpected error occurred while updating status.", 'error');
-  }
-};
-// ==========================================
-// SEARCH AND FILTERS
-// ==========================================
-const studentSearch = document.getElementById("studentSearch");
-const gradeFilter = document.getElementById("gradeFilter");
-const sectionFilter = document.getElementById("sectionFilter"); 
-const studentTableBody = document.getElementById("studentTableBody");
 
-function filterStudents() {
-  const searchValue = studentSearch ? studentSearch.value.toLowerCase().trim() : "";
-  const selectedGrade = gradeFilter ? gradeFilter.value : "all";
-  const selectedSex = sectionFilter ? sectionFilter.value : "all";
+    // ==========================================
+    // ADD STUDENT
+    // ==========================================
 
-  const rows = studentTableBody ? studentTableBody.querySelectorAll("tr") : [];
+    saveStudentBtn?.addEventListener("click", async (event) => {
+        event.preventDefault();
 
-  rows.forEach((row) => {
-    const studentId = (row.dataset.studentId || "").toLowerCase();
-    const studentName = `${row.dataset.firstName || ""} ${row.dataset.lastName || ""}`.toLowerCase();
-    const rowGrade = row.dataset.gradeLevel || "";
-    const rowSex = row.dataset.sex || "";
+        const formData = {
+            student_id: document.getElementById("studentId").value.trim(),
+            first_name: document.getElementById("firstName").value.trim(),
+            middle_name: document.getElementById("middleName").value.trim(),
+            last_name: document.getElementById("lastName").value.trim(),
+            grade_level: document.getElementById("gradeLevel").value,
+            sex: document.getElementById("sex").value,
+            school_year: document.getElementById("schoolYear").value,
+            email: document.getElementById("email").value.trim(),
+            status: document.getElementById("studentStatus").value,
+        };
 
-    const matchesSearch = searchValue === "" || studentId.includes(searchValue) || studentName.includes(searchValue);
-    const matchesGrade = selectedGrade === "all" || rowGrade === selectedGrade;
-    const matchesSex = selectedSex === "all" || rowSex === selectedSex;
+        saveStudentBtn.disabled = true;
 
-    row.style.display = (matchesSearch && matchesGrade && matchesSex) ? "" : "none";
-  });
-}
+        try {
+            const data = await sendRequest("/admin/students", "POST", formData);
 
-if (studentSearch) studentSearch.addEventListener("input", filterStudents);
-if (gradeFilter) gradeFilter.addEventListener("change", filterStudents);
-if (sectionFilter) sectionFilter.addEventListener("change", filterStudents);
+            closeModal(studentModal);
+            resetAddStudentForm();
+
+            showModal(data.message || "Student added successfully.", "success");
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error) {
+            console.error("Add Student Error:", error);
+
+            showModal(
+                getErrorMessage(error, "Unable to add student."),
+                "error",
+            );
+        } finally {
+            saveStudentBtn.disabled = false;
+        }
+    });
+
+    // ==========================================
+    // VIEW STUDENT
+    // ==========================================
+
+    window.viewStudent = function (id) {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+
+        if (!row) return;
+
+        const fullName = [
+            row.dataset.firstName,
+            row.dataset.middleName,
+            row.dataset.lastName,
+        ]
+            .filter(Boolean)
+            .join(" ");
+
+        document.getElementById("viewStudentId").textContent =
+            row.dataset.studentId || "—";
+
+        document.getElementById("viewStudentName").textContent =
+            fullName || "—";
+
+        document.getElementById("viewGradeLevel").textContent =
+            row.dataset.gradeLevel || "—";
+
+        document.getElementById("viewSex").textContent = row.dataset.sex || "—";
+
+        document.getElementById("viewSchoolYear").textContent =
+            row.dataset.schoolYear || "—";
+
+        document.getElementById("viewGmail").textContent =
+            row.dataset.email || "—";
+
+        document.getElementById("viewStudentStatus").textContent = row.dataset
+            .status
+            ? row.dataset.status.charAt(0).toUpperCase() +
+              row.dataset.status.slice(1)
+            : "—";
+
+        openModal(viewStudentModal);
+    };
+
+    // ==========================================
+    // EDIT STUDENT
+    // ==========================================
+
+    window.editStudent = function (id) {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+
+        if (!row) return;
+
+        selectedStudentId = id;
+
+        document.getElementById("editStudentId").value =
+            row.dataset.studentId || "";
+
+        document.getElementById("editFirstName").value =
+            row.dataset.firstName || "";
+
+        document.getElementById("editMiddleName").value =
+            row.dataset.middleName || "";
+
+        document.getElementById("editLastName").value =
+            row.dataset.lastName || "";
+
+        document.getElementById("editGradeLevel").value =
+            row.dataset.gradeLevel || "";
+
+        document.getElementById("editSex").value = row.dataset.sex || "";
+
+        document.getElementById("editSchoolYear").value =
+            row.dataset.schoolYear || "";
+
+        document.getElementById("editGmail").value = row.dataset.email || "";
+
+        document.getElementById("editStudentStatus").value =
+            row.dataset.status || "active";
+
+        openModal(editStudentModal);
+    };
+
+    // ==========================================
+    // SAVE EDITED STUDENT
+    // ==========================================
+
+    saveEditStudentBtn?.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        if (!selectedStudentId) return;
+
+        const updateData = {
+            student_id: document.getElementById("editStudentId").value.trim(),
+            first_name: document.getElementById("editFirstName").value.trim(),
+            middle_name: document.getElementById("editMiddleName").value.trim(),
+            last_name: document.getElementById("editLastName").value.trim(),
+            grade_level: document.getElementById("editGradeLevel").value,
+            sex: document.getElementById("editSex").value,
+            school_year: document.getElementById("editSchoolYear").value,
+            email: document.getElementById("editGmail").value.trim(),
+            status: document.getElementById("editStudentStatus").value,
+        };
+
+        saveEditStudentBtn.disabled = true;
+
+        try {
+            const data = await sendRequest(
+                `/admin/students/${selectedStudentId}`,
+                "PUT",
+                updateData,
+            );
+
+            closeModal(editStudentModal);
+
+            showModal(
+                data.message || "Student updated successfully.",
+                "success",
+            );
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error) {
+            console.error("Update Student Error:", error);
+
+            showModal(
+                getErrorMessage(error, "Unable to update student."),
+                "error",
+            );
+        } finally {
+            saveEditStudentBtn.disabled = false;
+        }
+    });
+
+    // ==========================================
+    // DEACTIVATE STUDENT - OPEN CONFIRMATION
+    // ==========================================
+
+    window.deleteStudent = function (id) {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+
+        if (!row) return;
+
+        selectedStudentId = id;
+
+        const studentName = [
+            row.dataset.firstName,
+            row.dataset.middleName,
+            row.dataset.lastName,
+        ]
+            .filter(Boolean)
+            .join(" ");
+
+        const nameElement = document.getElementById("deleteStudentName");
+
+        if (nameElement) {
+            nameElement.textContent = studentName || "this student";
+        }
+
+        openModal(deleteStudentModal);
+    };
+
+    // ==========================================
+    // CONFIRM DEACTIVATION
+    // ==========================================
+
+    const confirmDeleteStudent = document.getElementById(
+        "confirmDeleteStudent",
+    );
+
+    confirmDeleteStudent?.addEventListener("click", async () => {
+        if (!selectedStudentId) return;
+
+        confirmDeleteStudent.disabled = true;
+
+        try {
+            const data = await sendRequest(
+                `/admin/students/${selectedStudentId}`,
+                "DELETE",
+            );
+
+            closeModal(deleteStudentModal);
+
+            showModal(
+                data.message || "Student account deactivated successfully.",
+                "success",
+            );
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error) {
+            console.error("Deactivate Student Error:", error);
+
+            showModal(
+                getErrorMessage(error, "Unable to deactivate student."),
+                "error",
+            );
+        } finally {
+            confirmDeleteStudent.disabled = false;
+        }
+    });
+
+    // ==========================================
+    // ACTIVATE STUDENT
+    // ==========================================
+
+    window.toggleStatus = async function (id) {
+        try {
+            const data = await sendRequest(
+                `/admin/students/${id}/toggle-status`,
+                "PATCH",
+            );
+
+            showModal(
+                data.message || "Student account status updated.",
+                "success",
+            );
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error) {
+            console.error("Activate Student Error:", error);
+
+            showModal(
+                getErrorMessage(error, "Unable to update student status."),
+                "error",
+            );
+        }
+    };
+
+    // ==========================================
+    // SEARCH AND FILTERS
+    // ==========================================
+
+    function filterStudents() {
+        const searchValue = studentSearch?.value.toLowerCase().trim() || "";
+        const selectedGrade = gradeFilter?.value || "all";
+        const selectedSex = sexFilter?.value || "all";
+        const selectedStatus = statusFilter?.value || "all";
+
+        const rows = studentTableBody
+            ? studentTableBody.querySelectorAll("tr[data-id]")
+            : [];
+
+        let visibleCount = 0;
+
+        rows.forEach((row) => {
+            const studentId = (row.dataset.studentId || "").toLowerCase();
+
+            const studentName = [
+                row.dataset.firstName,
+                row.dataset.middleName,
+                row.dataset.lastName,
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            const rowGrade = row.dataset.gradeLevel || "";
+            const rowSex = row.dataset.sex || "";
+            const rowStatus = row.dataset.status || "";
+
+            const matchesSearch =
+                searchValue === "" ||
+                studentId.includes(searchValue) ||
+                studentName.includes(searchValue);
+
+            const matchesGrade =
+                selectedGrade === "all" || rowGrade === selectedGrade;
+
+            const matchesSex = selectedSex === "all" || rowSex === selectedSex;
+
+            const matchesStatus =
+                selectedStatus === "all" || rowStatus === selectedStatus;
+
+            const isVisible =
+                matchesSearch && matchesGrade && matchesSex && matchesStatus;
+
+            row.style.display = isVisible ? "" : "none";
+
+            if (isVisible) {
+                visibleCount++;
+            }
+        });
+
+        // Show no-results message only when records exist
+        // but none match the selected search and filters.
+
+        if (studentNoResults) {
+            studentNoResults.hidden = rows.length === 0 || visibleCount > 0;
+        }
+
+        // Hide the original server-side empty row when
+        // the separate no-results state is being displayed.
+
+        const serverEmptyRow =
+            studentTableBody?.querySelector(".empty-state-row");
+
+        if (serverEmptyRow) {
+            serverEmptyRow.style.display = rows.length === 0 ? "" : "none";
+        }
+    }
+
+    studentSearch?.addEventListener("input", filterStudents);
+    gradeFilter?.addEventListener("change", filterStudents);
+    sexFilter?.addEventListener("change", filterStudents);
+    statusFilter?.addEventListener("change", filterStudents);
+
+    // ==========================================
+    // CLEAR SEARCH AND FILTERS
+    // ==========================================
+
+    clearStudentFilters?.addEventListener("click", () => {
+        if (studentSearch) studentSearch.value = "";
+        if (gradeFilter) gradeFilter.value = "all";
+        if (sexFilter) sexFilter.value = "all";
+        if (statusFilter) statusFilter.value = "all";
+
+        filterStudents();
+    });
+
+    // ==========================================
+    // INITIAL FILTER STATE
+    // ==========================================
+
+    filterStudents();
+});

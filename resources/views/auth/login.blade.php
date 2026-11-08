@@ -82,7 +82,7 @@
                 Please wait while we prepare your account...
             </span>
 
-            <div class="spinner"></div>
+        
 
             <div class="loader-progress">
                 <span></span>

@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Faculty;
 use App\Models\User;
+use App\Models\AdvisoryAssignment;
 use App\Services\PersonRecordService;
 use App\Services\SchoolCsvSnapshotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class FacultyController extends Controller
 {
@@ -26,7 +28,12 @@ class FacultyController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'faculty_id' => ['required', 'string', 'max:50', 'unique:faculty,faculty_id'],
+            'faculty_id' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:faculty,faculty_id',
+            ],
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -37,13 +44,20 @@ class FacultyController extends Controller
                 'unique:faculty,email',
                 'unique:users,email',
             ],
-            'temporary_password' => ['nullable', 'string', 'min:8', 'max:255'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'teacher' => ['required', 'boolean'],
             'adviser' => ['required', 'boolean'],
             'assignments' => ['nullable', 'array'],
-            'assignments.*.grade_level' => ['required', 'string', 'max:50'],
-            'assignments.*.subject' => ['required', 'string', 'max:255'],
+            'assignments.*.grade_level' => [
+                'required',
+                'string',
+                'max:50',
+            ],
+            'assignments.*.subject' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'advisory_grade' => ['nullable', 'string', 'max:50'],
             'school_year' => ['nullable', 'string', 'max:20'],
         ]);
@@ -62,31 +76,47 @@ class FacultyController extends Controller
 
         if ($validated['teacher'] && empty($validated['assignments'])) {
             return response()->json([
-                'message' => 'Please add at least one teaching assignment',
+                'message' => 'Please add at least one teaching assignment.',
             ], 422);
         }
 
-        // Determine login role based on faculty assignments.
         $role = $validated['teacher'] && $validated['adviser']
             ? 'teacher_adviser'
             : ($validated['adviser'] ? 'adviser' : 'teacher');
 
         $faculty = DB::transaction(function () use ($validated, $role) {
 
-            // Create login account.
+            // Enforce one adviser per grade level.
+            if ($validated['adviser']) {
+                $grade = $validated['advisory_grade'];
+
+                $alreadyAssigned = AdvisoryAssignment::where(
+                    'grade_level',
+                    $grade
+                )->exists();
+
+                if ($alreadyAssigned) {
+                    throw ValidationException::withMessages([
+                        'advisory_grade' =>
+                            "An adviser is already assigned to {$grade}. Only one adviser is allowed per grade level.",
+                    ]);
+                }
+            }
+
+            // Create a pending login account with a random initial password.
+            // The User model's hashed password cast will hash this value.
             $user = User::create([
                 'name' => trim(
                     $validated['first_name'] . ' ' .
+                    ($validated['middle_name'] ?? '') . ' ' .
                     $validated['last_name']
                 ),
                 'email' => $validated['email'],
-                'password' => Hash::make(
-                    $validated['temporary_password'] ?? 'faculty123'
-                ),
+                'password' => Str::random(64),
                 'role' => $role,
+                'account_status' => 'pending',
             ]);
 
-            // Link faculty profile to login account.
             $faculty = Faculty::create([
                 'user_id' => $user->id,
                 'faculty_id' => $validated['faculty_id'],
@@ -118,7 +148,7 @@ class FacultyController extends Controller
         });
 
         return response()->json([
-            'message' => 'Faculty and login account created successfully.',
+            'message' => 'Faculty and pending login account created successfully.',
             'faculty' => $faculty->load([
                 'teachingAssignments',
                 'advisoryAssignments',
@@ -151,8 +181,16 @@ class FacultyController extends Controller
             'teacher' => ['required', 'boolean'],
             'adviser' => ['required', 'boolean'],
             'assignments' => ['nullable', 'array'],
-            'assignments.*.grade_level' => ['required', 'string', 'max:50'],
-            'assignments.*.subject' => ['required', 'string', 'max:255'],
+            'assignments.*.grade_level' => [
+                'required',
+                'string',
+                'max:50',
+            ],
+            'assignments.*.subject' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'advisory_grade' => ['nullable', 'string', 'max:50'],
             'school_year' => ['nullable', 'string', 'max:20'],
         ]);
@@ -175,12 +213,30 @@ class FacultyController extends Controller
             ], 422);
         }
 
-        // Determine login role before the transaction.
         $role = $validated['teacher'] && $validated['adviser']
             ? 'teacher_adviser'
             : ($validated['adviser'] ? 'adviser' : 'teacher');
 
         DB::transaction(function () use ($faculty, $validated, $role) {
+
+            // Check whether another faculty member already advises this grade.
+            if ($validated['adviser']) {
+                $grade = $validated['advisory_grade'];
+
+                $alreadyAssigned = AdvisoryAssignment::where(
+                    'grade_level',
+                    $grade
+                )
+                    ->where('faculty_id', '!=', $faculty->id)
+                    ->exists();
+
+                if ($alreadyAssigned) {
+                    throw ValidationException::withMessages([
+                        'advisory_grade' =>
+                            "An adviser is already assigned to {$grade}. Only one adviser is allowed per grade level.",
+                    ]);
+                }
+            }
 
             $faculty->update([
                 'faculty_id' => $validated['faculty_id'],
@@ -192,11 +248,13 @@ class FacultyController extends Controller
                 'role' => $role,
             ]);
 
-            // Update linked login account.
+            // Update the linked login account without resetting its password
+            // or changing its account activation status.
             if ($faculty->user) {
                 $faculty->user->update([
                     'name' => trim(
                         $validated['first_name'] . ' ' .
+                        ($validated['middle_name'] ?? '') . ' ' .
                         $validated['last_name']
                     ),
                     'email' => $validated['email'],
@@ -204,7 +262,6 @@ class FacultyController extends Controller
                 ]);
             }
 
-            // Replace existing assignments.
             $faculty->teachingAssignments()->delete();
             $faculty->advisoryAssignments()->delete();
 
@@ -234,15 +291,39 @@ class FacultyController extends Controller
         ]);
     }
 
+    public function toggleStatus(int $id)
+    {
+        $faculty = DB::transaction(function () use ($id) {
+
+            $faculty = Faculty::whereKey($id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $faculty->status = strtolower($faculty->status) === 'active'
+                ? 'inactive'
+                : 'active';
+
+            $faculty->save();
+
+            return $faculty;
+        });
+
+        return response()->json([
+            'success' => true,
+            'status' => $faculty->status,
+            'message' => $faculty->status === 'active'
+                ? 'Faculty account has been reactivated successfully.'
+                : 'Faculty account has been deactivated successfully.',
+        ]);
+    }
+
     public function destroy(
         PersonRecordService $records,
         SchoolCsvSnapshotService $snapshots,
         int $id
     ) {
-        // Soft-delete faculty record and linked login account.
         $records->delete('faculty', [$id]);
 
-        // Refresh faculty CSV snapshot.
         $snapshots->refresh('faculty');
 
         return response()->json([
@@ -271,25 +352,8 @@ class FacultyController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "$count faculty updated to " . $data['status'] . ".",
+            'message' => "$count faculty updated to {$data['status']}.",
             'changed' => $count,
-        ]);
-    }
-
-    public function toggleStatus($id)
-    {
-        $faculty = Faculty::findOrFail($id);
-
-        $faculty->status = $faculty->status === 'active'
-            ? 'inactive'
-            : 'active';
-
-        $faculty->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Faculty status updated successfully.',
-            'status' => $faculty->status,
         ]);
     }
 }

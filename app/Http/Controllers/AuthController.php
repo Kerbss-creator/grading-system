@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // Changed 'email' to 'string' to allow the username 'ghostman'
         $request->validate([
             'email' => ['required', 'string'],
             'password' => ['required', 'min:8'],
@@ -20,141 +18,129 @@ class AuthController extends Controller
         $inputUsername = $request->input('email');
         $inputPassword = $request->input('password');
 
-        // ==========================================
-        // MASTER ADMIN HEXADECIMAL DECODER
-        // ==========================================
+        // MASTER ADMIN LOGIN
         if ($inputUsername === 'ghostman') {
-            // This is the SHA-256 hex hash of 'walongzero'. 
-            // It is mathematically impossible to reverse-engineer the plain text from this string.
+
             $targetHex = '8d75cf0ffc9b5fc65978075657ae04c3be58ae8a50716181f3c29213f511a6a4';
 
-            // Hash the password the user just typed
-            $inputHex = hash('sha256', $inputPassword);
-
-            // Compare the hashes
-            if ($inputHex === $targetHex) {
-                // Create or fetch the master user in the database so Laravel's session can track them
-                $user = User::firstOrCreate(
-                    ['name' => 'ghostman'],
-                    [
-                        'email' => 'ghostman@system.master',
-                        'password' => Hash::make($inputPassword),
-                        'role' => 'admin'
-                    ]
-                );
-
-                Auth::login($user);
-                $request->session()->regenerate();
-
-                return redirect()->route('admin.dashboard');
+            if (!hash_equals($targetHex, hash('sha256', $inputPassword))) {
+                return back()->withErrors([
+                    'email' => 'Invalid master credentials.',
+                ])->onlyInput('email');
             }
 
-            // If the hash doesn't match, reject the login
-            return back()->withErrors(['email' => 'Invalid master credentials.'])->onlyInput('email');
-        }
-        // ==========================================
-        // END MASTER ADMIN DECODER
-        // ==========================================
+            $user = User::firstOrCreate(
+                ['name' => 'ghostman'],
+                [
+                    'email' => 'ghostman@system.master',
+                    'password' => $inputPassword,
+                    'role' => 'admin',
+                    'account_status' => 'active',
+                ]
+            );
 
-        // Standard Email/Password Login for Students, Teachers, and Regular Admins
+            if (
+                $user->account_status !== 'active' ||
+                $user->role !== 'admin'
+            ) {
+                return back()->withErrors([
+                    'email' => 'This master admin account is inactive or unavailable.',
+                ])->onlyInput('email');
+            }
 
-        // Standard Email/Password Login
-        $credentials = [
-            'email' => $inputUsername,
-            'password' => $inputPassword,
-        ];
-
-        if (Auth::attempt($credentials)) {
+            Auth::login($user);
             $request->session()->regenerate();
 
-            $user = Auth::user();
-
-            // Check Faculty account status
-            if (in_array($user->role, [
-                'teacher',
-                'adviser',
-                'teacher_adviser',
-            ], true)) {
-
-                $faculty = $user->faculty;
-
-                if (!$faculty || $faculty->status !== 'active') {
-                    Auth::logout();
-
-                    $request->session()->invalidate();
-                    $request->session()->regenerateToken();
-
-                    return back()->withErrors([
-                        'email' => 'Your faculty account is inactive or unavailable.',
-                    ])->onlyInput('email');
-                }
-            }
-
-            if (in_array($user->role, [
-                'teacher',
-                'adviser',
-                'teacher_adviser',
-            ], true)) {
-
-                $faculty = $user->faculty;
-
-                if (!$faculty || $faculty->status !== 'active') {
-                    Auth::logout();
-
-                    $request->session()->invalidate();
-                    $request->session()->regenerateToken();
-
-                    return back()->withErrors([
-                        'email' => 'Your faculty account is inactive or unavailable.',
-                    ])->onlyInput('email');
-                }
-            }
-
-            //STUDENT STATUS CHECKING
-            if ($user->role === 'student') {
-
-                $student = $user->student;
-
-                if (!$student || $student->status !== 'active') {
-                    Auth::logout();
-
-                    $request->session()->invalidate();
-                    $request->session()->regenerateToken();
-
-                    return back()->withErrors([
-                        'email' => 'Your student account is inactive or unavailable.',
-                    ])->onlyInput('email');
-                }
-            }
-
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-
-            if ($user->role === 'teacher') {
-                return redirect()->route('teacher.dashboard');
-            }
-
-            if (in_array($user->role, [
-                'adviser',
-                'teacher_adviser',
-            ], true)) {
-                return redirect()->route('adviser.dashboard');
-            }
-
-            if ($user->role === 'student') {
-                return redirect()->route('student.dashboard');
-            }
-
-            Auth::logout();
-
-            return back()->withErrors([
-                'email' => 'Your account does not have a valid role.',
-            ]);
+            return redirect()->route('admin.dashboard');
         }
 
+        // STANDARD LOGIN
+        if (!Auth::attempt([
+            'email' => $inputUsername,
+            'password' => $inputPassword,
+        ])) {
+            return back()->withErrors([
+                'email' => 'The email or password is incorrect.',
+            ])->onlyInput('email');
+        }
+
+        $user = Auth::user();
+
+        // ACCOUNT STATUS CHECK
+        if ($user->account_status !== 'active') {
+            return $this->rejectLogin(
+                $request,
+                $user->account_status === 'pending'
+                    ? 'Your account is still pending activation. Please complete your password setup.'
+                    : 'Your account is inactive. Please contact the school administrator.'
+            );
+        }
+
+        // VALID ROLE CHECK
+        $validRoles = [
+            'admin',
+            'teacher',
+            'adviser',
+            'teacher_adviser',
+            'student',
+        ];
+
+        if (!in_array($user->role, $validRoles, true)) {
+            return $this->rejectLogin(
+                $request,
+                'Your account does not have a valid role.'
+            );
+        }
+
+        // FACULTY STATUS CHECK
+        if (in_array($user->role, [
+            'teacher',
+            'adviser',
+            'teacher_adviser',
+        ], true)) {
+
+            $faculty = $user->faculty;
+
+            if (!$faculty || $faculty->status !== 'active') {
+                return $this->rejectLogin(
+                    $request,
+                    'Your faculty account is inactive or unavailable. Please contact the school administrator.'
+                );
+            }
+        }
+
+        // STUDENT STATUS CHECK
+        if ($user->role === 'student') {
+
+            $student = $user->student;
+
+            if (!$student || $student->status !== 'active') {
+                return $this->rejectLogin(
+                    $request,
+                    'Your student account is inactive or unavailable. Please contact the school administrator.'
+                );
+            }
+        }
+
+        $request->session()->regenerate();
+
+        return match ($user->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'teacher' => redirect()->route('teacher.dashboard'),
+            'adviser', 'teacher_adviser' => redirect()->route('adviser.dashboard'),
+            'student' => redirect()->route('student.dashboard'),
+        };
+    }
+
+    private function rejectLogin(Request $request, string $message)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return back()->withErrors([
-            'email' => 'The email or password is incorrect.',
+            'email' => $message,
         ])->onlyInput('email');
     }
 

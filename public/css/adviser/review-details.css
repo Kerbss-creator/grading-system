@@ -1,0 +1,563 @@
+/* =========================================
+   ADVISER GRADE REVIEW DETAILS
+========================================= */
+
+.grade-review-details-page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: #26352c;
+    font-family: "Poppins", sans-serif;
+}
+
+/* =========================================
+   BACK BUTTON
+========================================= */
+
+.review-back-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.review-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #036f35;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+
+.review-back-btn:hover {
+    color: #024d25;
+    transform: translateX(-4px);
+}
+
+/* =========================================
+   SUBMISSION INFORMATION
+========================================= */
+
+.submission-details-card,
+.student-grades-card {
+    background: #ffffff;
+    border: 1px solid #e9eee9;
+    border-radius: 15px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.035);
+}
+
+.submission-details-card {
+    padding: 25px;
+}
+
+.submission-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #edf0ed;
+}
+
+.submission-label {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #758378;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.submission-details-header h2 {
+    margin: 0 0 8px;
+    color: #1f3025;
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.submission-details-header p {
+    margin: 0;
+    color: #78847b;
+    font-size: 12px;
+}
+
+.submission-details-header p i {
+    margin-right: 5px;
+    color: #036f35;
+}
+
+/* =========================================
+   STATUS BADGES
+========================================= */
+
+.submission-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 13px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-submitted {
+    background: #fff4db;
+    color: #a46a00;
+}
+
+.status-forwarded_to_admin {
+    background: #e7f0ff;
+    color: #2762a8;
+}
+
+.status-approved {
+    background: #e4f5e9;
+    color: #087638;
+}
+
+.status-returned {
+    background: #fff0ed;
+    color: #c44735;
+}
+
+/* =========================================
+   SUBMISSION INFORMATION GRID
+========================================= */
+
+.submission-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    padding-top: 22px;
+}
+
+.submission-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.submission-info-item span {
+    color: #879189;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.submission-info-item strong {
+    color: #26392d;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* =========================================
+   STUDENT GRADE CARD
+========================================= */
+
+.student-grades-card {
+    overflow: hidden;
+}
+
+.student-grades-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 24px 25px 18px;
+}
+
+.student-grades-header h3 {
+    margin: 0 0 5px;
+    color: #26392d;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.student-grades-header p {
+    margin: 0;
+    color: #8a948d;
+    font-size: 11px;
+}
+
+.student-count-badge {
+    padding: 7px 12px;
+    background: #edf7f0;
+    color: #036f35;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* =========================================
+   ASSESSMENT LEGEND
+========================================= */
+
+.assessment-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 0 25px 18px;
+}
+
+.assessment-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #78847b;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.ww-dot {
+    background: #3986d8;
+}
+
+.pt-dot {
+    background: #e5a32d;
+}
+
+.ex-dot {
+    background: #8b69ce;
+}
+
+/* =========================================
+   GRADE TABLE
+========================================= */
+
+.grade-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-top: 1px solid #edf0ed;
+}
+
+.student-assessment-table {
+    width: 100%;
+    min-width: 1350px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 11px;
+}
+
+.student-assessment-table th,
+.student-assessment-table td {
+    padding: 13px 11px;
+    text-align: center;
+    border-bottom: 1px solid #edf0ed;
+    border-right: 1px solid #f0f2f0;
+    white-space: nowrap;
+}
+
+.student-assessment-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: #f8faf8;
+    color: #56665b;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.student-assessment-table .assessment-group-row th {
+    padding-top: 15px;
+    padding-bottom: 12px;
+}
+
+.student-assessment-table .assessment-code-row th {
+    top: 43px;
+    background: #f3f6f3;
+}
+
+.student-assessment-table .ww-heading {
+    color: #276cb1;
+    background: #edf5ff;
+}
+
+.student-assessment-table .pt-heading {
+    color: #a16a0a;
+    background: #fff6e7;
+}
+
+.student-assessment-table .ex-heading {
+    color: #7051ad;
+    background: #f4efff;
+}
+
+/* =========================================
+   STUDENT INFORMATION COLUMN
+========================================= */
+
+.student-assessment-table .student-column {
+    position: sticky;
+    left: 0;
+    z-index: 4;
+    min-width: 205px;
+    text-align: left;
+    background: #ffffff;
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.025);
+}
+
+.student-assessment-table thead .student-column {
+    z-index: 6;
+    background: #f8faf8;
+}
+
+.student-assessment-table tbody tr:hover td {
+    background-color: #f8fcf9;
+}
+
+.student-assessment-table tbody tr:hover .student-column {
+    background-color: #f8fcf9;
+}
+
+.student-name {
+    color: #2b3d30;
+    font-size: 11px;
+    font-weight: 700;
+    
+}
+
+.student-id {
+    margin-top: 4px;
+    color: #929c94;
+    font-size: 9px;
+    font-weight: 500;
+}
+
+/* =========================================
+   SCORES
+========================================= */
+
+.score-value {
+    color: #3c4b40;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.score-value small {
+    color: #9ba49d;
+    font-size: 9px;
+    font-weight: 500;
+}
+
+.missing-score {
+    color: #c4cbc5;
+    font-weight: 600;
+}
+
+.computed-grade {
+    color: #405a48;
+    font-weight: 700;
+}
+
+.term-grade {
+    color: #036f35;
+    background: #f1f9f3;
+}
+
+/* =========================================
+   TABLE NOTE
+========================================= */
+
+.grade-table-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 25px;
+    color: #859088;
+    font-size: 10px;
+}
+
+.grade-table-note i {
+    color: #036f35;
+}
+
+/* =========================================
+   ADVISER ACTIONS
+========================================= */
+
+.adviser-review-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 23px 25px;
+    background: #ffffff;
+    border: 1px solid #e9eee9;
+    border-radius: 15px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.035);
+}
+
+.review-action-description h3 {
+    margin: 0 0 5px;
+    color: #26392d;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.review-action-description p {
+    margin: 0;
+    color: #879189;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.review-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.review-action-buttons form {
+    margin: 0;
+}
+
+.review-action-buttons button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 17px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.return-grade-btn {
+    color: #c44735;
+    background: #fff0ed;
+}
+
+.return-grade-btn:hover {
+    color: #ffffff;
+    background: #c44735;
+    transform: translateY(-2px);
+}
+
+.forward-grade-btn {
+    color: #ffffff;
+    background: #036f35;
+}
+
+.forward-grade-btn:hover {
+    background: #025528;
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   COMPLETED NOTICE
+========================================= */
+
+.review-completed-notice {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 20px 23px;
+    background: #edf8f0;
+    border: 1px solid #dcefe1;
+    border-radius: 12px;
+}
+
+.review-completed-notice > i {
+    color: #087638;
+    font-size: 22px;
+}
+
+.review-completed-notice strong {
+    color: #176c37;
+    font-size: 12px;
+}
+
+.review-completed-notice p {
+    margin: 4px 0 0;
+    color: #6f8c77;
+    font-size: 10px;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 900px) {
+    .submission-info-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .adviser-review-actions {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .review-action-buttons {
+        width: 100%;
+    }
+
+    .review-action-buttons form {
+        flex: 1;
+    }
+
+    .review-action-buttons button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .grade-review-details-page {
+        gap: 16px;
+    }
+
+    .submission-details-card {
+        padding: 18px;
+    }
+
+    .submission-details-header {
+        flex-direction: column;
+    }
+
+    .submission-details-header h2 {
+        font-size: 20px;
+    }
+
+    .submission-info-grid {
+        gap: 18px 12px;
+    }
+
+    .student-grades-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 19px;
+    }
+
+    .assessment-legend {
+        gap: 12px;
+        padding: 0 19px 15px;
+    }
+
+    .grade-table-note {
+        align-items: flex-start;
+        padding: 13px 18px;
+        line-height: 1.6;
+    }
+
+    .adviser-review-actions {
+        padding: 19px;
+    }
+
+    .review-action-buttons {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

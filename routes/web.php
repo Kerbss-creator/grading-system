@@ -1,7 +1,7 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -14,8 +14,22 @@ use App\Http\Controllers\SchoolCsvController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\NotificationController;
+
+use App\Http\Controllers\SubjectController as AdminSubjectController;
+
+use App\Http\Controllers\Admin\GradebookController;
+use App\Http\Controllers\Admin\AdminGradeApprovalController;
+use App\Http\Controllers\Admin\UserManagementController;
+
+use App\Http\Controllers\Adviser\AdviserClassController;
+use App\Http\Controllers\Adviser\AdviserStudentController;
+use App\Http\Controllers\Adviser\AdviserGradeReviewController;
+
 use App\Http\Controllers\Teacher\GradeManagementController;
+use App\Http\Controllers\Teacher\GradeSubmissionController;
+use App\Http\Controllers\Teacher\GradeReviewController;
 use App\Http\Controllers\Teacher\SubjectController;
+
 use App\Models\Announcement;
 
 
@@ -25,7 +39,6 @@ use App\Models\Announcement;
 |--------------------------------------------------------------------------
 */
 
-// Login
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
@@ -33,12 +46,10 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'login'])
     ->name('login.submit');
 
-// Forgot Password
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->name('password.request');
 
-// Logout
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
@@ -52,7 +63,6 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 Route::middleware(['auth'])->group(function () {
 
-    // Notifications
     Route::patch(
         '/notifications/{id}/read',
         [NotificationController::class, 'markAsRead']
@@ -62,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
         '/notifications/{id}',
         [NotificationController::class, 'destroy']
     )->name('notifications.destroy');
+
 });
 
 
@@ -84,23 +95,30 @@ Route::middleware(['auth', 'school.role:admin'])
 
 
         // User Management
-        Route::get('/users', function () {
-            return view('admin.user-management');
-        })->name('users.index');
+        Route::get('/users', [UserManagementController::class, 'index'])
+            ->name('users.index');
+
+        Route::get('/users/data', [UserManagementController::class, 'getUsers'])
+            ->name('users.data');
+
+        Route::post('/users', [UserManagementController::class, 'store'])
+            ->name('users.store');
+
+        Route::put('/users/{user}', [UserManagementController::class, 'update'])
+            ->name('users.update');
+
+        Route::patch(
+            '/users/{user}/status',
+            [UserManagementController::class, 'toggleStatus']
+        )->name('users.toggle-status');
+
+        Route::patch(
+            '/users/{user}/password',
+            [UserManagementController::class, 'resetPassword']
+        )->name('users.reset-password');
 
 
-        // Admin Management
-        Route::get('/admins', function () {
-            return view('admin.admin-management');
-        })->name('management');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | STUDENT MANAGEMENT
-        |--------------------------------------------------------------------------
-        */
-
+        // Student Management
         Route::get('/students', [StudentController::class, 'index'])
             ->name('students.index');
 
@@ -119,19 +137,12 @@ Route::middleware(['auth', 'school.role:admin'])
         )->name('students.toggleStatus');
 
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | TEACHER MANAGEMENT
-        |--------------------------------------------------------------------------
-        */
-
+        // Teacher Management
         Route::get('/teachers', [TeacherController::class, 'index'])
             ->name('teachers');
 
 
-        // FACULTY MANAGEMENT
-
+        // Faculty Management
         Route::get('/faculty-management', [FacultyController::class, 'index'])
             ->name('faculty-management');
 
@@ -144,12 +155,18 @@ Route::middleware(['auth', 'school.role:admin'])
         Route::delete('/faculty-management/{id}', [FacultyController::class, 'destroy'])
             ->name('faculty.destroy');
 
-        Route::patch('/faculty-management/{id}/toggle-status', [FacultyController::class, 'toggleStatus'])
-            ->name('faculty.toggleStatus');
-            
+        Route::patch(
+            '/faculty-management/{id}/toggle-status',
+            [FacultyController::class, 'toggleStatus']
+        )->name('faculty.toggleStatus');
 
-        //csv import/export routes
+        Route::patch(
+            '/faculty-management/bulk-status',
+            [FacultyController::class, 'bulkStatus']
+        )->name('faculty.bulkStatus');
 
+
+        // CSV Import and Export
         Route::get('/imports/{type}', [SchoolCsvController::class, 'index'])
             ->name('imports.index');
 
@@ -162,36 +179,29 @@ Route::middleware(['auth', 'school.role:admin'])
         Route::get('/exports/{type}', [SchoolCsvController::class, 'export'])
             ->name('exports.csv');
 
+
+        // Activity Log and Recycle Bin
         Route::get('/activity-log', [ActivityLogController::class, 'index'])
             ->name('activity-log');
 
         Route::get('/recycle-bin', [ActivityLogController::class, 'trash'])
             ->name('recycle-bin');
 
-        Route::post('/recycle-bin/{type}/{id}/restore', [ActivityLogController::class, 'restore'])
-            ->name('recycle-bin.restore');
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUBJECT MANAGEMENT
-        |--------------------------------------------------------------------------
-        */
-
-        Route::get('/subjects', function () {
-            return view('admin.subject-management');
-        })->name('subjects.index');
-
-        Route::get('/subject-details', function () {
-            return view('admin.subject-details');
-        })->name('subject-details');
+        Route::post(
+            '/recycle-bin/{type}/{id}/restore',
+            [ActivityLogController::class, 'restore']
+        )->name('recycle-bin.restore');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | GRADE LEVEL MANAGEMENT
-        |--------------------------------------------------------------------------
-        */
+        // Subject Management
+        Route::get('/subjects', [AdminSubjectController::class, 'index'])
+            ->name('subjects.index');
 
+        Route::get('/subject-details', [AdminSubjectController::class, 'show'])
+            ->name('subject-details');
+
+
+        // Grade Level Management
         Route::get('/grade-level', function () {
             return view('admin.grade-level');
         })->name('grade-level');
@@ -214,30 +224,50 @@ Route::middleware(['auth', 'school.role:admin'])
                 'gradeLevel' => 'Grade ' . $grade,
                 'studentCount' => $studentCounts[$grade],
             ]);
+
         })->whereNumber('grade')->name('grade-level.details');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | GRADE MANAGEMENT
-        |--------------------------------------------------------------------------
-        */
-
+        // Grade Management
         Route::get('/grades', function () {
             return view('admin.grade-management');
         })->name('grades.index');
 
-        Route::get('/grade-approval', function () {
-            return view('admin.grade-approval');
-        })->name('grade-approval');
+
+        // Gradebook
+        Route::get('/gradebook', [GradebookController::class, 'index'])
+            ->name('gradebook');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | ANNOUNCEMENTS
-        |--------------------------------------------------------------------------
-        */
+        // Grade Approval
+        Route::get(
+            '/grade-approval',
+            [AdminGradeApprovalController::class, 'index']
+        )->name('grade-approval');
 
+        Route::post(
+            '/grade-approval/{assignmentId}/{schoolYear}/{term}/approve',
+            [AdminGradeApprovalController::class, 'approve']
+        )->whereNumber('assignmentId')
+            ->whereNumber('term')
+            ->name('grade-approval.approve');
+
+        Route::post(
+            '/grade-approval/{assignmentId}/{schoolYear}/{term}/return',
+            [AdminGradeApprovalController::class, 'returnToTeacher']
+        )->whereNumber('assignmentId')
+            ->whereNumber('term')
+            ->name('grade-approval.return');
+
+        Route::get(
+            '/grade-approval/{assignmentId}/{schoolYear}/{term}',
+            [AdminGradeApprovalController::class, 'show']
+        )->whereNumber('assignmentId')
+            ->whereNumber('term')
+            ->name('grade-approval.show');
+
+
+        // Announcements
         Route::get('/announcement', [
             AnnouncementController::class,
             'index'
@@ -259,15 +289,11 @@ Route::middleware(['auth', 'school.role:admin'])
         ])->name('announcement.destroy');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | SETTINGS
-        |--------------------------------------------------------------------------
-        */
-
+        // Settings
         Route::get('/settings', function () {
             return view('admin.settings');
         })->name('settings');
+
     });
 
 
@@ -277,7 +303,7 @@ Route::middleware(['auth', 'school.role:admin'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'school.role:teacher'])
+Route::middleware(['auth', 'school.role:teacher,teacher_adviser'])
     ->prefix('teacher')
     ->name('teacher.')
     ->group(function () {
@@ -297,14 +323,48 @@ Route::middleware(['auth', 'school.role:teacher'])
         Route::get('/grade-management', [GradeManagementController::class, 'index'])
             ->name('grade-management');
 
+        Route::get('/grade-management/load', [GradeManagementController::class, 'load'])
+            ->name('grade-management.load');
+
+        Route::post('/grade-management/save', [GradeManagementController::class, 'save'])
+            ->name('grade-management.save');
+
+        Route::post(
+            '/grade-management/assessment-settings',
+            [GradeManagementController::class, 'updateAssessmentSettings']
+        )->name('grade-management.assessment-settings');
+
+        Route::post(
+            '/grade-management/reset',
+            [GradeManagementController::class, 'reset']
+        )->name('grade-management.reset');
+
+        Route::post(
+            '/grade-management/clear-scores',
+            [GradeManagementController::class, 'clearScores']
+        )->name('grade-management.clear-scores');
+
 
         // Grade Submission
-        Route::get('/grade-submission', function () {
-            return view('teacher.grade-submission');
-        })->name('grade-submission');
+        Route::get(
+            '/grade-submission',
+            [GradeSubmissionController::class, 'index']
+        )->name('grade-submission');
+
+        Route::post(
+            '/grade-submission/submit',
+            [GradeSubmissionController::class, 'submit']
+        )->name('grade-submission.submit');
 
 
-        // MY SUBJECTS
+        // Teacher Grade Review
+        Route::get(
+            '/grade-review',
+            [GradeReviewController::class, 'index']
+        )->name('grade-review');
+
+
+        // My Subjects
         Route::get('/subjects', [SubjectController::class, 'index'])
             ->name('subjects');
 
@@ -318,6 +378,7 @@ Route::middleware(['auth', 'school.role:teacher'])
             ])->latest()->get();
 
             return view('teacher.announcements', compact('announcements'));
+
         })->name('announcements');
 
 
@@ -331,6 +392,7 @@ Route::middleware(['auth', 'school.role:teacher'])
         Route::get('/settings', function () {
             return view('teacher.settings');
         })->name('settings');
+
     });
 
 
@@ -340,7 +402,7 @@ Route::middleware(['auth', 'school.role:teacher'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'school.role:adviser'])
+Route::middleware(['auth', 'school.role:adviser,teacher_adviser'])
     ->prefix('adviser')
     ->name('adviser.')
     ->group(function () {
@@ -351,15 +413,17 @@ Route::middleware(['auth', 'school.role:adviser'])
 
 
         // Advisory Classes
-        Route::get('/classes', function () {
-            return view('adviser.classes');
-        })->name('classes');
+        Route::get(
+            '/classes',
+            [AdviserClassController::class, 'index']
+        )->name('classes');
 
 
         // My Students
-        Route::get('/students', function () {
-            return view('adviser.students');
-        })->name('students');
+        Route::get(
+            '/students',
+            [AdviserStudentController::class, 'index']
+        )->name('students');
 
 
         // Academic Records
@@ -368,10 +432,32 @@ Route::middleware(['auth', 'school.role:adviser'])
         })->name('academic-records');
 
 
-        // Grade Submission History
-        Route::get('/grade-review', function () {
-            return view('adviser.grade-review');
-        })->name('grade-review');
+        // Adviser Grade Review
+        Route::get(
+            '/grade-review',
+            [AdviserGradeReviewController::class, 'index']
+        )->name('grade-review');
+
+        Route::get(
+            '/grade-review/{assignmentId}/{schoolYear}/{term}',
+            [AdviserGradeReviewController::class, 'show']
+        )->whereNumber('assignmentId')
+            ->whereNumber('term')
+            ->name('grade-review.show');
+
+        Route::post(
+            '/grade-review/{assignmentId}/{schoolYear}/{term}/forward',
+            [AdviserGradeReviewController::class, 'forward']
+        )->whereNumber('assignmentId')
+            ->whereNumber('term')
+            ->name('grade-review.forward');
+
+        Route::post(
+            '/grade-review/{assignmentId}/{schoolYear}/{term}/return',
+            [AdviserGradeReviewController::class, 'returnToTeacher']
+        )->whereNumber('assignmentId')
+            ->whereNumber('term')
+            ->name('grade-review.return');
 
 
         // Announcements
@@ -383,6 +469,7 @@ Route::middleware(['auth', 'school.role:adviser'])
             ])->latest()->get();
 
             return view('adviser.announcements', compact('announcements'));
+
         })->name('announcements');
 
 
@@ -396,6 +483,7 @@ Route::middleware(['auth', 'school.role:adviser'])
         Route::get('/settings', function () {
             return view('adviser.settings');
         })->name('settings');
+
     });
 
 
@@ -431,10 +519,12 @@ Route::middleware(['auth', 'school.role:student'])
             ])->latest()->get();
 
             return view('student.announcements', compact('announcements'));
+
         })->name('announcements');
 
 
         // My Profile
         Route::view('/profile', 'student.profile')
             ->name('profile');
+
     });

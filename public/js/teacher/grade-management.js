@@ -28,8 +28,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveButton = document.getElementById("saveGradebook");
     const unsavedNote = document.getElementById("unsavedNote");
 
+    const csrfToken = document.querySelector(
+        'meta[name="csrf-token"]',
+    )?.content;
+
+    const gradeLockModal = document.getElementById("gradeLockModal");
+    const closeGradeLockModal = document.getElementById("closeGradeLockModal");
+
+    function closeGradeLock() {
+        gradeLockModal?.classList.remove("show");
+    }
+
+    closeGradeLockModal?.addEventListener("click", closeGradeLock);
+
+    // Close kapag pinindot ang background
+    gradeLockModal?.addEventListener("click", (event) => {
+        if (event.target === gradeLockModal) {
+            closeGradeLock();
+        }
+    });
+
+    // Close kapag pinindot ang Escape
+    document.addEventListener("keydown", (event) => {
+        if (
+            event.key === "Escape" &&
+            gradeLockModal?.classList.contains("show")
+        ) {
+            closeGradeLock();
+        }
+    });
+
     // ==========================================
-    // LOAD CONFIGURATION FROM BLADE
+    // CONFIGURATION
     // ==========================================
 
     let assessmentDefinitions = [];
@@ -43,21 +73,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const rawWeights = JSON.parse(gradebook.dataset.gradingWeights || "{}");
 
         weights = {
-            ww: Number(rawWeights.ww) / 100,
-            pt: Number(rawWeights.pt) / 100,
-            ex: Number(rawWeights.ex) / 100,
+            ww: Number(rawWeights.ww ?? rawWeights.WW) / 100,
+            pt: Number(rawWeights.pt ?? rawWeights.PT) / 100,
+            ex: Number(rawWeights.ex ?? rawWeights.EX) / 100,
         };
     } catch (error) {
-        console.error("Unable to read gradebook configuration:", error);
+        console.error("Gradebook configuration error:", error);
 
-        window.alert(
-            "Gradebook configuration could not be loaded. Please refresh the page.",
-        );
-
+        alert("Gradebook configuration could not be loaded.");
         return;
     }
 
-    // Normalize assessment configuration from Blade.
     assessmentDefinitions = assessmentDefinitions.map((assessment) => ({
         ...assessment,
         label: String(assessment.label ?? "")
@@ -79,14 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const validAssessments =
         assessmentCount > 0 &&
-        assessmentDefinitions.every((assessment) => {
-            return (
+        assessmentDefinitions.every(
+            (assessment) =>
                 assessment.label &&
                 validGroups.includes(assessment.group) &&
                 Number.isFinite(assessment.max) &&
-                assessment.max > 0
-            );
-        });
+                assessment.max > 0,
+        );
 
     const validWeights =
         Object.values(weights).every(
@@ -109,10 +134,9 @@ document.addEventListener("DOMContentLoaded", () => {
             assessmentCount,
         });
 
-        window.alert(
+        alert(
             "The gradebook assessment configuration is incomplete or invalid.",
         );
-
         return;
     }
 
@@ -133,8 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
             .map((item, index) => (item.group === "ex" ? index : null))
             .filter((index) => index !== null),
     };
-
-    // Required EX assessments: SA 20%, SB 20%, SC 20%, TE 40%.
 
     const requiredExamLabels = ["SA", "SB", "SC", "TE"];
     const requiredExamWeights = [20, 20, 20, 40];
@@ -161,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
             assessmentIndexes,
         });
 
-        window.alert(
+        alert(
             "The assessment structure must contain 4 WW, 2 PT, SA, SB, SC, and TE.",
         );
 
@@ -172,7 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // TERM DATA MANAGEMENT
     // ==========================================
 
-    let activeTerm = 1;
+    let activeTerm = Number(termSelect?.value || 1);
+    let isLoadingTerm = false;
+    let isSaving = false;
 
     function captureTableData() {
         return getScoreInputs().map((input) => ({
@@ -195,6 +219,8 @@ document.addEventListener("DOMContentLoaded", () => {
         2: createBlankTermData(),
         3: createBlankTermData(),
     };
+
+    const loadedTerms = new Set();
 
     function saveCurrentTermData() {
         termData[activeTerm] = getScoreInputs().map((input) => ({
@@ -225,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 header.appendChild(maxLabel);
             }
 
-            maxLabel.textContent = `Max ${assessment.max}`;
+            maxLabel.textContent = ` ${Number(assessment.max)}`;
         });
     }
 
@@ -253,6 +279,66 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
+    // DATABASE LOADING
+    // ==========================================
+
+    async function loadTermFromDatabase(term) {
+        const loadUrl = gradebook.dataset.loadUrl;
+
+        if (!loadUrl) {
+            throw new Error("Grade loading URL is missing.");
+        }
+
+        const params = new URLSearchParams({
+            assignment: gradebook.dataset.assignmentId,
+            school_year: gradebook.dataset.schoolYear,
+            term: String(term),
+        });
+
+        const response = await fetch(`${loadUrl}?${params.toString()}`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Unable to load saved grades.");
+        }
+
+        const scores = result.scores || {};
+        const maxScores = result.max_scores || {};
+
+        const newTermData = [];
+
+        getLearnerRows().forEach((row) => {
+            const studentId = String(row.dataset.learnerId);
+            const studentScores = scores[studentId] || {};
+
+            assessmentDefinitions.forEach((assessment, index) => {
+                const savedScore = studentScores[index];
+
+                newTermData.push({
+                    value:
+                        savedScore === null || savedScore === undefined
+                            ? ""
+                            : String(savedScore),
+
+                    max: String(maxScores[index] ?? assessment.max),
+                });
+            });
+        });
+
+        termData[term] = newTermData;
+        loadedTerms.add(term);
+
+        return result;
+    }
+
+    // ==========================================
     // FORMATTING AND CELL HELPERS
     // ==========================================
 
@@ -263,9 +349,95 @@ document.addEventListener("DOMContentLoaded", () => {
     function setCell(row, selector, value) {
         const cell = row.querySelector(selector);
 
-        if (cell) {
-            cell.textContent = value === null ? "—" : formatNumber(value);
+        if (!cell) return;
+
+        if (value === null || !Number.isFinite(value)) {
+            cell.textContent = "—";
+            return;
         }
+
+        // TOTAL cells must display whole numbers.
+        const totalCells = [".ww-total", ".pt-total", ".ex-total"];
+
+        if (totalCells.includes(selector)) {
+            cell.textContent = String(Math.round(value));
+        } else {
+            cell.textContent = formatNumber(value);
+        }
+    }
+
+    // ==========================================
+    // TERM GRADE TRANSMUTATION
+    // ==========================================
+
+    function transmuteGrade(initialGrade) {
+        if (!Number.isFinite(initialGrade)) return null;
+
+        const ranges = [
+            [99.5, 100.0, 100],
+            [98.32, 99.49, 99],
+            [97.14, 98.31, 98],
+            [95.96, 97.13, 97],
+            [94.78, 95.95, 96],
+            [93.6, 94.77, 95],
+            [92.42, 93.59, 94],
+            [91.24, 92.41, 93],
+            [90.06, 91.23, 92],
+            [88.88, 90.05, 91],
+            [87.7, 88.87, 90],
+            [86.52, 87.69, 89],
+            [85.34, 86.51, 88],
+            [84.16, 85.33, 87],
+            [82.98, 84.15, 86],
+            [81.8, 82.97, 85],
+            [80.62, 81.79, 84],
+            [79.44, 80.61, 83],
+            [78.26, 79.43, 82],
+            [77.08, 78.25, 81],
+            [75.9, 77.07, 80],
+            [74.72, 75.89, 79],
+            [73.54, 74.71, 78],
+            [72.36, 73.53, 77],
+            [71.18, 72.35, 76],
+            [70.0, 71.17, 75],
+            [65.34, 69.99, 74],
+            [60.67, 65.33, 73],
+            [56.01, 60.66, 72],
+            [51.34, 56.0, 71],
+            [46.67, 51.33, 70],
+            [42.01, 46.66, 69],
+            [37.34, 42.0, 68],
+            [32.68, 37.33, 67],
+            [28.01, 32.67, 66],
+            [23.35, 28.0, 65],
+            [18.68, 23.34, 64],
+            [14.01, 18.67, 63],
+            [9.35, 14.0, 62],
+            [4.68, 9.34, 61],
+            [0.0, 4.67, 60],
+        ];
+
+        const matchedRange = ranges.find(
+            ([minimum, maximum]) =>
+                initialGrade >= minimum && initialGrade <= maximum,
+        );
+
+        return matchedRange ? matchedRange[2] : null;
+    }
+
+    // ==========================================
+    // TERM GRADE DESCRIPTOR
+    // ==========================================
+
+    function getGradeDescriptor(termGrade) {
+        if (!Number.isFinite(termGrade)) return null;
+
+        if (termGrade >= 90) return "Advancing";
+        if (termGrade >= 80) return "Benchmarking";
+        if (termGrade >= 75) return "Connecting";
+        if (termGrade >= 65) return "Developing";
+
+        return "Emerging";
     }
 
     // ==========================================
@@ -288,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const score = Number(rawValue);
 
         const valid =
-            Number.isFinite(score) && score >= 0 && score <= max && max > 0;
+            Number.isInteger(score) && score >= 0 && score <= max && max > 0;
 
         return {
             entered: true,
@@ -376,7 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // INDIVIDUAL SA / SB / SC / TE COMPUTATION
+    // INDIVIDUAL EX COMPUTATION
     // ==========================================
 
     function calculateIndividualExam(row, label) {
@@ -385,9 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 assessment.group === "ex" && assessment.label === label,
         );
 
-        if (assessmentIndex === -1) {
-            return null;
-        }
+        if (assessmentIndex === -1) return null;
 
         const input = row.querySelector(
             `.score-input[data-assessment-index="${assessmentIndex}"]`,
@@ -439,11 +609,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
 
-        // EX Total is the sum of individual weighted scores.
-
         const total = exams.sa.ws + exams.sb.ws + exams.sc.ws + exams.te.ws;
-
-        // Apply the overall subject-specific EX component weight.
 
         const ws = total * weights.ex;
 
@@ -475,13 +641,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setCell(row, ".pt-ps", pt.ps);
         setCell(row, ".pt-ws", pt.ws);
 
-        /*
-         * Initial Grade is displayed only when:
-         * - All assessment scores are entered.
-         * - No score is invalid.
-         * - All three component calculations are available.
-         */
-
         const canCalculateInitialGrade =
             validation.allScoresComplete &&
             !validation.hasInvalid &&
@@ -495,23 +654,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setCell(row, ".initial-grade", initialGrade);
 
-        // Official Term Grade and Descriptor remain pending.
+        const termGrade =
+            initialGrade !== null ? transmuteGrade(initialGrade) : null;
 
-        const termGrade = row.querySelector(".term-grade");
-        const descriptor = row.querySelector(".descriptor");
+        const descriptor =
+            termGrade !== null ? getGradeDescriptor(termGrade) : null;
 
-        if (termGrade) {
-            termGrade.textContent = "Pending";
+        const termGradeCell = row.querySelector(".term-grade");
+        const descriptorCell = row.querySelector(".descriptor");
+
+        if (termGradeCell) {
+            termGradeCell.textContent =
+                termGrade !== null ? String(termGrade) : "Pending";
+
+            termGradeCell.classList.toggle(
+                "grade-failed",
+                termGrade !== null && termGrade <= 74,
+            );
+
+            termGradeCell.classList.toggle(
+                "grade-passed",
+                termGrade !== null && termGrade >= 75,
+            );
         }
 
-        if (descriptor) {
-            descriptor.replaceChildren();
+        if (descriptorCell) {
+            descriptorCell.replaceChildren();
 
             const badge = document.createElement("span");
-            badge.className = "status-pending";
-            badge.textContent = "Pending";
 
-            descriptor.appendChild(badge);
+            badge.className =
+                termGrade !== null && termGrade <= 74
+                    ? "status-failed"
+                    : termGrade !== null
+                      ? "status-passed"
+                      : "status-pending";
+
+            badge.textContent = descriptor ?? "Pending";
+
+            descriptorCell.appendChild(badge);
         }
     }
 
@@ -566,7 +747,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // SPREADSHEET-STYLE NAVIGATION
+    // EXCEL-STYLE KEYBOARD NAVIGATION
     // ==========================================
 
     function handleScoreNavigation(event) {
@@ -638,7 +819,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // TERM AND SUMMARY NAVIGATION
     // ==========================================
 
-    function setActiveTab(selectedTab, index) {
+    async function setActiveTab(selectedTab, index) {
+        if (isLoadingTerm) return;
+
         const isSummary = selectedTab.dataset.view === "summary";
 
         if (!isSummary) {
@@ -647,13 +830,39 @@ document.addEventListener("DOMContentLoaded", () => {
             if (selectedTerm !== activeTerm) {
                 saveCurrentTermData();
 
-                activeTerm = selectedTerm;
+                const previousTerm = activeTerm;
 
-                loadTermData(activeTerm);
+                activeTerm = selectedTerm;
+                isLoadingTerm = true;
+
+                try {
+                    if (!loadedTerms.has(activeTerm)) {
+                        await loadTermFromDatabase(activeTerm);
+                    }
+
+                    loadTermData(activeTerm);
+                } catch (error) {
+                    console.error("Term loading error:", error);
+
+                    alert(error.message || "Unable to load saved grades.");
+
+                    activeTerm = previousTerm;
+
+                    if (termSelect) {
+                        termSelect.value = String(previousTerm);
+                    }
+
+                    isLoadingTerm = false;
+                    return;
+                } finally {
+                    isLoadingTerm = false;
+                }
             }
         } else {
             saveCurrentTermData();
         }
+
+        const showingSummary = selectedTab.dataset.view === "summary";
 
         tabs.forEach((tab, tabIndex) => {
             const isActive = tab === selectedTab;
@@ -669,17 +878,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        termTable.classList.toggle("is-hidden", isSummary);
+        termTable.classList.toggle("is-hidden", showingSummary);
 
-        summaryView?.classList.toggle("is-hidden", !isSummary);
+        summaryView?.classList.toggle("is-hidden", !showingSummary);
 
         if (tableTitle) {
-            tableTitle.textContent = isSummary
+            tableTitle.textContent = showingSummary
                 ? "Summary of Grades"
                 : `Term ${activeTerm} Scores`;
         }
 
-        if (!isSummary && termSelect) {
+        if (!showingSummary && termSelect) {
             termSelect.value = String(activeTerm);
         }
     }
@@ -690,16 +899,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    if (termSelect) {
-        termSelect.addEventListener("change", () => {
-            const selectedTerm = Number(termSelect.value);
-            const matchingTab = tabs[selectedTerm - 1];
+    termSelect?.addEventListener("change", () => {
+        const selectedTerm = Number(termSelect.value);
+        const matchingTab = tabs[selectedTerm - 1];
 
-            if (matchingTab) {
-                setActiveTab(matchingTab, selectedTerm - 1);
-            }
-        });
-    }
+        if (matchingTab) {
+            setActiveTab(matchingTab, selectedTerm - 1);
+        }
+    });
 
     // ==========================================
     // WARNING MODALS
@@ -745,9 +952,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     [clearScoresModal, resetGradebookModal].forEach((modal) => {
-        if (!modal) return;
-
-        modal.addEventListener("click", (event) => {
+        modal?.addEventListener("click", (event) => {
             if (event.target === modal) {
                 closeWarningModal(modal);
             }
@@ -758,46 +963,157 @@ document.addEventListener("DOMContentLoaded", () => {
     // CLEAR SCORES
     // ==========================================
 
-    function clearCurrentTermScores() {
-        getScoreInputs().forEach((input) => {
-            input.value = "";
+    async function clearCurrentTermScores() {
+        const clearUrl = gradebook.dataset.clearScoresUrl;
 
-            input.classList.remove("is-invalid");
+        if (!csrfToken || !clearUrl) {
+            alert("Clear Scores URL or CSRF token is missing.");
+            return;
+        }
 
-            input.setAttribute("aria-invalid", "false");
-        });
+        try {
+            confirmClearScoresButton.disabled = true;
+            confirmClearScoresButton.textContent = "Clearing...";
 
-        saveCurrentTermData();
-        calculateAllRows();
-        markUnsaved();
+            const response = await fetch(clearUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify({
+                    assignment: gradebook.dataset.assignmentId,
+                    school_year: gradebook.dataset.schoolYear,
+                    term: activeTerm,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                const validationMessage = result.errors
+                    ? Object.values(result.errors).flat()[0]
+                    : null;
+
+                throw new Error(
+                    validationMessage ||
+                        result.message ||
+                        "Unable to clear student scores.",
+                );
+            }
+
+            getScoreInputs().forEach((input) => {
+                input.value = "";
+                input.classList.remove("is-invalid");
+                input.setAttribute("aria-invalid", "false");
+            });
+
+            saveCurrentTermData();
+            calculateAllRows();
+
+            if (unsavedNote) {
+                unsavedNote.textContent = `Term ${activeTerm} scores cleared successfully.`;
+            }
+
+            closeWarningModal(clearScoresModal);
+
+            alert(result.message || "All student scores have been cleared.");
+        } catch (error) {
+            console.error("Clear scores error:", error);
+            alert(error.message || "Unable to clear student scores.");
+        } finally {
+            confirmClearScoresButton.disabled = false;
+            confirmClearScoresButton.textContent = "Clear Scores";
+        }
     }
 
     clearButton?.addEventListener("click", () => {
         openWarningModal(clearScoresModal, clearScoresTerm);
     });
 
-    confirmClearScoresButton?.addEventListener("click", () => {
-        clearCurrentTermScores();
-        closeWarningModal(clearScoresModal);
-    });
+    confirmClearScoresButton?.addEventListener("click", clearCurrentTermScores);
 
     // ==========================================
     // RESET GRADEBOOK
     // ==========================================
 
-    function resetCurrentTerm() {
-        if (activeTerm === 1) {
-            termData[1] = originalTermData.map((item) => ({
-                ...item,
-            }));
-        } else {
-            termData[activeTerm] = createBlankTermData();
+    async function resetCurrentTerm() {
+        const resetUrl = gradebook.dataset.resetUrl;
+
+        if (!csrfToken || !resetUrl) {
+            alert("Reset Gradebook URL or CSRF token is missing.");
+            return;
         }
 
-        loadTermData(activeTerm);
+        try {
+            confirmResetGradebookButton.disabled = true;
+            confirmResetGradebookButton.textContent = "Resetting...";
 
-        if (unsavedNote) {
-            unsavedNote.textContent = `Term ${activeTerm} has been reset. Changes are not saved to the database.`;
+            const response = await fetch(resetUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify({
+                    assignment: gradebook.dataset.assignmentId,
+                    school_year: gradebook.dataset.schoolYear,
+                    term: activeTerm,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                const validationMessage = result.errors
+                    ? Object.values(result.errors).flat()[0]
+                    : null;
+
+                throw new Error(
+                    validationMessage ||
+                        result.message ||
+                        "Unable to reset assessment settings.",
+                );
+            }
+
+            const defaultMaximums = result.max_scores || {};
+
+            termData[activeTerm] = termData[activeTerm].map(
+                (item, flatIndex) => {
+                    const assessmentIndex = flatIndex % assessmentCount;
+
+                    return {
+                        ...item,
+                        max: String(
+                            defaultMaximums[assessmentIndex] ??
+                                assessmentDefinitions[assessmentIndex].max,
+                        ),
+                    };
+                },
+            );
+
+            loadTermData(activeTerm);
+            saveCurrentTermData();
+
+            if (unsavedNote) {
+                unsavedNote.textContent = `Term ${activeTerm} assessment maximum points restored to defaults.`;
+            }
+
+            closeWarningModal(resetGradebookModal);
+
+            alert(
+                result.message ||
+                    "Assessment maximum points restored successfully.",
+            );
+        } catch (error) {
+            console.error("Reset gradebook error:", error);
+
+            alert(error.message || "Unable to reset assessment settings.");
+        } finally {
+            confirmResetGradebookButton.disabled = false;
+            confirmResetGradebookButton.textContent = "Reset Gradebook";
         }
     }
 
@@ -805,34 +1121,142 @@ document.addEventListener("DOMContentLoaded", () => {
         openWarningModal(resetGradebookModal, resetGradebookTerm);
     });
 
-    confirmResetGradebookButton?.addEventListener("click", () => {
-        resetCurrentTerm();
-        closeWarningModal(resetGradebookModal);
-    });
+    confirmResetGradebookButton?.addEventListener("click", resetCurrentTerm);
 
     // ==========================================
     // SAVE GRADEBOOK
     // ==========================================
 
-    saveButton?.addEventListener("click", () => {
+    async function saveGradebookToDatabase() {
+        if (isSaving) return;
+
         saveCurrentTermData();
 
-        const hasInvalidScore = getScoreInputs().some((input) =>
-            input.classList.contains("is-invalid"),
-        );
+        const inputs = getScoreInputs();
 
-        if (hasInvalidScore) {
-            window.alert(
-                "May invalid score. Siguraduhing nasa pagitan ng 0 at maximum points ang bawat score.",
-            );
+        for (const input of inputs) {
+            const information = getScoreInformation(input);
 
+            if (!information.valid) {
+                input.classList.add("is-invalid");
+                input.focus();
+
+                alert(
+                    "May invalid score. Siguraduhing nasa pagitan ng 0 at maximum points ang bawat score.",
+                );
+
+                return;
+            }
+        }
+
+        if (!csrfToken) {
+            alert("CSRF token is missing.");
             return;
         }
 
-        window.alert(
-            `Term ${activeTerm} scores are currently stored in page memory only. Database saving is not yet connected.`,
-        );
-    });
+        const saveUrl = gradebook.dataset.saveUrl;
+
+        if (!saveUrl) {
+            alert("Gradebook save URL is missing.");
+            return;
+        }
+
+        const scores = {};
+        const maxScores = {};
+
+        getLearnerRows().forEach((row) => {
+            const studentId = row.dataset.learnerId;
+
+            if (!studentId) return;
+
+            scores[studentId] = {};
+
+            row.querySelectorAll(".score-input").forEach((input) => {
+                const assessmentIndex = Number(input.dataset.assessmentIndex);
+
+                scores[studentId][assessmentIndex] =
+                    input.value.trim() === "" ? null : Number(input.value);
+
+                maxScores[assessmentIndex] = Number(
+                    input.dataset.max || input.max || 0,
+                );
+            });
+        });
+
+        const payload = {
+            assignment: gradebook.dataset.assignmentId,
+            school_year: gradebook.dataset.schoolYear,
+            term: activeTerm,
+            scores,
+            max_scores: maxScores,
+        };
+
+        try {
+            isSaving = true;
+
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+
+            const response = await fetch(saveUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                const validationMessage = result.errors
+                    ? Object.values(result.errors).flat()[0]
+                    : null;
+
+                throw new Error(
+                    validationMessage ||
+                        result.message ||
+                        "Unable to save grades.",
+                );
+            }
+
+            loadedTerms.add(activeTerm);
+
+            if (unsavedNote) {
+                unsavedNote.textContent = `Term ${activeTerm} scores saved successfully.`;
+            }
+
+            alert(result.message || "Successfully saved grades!");
+        } catch (error) {
+            console.error("Grade saving error:", error);
+
+            const errorMessage = String(error.message || "");
+
+            if (
+                errorMessage
+                    .toLowerCase()
+                    .includes("only draft grades can be edited")
+            ) {
+                if (gradeLockModal) {
+                    gradeLockModal.classList.add("show");
+                } else {
+                    alert(
+                        "These grades have already been submitted and can no longer be edited.",
+                    );
+                }
+            } else {
+                alert(errorMessage || "Unable to save grades.");
+            }
+        } finally {
+            isSaving = false;
+
+            saveButton.disabled = false;
+            saveButton.textContent = "Save Changes";
+        }
+    }
+
+    saveButton?.addEventListener("click", saveGradebookToDatabase);
 
     // ==========================================
     // ASSESSMENT SETTINGS
@@ -963,7 +1387,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    applyAssessmentButton?.addEventListener("click", () => {
+    applyAssessmentButton?.addEventListener("click", async () => {
         if (!assessmentFields) return;
 
         const settingInputs = Array.from(
@@ -971,10 +1395,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         if (settingInputs.length !== assessmentCount) {
-            window.alert(
-                "Assessment settings could not be loaded. Please try again.",
-            );
-
+            alert("Assessment settings could not be loaded.");
             return;
         }
 
@@ -989,43 +1410,139 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         if (hasInvalidMaximum) {
-            window.alert(
+            alert(
                 "Please enter a valid maximum point greater than zero for every assessment.",
             );
 
             return;
         }
 
-        // Update each learner's maximum points using
-        // the matching assessment index.
+        for (const row of getLearnerRows()) {
+            const rowInputs = Array.from(row.querySelectorAll(".score-input"));
 
-        termData[activeTerm] = termData[activeTerm].map((item, flatIndex) => {
-            const assessmentIndex = flatIndex % assessmentCount;
+            for (const input of rowInputs) {
+                const index = Number(input.dataset.assessmentIndex);
 
-            return {
-                ...item,
-                max: String(newMaximums[assessmentIndex]),
-            };
-        });
+                const score = input.value.trim();
 
-        updateAssessmentMaximums();
-        saveCurrentTermData();
-        markUnsaved();
+                if (score !== "" && Number(score) > newMaximums[index]) {
+                    alert(
+                        `A student score exceeds the new maximum for ${assessmentDefinitions[index].label}. Please check the scores first.`,
+                    );
 
-        closeAssessmentModal();
+                    return;
+                }
+            }
+        }
 
-        window.alert(
-            `Assessment maximum points for Term ${activeTerm} have been updated.`,
-        );
+        const settingsUrl = gradebook.dataset.assessmentSettingsUrl;
+
+        if (!csrfToken || !settingsUrl) {
+            alert("Assessment settings URL or CSRF token is missing.");
+
+            return;
+        }
+
+        const payload = {
+            assignment: gradebook.dataset.assignmentId,
+            school_year: gradebook.dataset.schoolYear,
+            term: activeTerm,
+            max_scores: Object.fromEntries(
+                newMaximums.map((max, index) => [index, max]),
+            ),
+        };
+
+        try {
+            applyAssessmentButton.disabled = true;
+            applyAssessmentButton.textContent = "Saving...";
+
+            const response = await fetch(settingsUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                const validationMessage = result.errors
+                    ? Object.values(result.errors).flat()[0]
+                    : null;
+
+                throw new Error(
+                    validationMessage ||
+                        result.message ||
+                        "Unable to save assessment settings.",
+                );
+            }
+
+            termData[activeTerm] = termData[activeTerm].map(
+                (item, flatIndex) => {
+                    const assessmentIndex = flatIndex % assessmentCount;
+
+                    return {
+                        ...item,
+                        max: String(newMaximums[assessmentIndex]),
+                    };
+                },
+            );
+
+            updateAssessmentMaximums();
+            saveCurrentTermData();
+
+            closeAssessmentModal();
+
+            if (unsavedNote) {
+                unsavedNote.textContent = `Term ${activeTerm} assessment settings saved successfully.`;
+            }
+
+            alert(result.message || "Assessment settings saved successfully.");
+        } catch (error) {
+            console.error("Assessment settings error:", error);
+
+            alert(error.message || "Unable to save assessment settings.");
+        } finally {
+            applyAssessmentButton.disabled = false;
+            applyAssessmentButton.textContent = "Apply Changes";
+        }
     });
 
     // ==========================================
     // INITIAL DISPLAY
     // ==========================================
 
-    if (termSelect) {
-        termSelect.value = "1";
+    async function initializeGradebook() {
+        activeTerm = 1;
+
+        if (termSelect) {
+            termSelect.value = "1";
+        }
+
+        try {
+            isLoadingTerm = true;
+
+            await loadTermFromDatabase(1);
+
+            loadTermData(1);
+
+            if (unsavedNote) {
+                unsavedNote.textContent = "Saved grades loaded successfully.";
+            }
+        } catch (error) {
+            console.error("Initial grade loading error:", error);
+
+            alert(error.message || "Unable to load saved grades.");
+
+            // Retain server-rendered scores if loading fails.
+            loadTermData(1);
+        } finally {
+            isLoadingTerm = false;
+        }
     }
 
-    loadTermData(1);
+    initializeGradebook();
 });

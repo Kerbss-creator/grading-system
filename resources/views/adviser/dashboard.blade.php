@@ -37,7 +37,7 @@
                         <i class="fa-solid fa-calendar"></i>
                         <div>
                             <small>School Year</small>
-                            <strong>2026 - 2027</strong>
+                            <strong>{{ str_replace('-', ' - ', $schoolYear) }}</strong>
                         </div>
                     </div>
 
@@ -47,15 +47,19 @@
                         <i class="fa-solid fa-book-open"></i>
                         <div>
                             <small>Term</small>
-                            <strong>1st Term</strong>
+                            <strong>
+                                {{ $term == 1 ? '1st Term' : ($term == 2 ? '2nd Term' : '3rd Term') }}
+                            </strong>
                         </div>
                     </div>
                 </div>
             </div>
 
+
             <div class="welcome-icon">
-                <i class="fa-solid fa-graduation-cap"></i>
+                <img src="{{ asset('images/forbesologo.png') }}" alt="Forbes Academy Logo">
             </div>
+
         </div>
 
         {{-- DASHBOARD STATISTICS --}}
@@ -67,7 +71,7 @@
                 </div>
                 <div class="stat-details">
                     <p>Assigned Classes</p>
-                    <h3>3</h3>
+                    <h3>{{ $assignedClasses->count() }}</h3>
                     <span>Classes handled</span>
                 </div>
             </div>
@@ -78,7 +82,7 @@
                 </div>
                 <div class="stat-details">
                     <p>Total Students</p>
-                    <h3>118</h3>
+                    <h3>{{ $totalStudents }}</h3>
                     <span>Across assigned classes</span>
                 </div>
             </div>
@@ -89,7 +93,7 @@
                 </div>
                 <div class="stat-details">
                     <p>Pending Reviews</p>
-                    <h3>2</h3>
+                    <h3>{{ $pendingReviews }}</h3>
                     <span>Awaiting your review</span>
                 </div>
             </div>
@@ -100,12 +104,188 @@
                 </div>
                 <div class="stat-details">
                     <p>Forwarded to Admin</p>
-                    <h3>5</h3>
+                    <h3>{{ $forwardedToAdmin }}</h3>
                     <span>Submitted for approval</span>
                 </div>
             </div>
 
         </div>
+
+
+
+        {{-- GRADE SUBMISSION PROGRESS --}}
+        <div class="adviser-panel grade-progress-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Grade Submission Progress</h3>
+                    <p>Monitor teacher grade submissions for your advisory classes.</p>
+                </div>
+
+                {{-- TERM FILTER --}}
+                <form method="GET" action="{{ route('adviser.dashboard') }}" class="grade-term-filter">
+
+                    <label for="gradeTerm">Academic Term</label>
+
+                    <select name="term" id="gradeTerm" onchange="this.form.submit()">
+                        <option value="1" {{ $term == 1 ? 'selected' : '' }}>1st Term</option>
+                        <option value="2" {{ $term == 2 ? 'selected' : '' }}>2nd Term</option>
+                        <option value="3" {{ $term == 3 ? 'selected' : '' }}>3rd Term</option>
+                    </select>
+                </form>
+            </div>
+
+            @forelse($assignedClasses as $class)
+
+                <div class="grade-progress-class">
+
+                    {{-- CLASS HEADER --}}
+                    <div class="grade-progress-class-header">
+
+                        <div class="grade-progress-class-info">
+                            <div class="grade-progress-class-icon">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            </div>
+
+                            <div>
+                                <h4>
+                                    {{ $class->grade_level }}
+                                </h4>
+
+                                <span>
+                                    {{ $class->student_count }}
+                                    {{ $class->student_count === 1 ? 'Student' : 'Students' }}
+                                    <span class="progress-dot">•</span>
+                                    {{ $class->total_subjects }}
+                                    {{ $class->total_subjects === 1 ? 'Subject' : 'Subjects' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grade-progress-summary">
+                            <strong>{{ $class->progress_percentage }}%</strong>
+                            <span>Completed</span>
+                        </div>
+
+                    </div>
+
+                    {{-- OVERALL PROGRESS BAR --}}
+                    <div class="grade-progress-bar">
+                        <div class="grade-progress-fill" style="width: {{ $class->progress_percentage }}%;">
+                        </div>
+                    </div>
+
+                    {{-- SUBJECT SUMMARY --}}
+                    <div class="grade-progress-counts">
+                        <span class="progress-count submitted-count">
+                            <i class="fa-solid fa-circle-check"></i>
+                            {{ $class->submitted_subjects }} Submitted
+                        </span>
+
+                        <span class="progress-count partial-count">
+                            <i class="fa-solid fa-circle-half-stroke"></i>
+                            {{ $class->partial_subjects }} Partial
+                        </span>
+
+                        <span class="progress-count not-submitted-count">
+                            <i class="fa-regular fa-circle"></i>
+                            {{ $class->not_submitted_subjects }} Not Submitted
+                        </span>
+                    </div>
+
+                    {{-- EXPANDABLE SUBJECT LIST --}}
+                    {{-- EXPANDABLE SUBJECT LIST --}}
+                    <div class="grade-progress-details">
+
+                        <button type="button" class="grade-progress-toggle" aria-expanded="false">
+
+                            <span>View Subject Details</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+
+                        </button>
+
+                        <div class="grade-progress-content">
+                            <div class="grade-progress-content-inner">
+
+                                {{-- EXISTING SUBJECT LIST --}}
+                                @forelse($class->subjectProgress as $subject)
+
+                                    @php
+                                        $teacher = $subject->faculty;
+
+                                        $teacherName = $teacher
+                                            ? trim(implode(' ', array_filter([
+                                                $teacher->first_name,
+                                                $teacher->middle_name,
+                                                $teacher->last_name,
+                                            ])))
+                                            : 'No Teacher Assigned';
+
+                                        $statusClass = match ($subject->status) {
+                                            'Submitted' => 'submitted',
+                                            'Partial' => 'partial',
+                                            default => 'not-submitted',
+                                        };
+                                    @endphp
+
+                                    <div class="grade-progress-subject">
+
+                                        <div class="grade-subject-info">
+                                            <div class="grade-subject-icon">
+                                                <i class="fa-solid fa-book-open"></i>
+                                            </div>
+
+                                            <div>
+                                                <h5>{{ $subject->subject }}</h5>
+                                                <span>{{ $teacherName }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="grade-subject-submission">
+                                            <span class="grade-submission-count">
+                                                {{ $subject->submitted_count }}
+                                                / {{ $subject->total_students }} Students
+                                            </span>
+
+                                            <span class="grade-progress-status {{ $statusClass }}">
+                                                {{ $subject->status }}
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                @empty
+
+                                    <div class="grade-progress-empty">
+                                        <i class="fa-solid fa-book"></i>
+                                        <p>No Subjects Assigned</p>
+                                        <span>No teaching assignments were found for this grade level.</span>
+                                    </div>
+
+                                @endforelse
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            @empty
+
+                <div class="grade-progress-empty">
+                    <i class="fa-solid fa-chalkboard"></i>
+                    <p>No Advisory Classes Found</p>
+                    <span>
+                        Your grade submission progress will appear once an advisory
+                        class is assigned to you.
+                    </span>
+                </div>
+
+            @endforelse
+
+        </div>
+
 
         {{-- RECENT GRADE SUBMISSIONS --}}
         <div class="adviser-panel">
@@ -115,7 +295,7 @@
                     <p>Review the latest grade submissions from your teachers.</p>
                 </div>
 
-                <a href="{{ url('/adviser/grade-submissions') }}" class="view-all-link">
+                <a href="{{ route('adviser.grade-review') }}" class="view-all-link">
                     View All
                     <i class="fa-solid fa-arrow-right"></i>
                 </a>
@@ -134,56 +314,66 @@
                     </thead>
 
                     <tbody>
-                        <tr>
-                            <td>
-                                <div class="class-name">Grade 7 - A</div>
-                                <span class="subject-name">Mathematics</span>
-                            </td>
-                            <td>Maria Santos</td>
-                            <td>Oct 15, 2026</td>
-                            <td>
-                                <span class="status-badge pending">Pending Review</span>
-                            </td>
-                            <td>
-                                <a href="{{ url('/adviser/grade-submissions') }}" class="action-link">
-                                    Review
-                                </a>
-                            </td>
-                        </tr>
+                        @forelse($recentSubmissions as $submission)
 
-                        <tr>
-                            <td>
-                                <div class="class-name">Grade 8 - A</div>
-                                <span class="subject-name">Science</span>
-                            </td>
-                            <td>Juan Dela Cruz</td>
-                            <td>Oct 14, 2026</td>
-                            <td>
-                                <span class="status-badge forwarded">Forwarded</span>
-                            </td>
-                            <td>
-                                <a href="{{ url('/adviser/grade-submissions') }}" class="action-link">
-                                    View
-                                </a>
-                            </td>
-                        </tr>
+                                        @php
+                                            $assignment = $submission->teachingAssignment;
+                                            $teacher = $assignment?->faculty;
 
-                        <tr>
-                            <td>
-                                <div class="class-name">Grade 9 - A</div>
-                                <span class="subject-name">English</span>
-                            </td>
-                            <td>Anna Reyes</td>
-                            <td>Oct 13, 2026</td>
-                            <td>
-                                <span class="status-badge pending">Pending Review</span>
-                            </td>
-                            <td>
-                                <a href="{{ url('/adviser/grade-submissions') }}" class="action-link">
-                                    Review
-                                </a>
-                            </td>
-                        </tr>
+                                            $teacherName = $teacher
+                                                ? trim(
+                                                    $teacher->first_name . ' ' .
+                                                    ($teacher->middle_name ? $teacher->middle_name . ' ' : '') .
+                                                    $teacher->last_name
+                                                )
+                                                : 'Unknown Teacher';
+                                        @endphp
+
+                                        <tr>
+                                            <td>
+                                                <div class="class-name">
+                                                    {{ $assignment?->grade_level ?? 'Unknown Class' }}
+                                                </div>
+                                                <span class="subject-name">
+                                                    {{ $assignment?->subject ?? 'Unknown Subject' }}
+                                                    •
+                                                    {{ $submission->term }}{{ $submission->term == 1 ? 'st' : ($submission->term == 2 ? 'nd' : 'rd') }}
+                                                    Term
+                                                </span>
+                                            </td>
+
+                                            <td>{{ $teacherName }}</td>
+
+                                            <td>
+                                                {{ $submission->submitted_at
+                            ? \Carbon\Carbon::parse($submission->submitted_at)->format('M d, Y')
+                            : 'N/A' }}
+                                            </td>
+
+                                            <td>
+                                                <span class="status-badge pending">
+                                                    Pending Review
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <a href="{{ route('adviser.grade-review') }}" class="action-link">
+                                                    Review
+                                                </a>
+                                            </td>
+                                        </tr>
+
+                        @empty
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    <p>No Grade Submissions Yet</p>
+                                    <span>
+                                        Teacher submissions will appear here once submitted.
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -201,38 +391,34 @@
                     </div>
                 </div>
 
-                <div class="assigned-class-item">
-                    <div class="assigned-class-icon">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <div class="assigned-class-info">
-                        <h4>Grade 7 - A</h4>
-                        <p>42 Students</p>
-                    </div>
-                    <i class="fa-solid fa-chevron-right class-arrow"></i>
-                </div>
+                @forelse($assignedClasses as $class)
 
-                <div class="assigned-class-item">
-                    <div class="assigned-class-icon">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <div class="assigned-class-info">
-                        <h4>Grade 8 - A</h4>
-                        <p>38 Students</p>
-                    </div>
-                    <i class="fa-solid fa-chevron-right class-arrow"></i>
-                </div>
+                    <div class="assigned-class-item">
+                        <div class="assigned-class-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
 
-                <div class="assigned-class-item">
-                    <div class="assigned-class-icon">
-                        <i class="fa-solid fa-users"></i>
+                        <div class="assigned-class-info">
+                            <h4>
+                                {{ $class->grade_level }}
+                            </h4>
+                            <p>
+                                {{ $class->student_count }}
+                                {{ $class->student_count === 1 ? 'Student' : 'Students' }}
+                            </p>
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right class-arrow"></i>
                     </div>
-                    <div class="assigned-class-info">
-                        <h4>Grade 9 - A</h4>
-                        <p>38 Students</p>
+
+                @empty
+                    <div class="empty-state">
+                        <i class="fa-solid fa-chalkboard"></i>
+                        <<p>No Assigned Grade Level</p>
+                            <span>Your assigned grade level will appear here once an administrator assigns you as an
+                                adviser.</span>
                     </div>
-                    <i class="fa-solid fa-chevron-right class-arrow"></i>
-                </div>
+                @endforelse
             </div>
 
             {{-- QUICK ACTIONS --}}
@@ -244,7 +430,7 @@
                     </div>
                 </div>
 
-                <a href="{{ url('/adviser/grade-submissions') }}" class="quick-action-item">
+                <a href="{{ route('adviser.grade-review') }}" class="quick-action-item">
                     <div class="quick-action-icon">
                         <i class="fa-solid fa-clipboard-check"></i>
                     </div>
@@ -255,7 +441,7 @@
                     <i class="fa-solid fa-chevron-right quick-arrow"></i>
                 </a>
 
-                <a href="{{ url('/adviser/classes') }}" class="quick-action-item">
+                <a href="{{ route('adviser.classes') }}" class="quick-action-item">
                     <div class="quick-action-icon">
                         <i class="fa-solid fa-chalkboard"></i>
                     </div>
@@ -281,5 +467,64 @@
         </div>
 
     </section>
+
+@endsection
+
+{{-- PAGE JAVASCRIPT --}}
+@section('page-js')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            document.querySelectorAll('.grade-progress-toggle').forEach(button => {
+
+                button.addEventListener('click', function () {
+
+                    const content = this.nextElementSibling;
+                    const isOpen = this.classList.contains('active');
+
+                    if (isOpen) {
+
+                        // SMOOTH CLOSE
+                        content.style.height = content.scrollHeight + 'px';
+
+                        content.offsetHeight;
+
+                        content.style.height = '0px';
+                        content.classList.remove('show');
+
+                        this.classList.remove('active');
+                        this.setAttribute('aria-expanded', 'false');
+
+                    } else {
+
+                        // SMOOTH OPEN
+                        content.classList.add('show');
+                        content.style.height = content.scrollHeight + 'px';
+
+                        this.classList.add('active');
+                        this.setAttribute('aria-expanded', 'true');
+
+                        const handleTransition = function (event) {
+
+                            if (event.propertyName !== 'height') return;
+
+                            if (content.classList.contains('show')) {
+                                content.style.height = 'auto';
+                            }
+
+                            content.removeEventListener('transitionend', handleTransition);
+                        };
+
+                        content.addEventListener('transitionend', handleTransition);
+
+                    }
+
+                });
+
+            });
+
+        });
+    </script>
 
 @endsection

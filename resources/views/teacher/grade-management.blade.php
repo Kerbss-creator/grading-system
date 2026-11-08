@@ -34,13 +34,13 @@
 
         $normalizedSubject = strtoupper(trim($gradebookSubject));
 
-        $isComputerTleMpeh = in_array(
+        $isComputerTleMapeh = in_array(
             $normalizedSubject,
-            ['COMPUTER', 'TLE', 'MAPEH'],
+            ['COMPUTER EDUCATION', 'TLE', 'MAPEH'],
             true
         );
 
-        $gradingWeights = $isComputerTleMpeh
+        $gradingWeights = $isComputerTleMapeh
             ? [
                 'ww' => 20,
                 'pt' => 60,
@@ -113,8 +113,14 @@
         $assessmentColspan = 2 + 7 + 5 + 10 + 3;
     @endphp
 
-    <div class="gradebook-page" data-school-year="{{ $gradebookYear }}" data-subject-code="{{ $gradebookCode }}"
-        data-assessments='@json($assessments)' data-grading-weights='@json($gradingWeights)'>
+    <div class="gradebook-page" data-assignment-id="{{ $assignment->id }}"
+        data-assessment-settings-url="{{ route('teacher.grade-management.assessment-settings') }}"
+        data-save-url="{{ route('teacher.grade-management.save') }}"
+        data-load-url="{{ route('teacher.grade-management.load') }}"
+        data-reset-url="{{ route('teacher.grade-management.reset') }}"
+        data-clear-scores-url="{{ route('teacher.grade-management.clear-scores') }}" data-school-year="{{ $gradebookYear }}"
+        data-subject-code="{{ $gradebookCode }}" data-assessments='@json($assessments)'
+        data-grading-weights='@json($gradingWeights)'>
 
         {{-- Gradebook Navigation --}}
         <div class="grade-management-header">
@@ -166,9 +172,9 @@
                     <label for="gradebookTerm">Term</label>
 
                     <select id="gradebookTerm">
-                        <option value="1">Term 1</option>
-                        <option value="2">Term 2</option>
-                        <option value="3">Term 3</option>
+                        <option value="1" @selected(($selectedTerm ?? 1) == 1)>Term 1</option>
+                        <option value="2" @selected(($selectedTerm ?? 1) == 2)>Term 2</option>
+                        <option value="3" @selected(($selectedTerm ?? 1) == 3)>Term 3</option>
                     </select>
                 </div>
 
@@ -195,15 +201,16 @@
             {{-- Gradebook View Navigation --}}
             <div class="gradebook-tabs" role="tablist" aria-label="Gradebook views">
 
-                <button class="gradebook-tab is-active" type="button" role="tab" aria-selected="true" data-view="term">
+                <button class="gradebook-tab is-active" type="button" role="tab" aria-selected="true" data-view="term"
+                    data-term="1">
                     Term 1
                 </button>
 
-                <button class="gradebook-tab" type="button" role="tab" aria-selected="false" data-view="term">
+                <button class="gradebook-tab" type="button" role="tab" aria-selected="false" data-view="term" data-term="2">
                     Term 2
                 </button>
 
-                <button class="gradebook-tab" type="button" role="tab" aria-selected="false" data-view="term">
+                <button class="gradebook-tab" type="button" role="tab" aria-selected="false" data-view="term" data-term="3">
                     Term 3
                 </button>
 
@@ -368,20 +375,14 @@
 
                                     @if ($assessment['group'] === 'ww')
 
-                                        @php
-                                            $existingScore = data_get(
-                                                $learner,
-                                                'scores.' . $assessmentIndex,
-                                                ''
-                                            );
-                                        @endphp
+
 
                                         <td class="score-cell">
                                             <input type="number" class="score-input"
                                                 name="scores[{{ data_get($learner, 'id', $index + 1) }}][{{ $assessmentIndex }}]"
-                                                value="{{ $existingScore }}" min="0" max="{{ $assessment['max'] }}" step="any"
-                                                inputmode="decimal" data-group="ww" data-assessment-index="{{ $assessmentIndex }}"
-                                                data-max="{{ $assessment['max'] }}"
+                                                value="{{ data_get($learner, 'scores.' . str_replace(' ', '', $assessment['label']), '') }}"
+                                                min="0" max="{{ $assessment['max'] }}" step="any" inputmode="decimal" data-group="ww"
+                                                data-assessment-index="{{ $assessmentIndex }}" data-max="{{ $assessment['max'] }}"
                                                 aria-label="{{ data_get($learner, 'name', 'Learner') }} {{ $assessment['label'] }} score"
                                                 placeholder="—">
                                         </td>
@@ -414,9 +415,9 @@
                                         <td class="score-cell">
                                             <input type="number" class="score-input"
                                                 name="scores[{{ data_get($learner, 'id', $index + 1) }}][{{ $assessmentIndex }}]"
-                                                value="{{ $existingScore }}" min="0" max="{{ $assessment['max'] }}" step="any"
-                                                inputmode="decimal" data-group="pt" data-assessment-index="{{ $assessmentIndex }}"
-                                                data-max="{{ $assessment['max'] }}"
+                                                value="{{ data_get($learner, 'scores.' . str_replace(' ', '', $assessment['label']), '') }}"
+                                                min="0" max="{{ $assessment['max'] }}" step="any" inputmode="decimal" data-group="pt"
+                                                data-assessment-index="{{ $assessmentIndex }}" data-max="{{ $assessment['max'] }}"
                                                 aria-label="{{ data_get($learner, 'name', 'Learner') }} {{ $assessment['label'] }} score"
                                                 placeholder="—">
                                         </td>
@@ -449,9 +450,9 @@
                                         <td class="score-cell">
                                             <input type="number" class="score-input"
                                                 name="scores[{{ data_get($learner, 'id', $index + 1) }}][{{ $assessmentIndex }}]"
-                                                value="{{ $existingScore }}" min="0" max="{{ $assessment['max'] }}" step="any"
-                                                inputmode="decimal" data-group="ex" data-assessment-index="{{ $assessmentIndex }}"
-                                                data-max="{{ $assessment['max'] }}"
+                                                value="{{ data_get($learner, 'scores.' . str_replace(' ', '', $assessment['label']), '') }}"
+                                                min="0" max="{{ $assessment['max'] }}" step="any" inputmode="decimal" data-group="ex"
+                                                data-assessment-index="{{ $assessmentIndex }}" data-max="{{ $assessment['max'] }}"
                                                 aria-label="{{ data_get($learner, 'name', 'Learner') }} {{ $assessment['label'] }} score"
                                                 placeholder="—">
                                         </td>
@@ -771,10 +772,10 @@
                 <h3 id="resetGradebookTitle">Reset Gradebook?</h3>
 
                 <p>
-                    Term
+                    The assessment maximum points for Term
                     <strong id="resetGradebookTerm">1</strong>
-                    scores and assessment maximums will return to their default values.
-                    This action cannot be undone.
+                    will return to their default values.
+                    Existing student scores will remain unchanged.
                 </p>
 
                 <div class="warning-modal-actions">
@@ -793,6 +794,31 @@
 
         </div>
 
+    </div>
+
+    <div class="grade-lock-overlay" id="gradeLockModal">
+        <div class="grade-lock-modal">
+            <div class="grade-lock-icon">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <h2>Grades Locked</h2>
+
+            <p>
+                These grades have already been submitted
+                and can no longer be edited.
+            </p>
+
+            <div class="grade-lock-notice">
+                <i class="fa-solid fa-circle-info"></i>
+                Please contact your Adviser or Administrator
+                if these grades need corrections.
+            </div>
+
+            <button type="button" id="closeGradeLockModal">
+                Okay, Got It
+            </button>
+        </div>
     </div>
 
 @endsection

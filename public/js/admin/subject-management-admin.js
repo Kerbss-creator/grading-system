@@ -7,19 +7,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const subjectCount = document.getElementById("subjectCount");
 
     if (!subjectTableBody) {
+        console.error("Subject table body not found.");
         return;
     }
 
+    // Subject name to database subject code
+    const subjectCodes = {
+        Mathematics: "MATH",
+        Science: "SCI",
+        English: "ENG",
+        Filipino: "FIL",
+        "Araling Panlipunan": "AP",
+        TLE: "TLE",
+        MAPEH: "MAPEH",
+        "Values Education": "VE",
+        Computer: "COMP",
+    };
+
     const rows = Array.from(subjectTableBody.querySelectorAll("tr"));
 
+    // Get subject name from row
     const getSubjectName = (row) => {
         return (
             row.dataset.subject ||
-            row.querySelector(".subject-name")?.textContent.trim() ||
+            row.querySelector(".view-btn")?.dataset.subject ||
+            row
+                .querySelector(".subject-name span:last-child")
+                ?.textContent.trim() ||
             ""
         );
     };
 
+    // Filter subjects
     const filterSubjects = () => {
         const searchValue = subjectSearch?.value.trim().toLowerCase() || "";
         const selectedGrade = gradeFilter?.value || "";
@@ -41,9 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             row.hidden = !isVisible;
 
-            if (isVisible) {
-                visibleCount++;
-            }
+            if (isVisible) visibleCount++;
         });
 
         if (subjectEmptyState) {
@@ -55,8 +72,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    // Navigate to Subject Details
     const openSubjectDetails = (subjectName) => {
-        if (!subjectName) {
+        const subjectCode = subjectCodes[subjectName];
+
+        if (!subjectCode) {
+            console.error("Subject code not found for:", subjectName);
             return;
         }
 
@@ -65,55 +86,51 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.origin,
         );
 
-        destination.searchParams.set("subject", subjectName);
+        destination.searchParams.set("code", subjectCode);
+
         window.location.href = destination.href;
     };
 
+    // Search and filters
     subjectSearch?.addEventListener("input", filterSubjects);
     gradeFilter?.addEventListener("change", filterSubjects);
     statusFilter?.addEventListener("change", filterSubjects);
 
+    // Subject row and View button click
     subjectTableBody.addEventListener("click", (event) => {
         const row = event.target.closest("tr");
 
-        if (!row || row.hidden) {
-            return;
-        }
+        if (!row || row.hidden) return;
 
-        const subjectName = getSubjectName(row);
-        const clickedButton = event.target.closest(".view-btn");
-
-        if (clickedButton) {
-            openSubjectDetails(clickedButton.dataset.subject || subjectName);
-            return;
-        }
+        const subjectName =
+            event.target.closest(".view-btn")?.dataset.subject ||
+            getSubjectName(row);
 
         openSubjectDetails(subjectName);
     });
 
+    // Keyboard accessibility
     subjectTableBody.addEventListener("keydown", (event) => {
-        if (event.key !== "Enter" && event.key !== " ") {
-            return;
-        }
+        if (event.key !== "Enter" && event.key !== " ") return;
 
         const row = event.target.closest("tr");
 
-        if (
-            !row ||
-            row.hidden ||
-            event.target.closest("button, a, input, select")
-        ) {
-            return;
-        }
+        if (!row || row.hidden) return;
+
+        if (event.target.closest("button, a, input, select")) return;
 
         event.preventDefault();
         openSubjectDetails(getSubjectName(row));
     });
 
+    // Make subject rows keyboard accessible
     rows.forEach((row) => {
         row.tabIndex = 0;
+        row.style.cursor = "pointer";
+
         row.setAttribute("aria-label", `View ${getSubjectName(row)} details`);
     });
 
+    // Initial display
     filterSubjects();
 });
