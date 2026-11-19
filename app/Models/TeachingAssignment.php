@@ -11,13 +11,14 @@ class TeachingAssignment extends Model
         'faculty_id',
         'grade_level',
         'subject',
+        'school_year',
     ];
 
     public function faculty(): BelongsTo
     {
         return $this->belongsTo(Faculty::class);
     }
-    
+
     public function gradeRecords()
     {
         return $this->hasMany(GradeRecord::class);

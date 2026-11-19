@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\AdvisoryAssignment;
 use App\Services\PersonRecordService;
 use App\Services\SchoolCsvSnapshotService;
+use App\Services\AccountSetupService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -25,7 +26,11 @@ class FacultyController extends Controller
         return view('admin.faculty-management', compact('faculty'));
     }
 
-    public function store(Request $request)
+    /**
+     * Create a Faculty manually.
+     * Both Faculty and User start as pending.
+     */
+    public function store(Request $request, AccountSetupService $accountSetup)
     {
         $validated = $request->validate([
             'faculty_id' => [
@@ -44,7 +49,6 @@ class FacultyController extends Controller
                 'unique:faculty,email',
                 'unique:users,email',
             ],
-            'status' => ['required', Rule::in(['active', 'inactive'])],
             'teacher' => ['required', 'boolean'],
             'adviser' => ['required', 'boolean'],
             'assignments' => ['nullable', 'array'],
@@ -59,7 +63,7 @@ class FacultyController extends Controller
                 'max:255',
             ],
             'advisory_grade' => ['nullable', 'string', 'max:50'],
-            'school_year' => ['nullable', 'string', 'max:20'],
+            'school_year' => ['required', 'string', 'max:20'],
         ]);
 
         if (!$validated['teacher'] && !$validated['adviser']) {
@@ -86,31 +90,28 @@ class FacultyController extends Controller
 
         $faculty = DB::transaction(function () use ($validated, $role) {
 
-            // Enforce one adviser per grade level.
             if ($validated['adviser']) {
-                $grade = $validated['advisory_grade'];
-
                 $alreadyAssigned = AdvisoryAssignment::where(
                     'grade_level',
-                    $grade
+                    $validated['advisory_grade']
                 )->exists();
 
                 if ($alreadyAssigned) {
                     throw ValidationException::withMessages([
                         'advisory_grade' =>
-                            "An adviser is already assigned to {$grade}. Only one adviser is allowed per grade level.",
+                        "An adviser is already assigned to {$validated['advisory_grade']}. Only one adviser is allowed per grade level.",
                     ]);
                 }
             }
 
-            // Create a pending login account with a random initial password.
-            // The User model's hashed password cast will hash this value.
-            $user = User::create([
-                'name' => trim(
-                    $validated['first_name'] . ' ' .
+            $name = trim(
+                $validated['first_name'] . ' ' .
                     ($validated['middle_name'] ?? '') . ' ' .
                     $validated['last_name']
-                ),
+            );
+
+            $user = User::create([
+                'name' => $name,
                 'email' => $validated['email'],
                 'password' => Str::random(64),
                 'role' => $role,
@@ -124,15 +125,16 @@ class FacultyController extends Controller
                 'middle_name' => $validated['middle_name'] ?? null,
                 'last_name' => $validated['last_name'],
                 'email' => $validated['email'],
-                'status' => $validated['status'],
+                'status' => 'pending',
                 'role' => $role,
             ]);
 
             if ($validated['teacher']) {
-                foreach ($validated['assignments'] ?? [] as $assignment) {
+                foreach ($validated['assignments'] as $assignment) {
                     $faculty->teachingAssignments()->create([
                         'grade_level' => $assignment['grade_level'],
                         'subject' => $assignment['subject'],
+                        'school_year' => $validated['school_year'],
                     ]);
                 }
             }
@@ -140,15 +142,26 @@ class FacultyController extends Controller
             if ($validated['adviser']) {
                 $faculty->advisoryAssignments()->create([
                     'grade_level' => $validated['advisory_grade'],
-                    'school_year' => $validated['school_year'] ?? null,
+                    'school_year' => $validated['school_year'],
                 ]);
             }
 
             return $faculty;
         });
 
+        try {
+            $accountSetup->sendSetupLink($faculty->user);
+            $emailSent = true;
+        } catch (\Throwable $e) {
+            report($e);
+            $emailSent = false;
+        }
+
         return response()->json([
-            'message' => 'Faculty and pending login account created successfully.',
+            'message' => $emailSent
+                ? 'Faculty created successfully. A password setup link has been sent to the faculty email.'
+                : 'Faculty created successfully, but the password setup email could not be sent. Please resend the setup link.',
+            'email_sent' => $emailSent,
             'faculty' => $faculty->load([
                 'teachingAssignments',
                 'advisoryAssignments',
@@ -156,8 +169,16 @@ class FacultyController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, int $id)
-    {
+    /**
+     * Update Faculty details and assignments.
+     * Imported Faculty receives a User account only after assignments
+     * have been validated and saved successfully.
+     */
+    public function update(
+        Request $request,
+        int $id,
+        AccountSetupService $accountSetup
+    ) {
         $faculty = Faculty::findOrFail($id);
 
         $validated = $request->validate([
@@ -177,7 +198,6 @@ class FacultyController extends Controller
                 Rule::unique('faculty', 'email')->ignore($faculty->id),
                 Rule::unique('users', 'email')->ignore($faculty->user_id),
             ],
-            'status' => ['required', Rule::in(['active', 'inactive'])],
             'teacher' => ['required', 'boolean'],
             'adviser' => ['required', 'boolean'],
             'assignments' => ['nullable', 'array'],
@@ -192,7 +212,7 @@ class FacultyController extends Controller
                 'max:255',
             ],
             'advisory_grade' => ['nullable', 'string', 'max:50'],
-            'school_year' => ['nullable', 'string', 'max:20'],
+            'school_year' => ['required', 'string', 'max:20'],
         ]);
 
         if (!$validated['teacher'] && !$validated['adviser']) {
@@ -217,15 +237,39 @@ class FacultyController extends Controller
             ? 'teacher_adviser'
             : ($validated['adviser'] ? 'adviser' : 'teacher');
 
-        DB::transaction(function () use ($faculty, $validated, $role) {
+        $setupUser = null;
 
-            // Check whether another faculty member already advises this grade.
+        $faculty = DB::transaction(function () use (
+            $id,
+            $validated,
+            $role,
+            &$setupUser
+        ) {
+            $faculty = Faculty::whereKey($id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $isUnassignedImport = !$faculty->user_id && !$faculty->role;
+
+            $account = $faculty->user_id
+                ? User::withTrashed()->find($faculty->user_id)
+                : null;
+
+            if (!$isUnassignedImport) {
+                if (
+                    !$account ||
+                    $account->trashed()
+                ) {
+                    throw ValidationException::withMessages([
+                        'email' => 'The linked login account is unavailable. Repair or restore the account before editing this Faculty.',
+                    ]);
+                }
+            }
+
             if ($validated['adviser']) {
-                $grade = $validated['advisory_grade'];
-
                 $alreadyAssigned = AdvisoryAssignment::where(
                     'grade_level',
-                    $grade
+                    $validated['advisory_grade']
                 )
                     ->where('faculty_id', '!=', $faculty->id)
                     ->exists();
@@ -233,10 +277,16 @@ class FacultyController extends Controller
                 if ($alreadyAssigned) {
                     throw ValidationException::withMessages([
                         'advisory_grade' =>
-                            "An adviser is already assigned to {$grade}. Only one adviser is allowed per grade level.",
+                        "An adviser is already assigned to {$validated['advisory_grade']}. Only one adviser is allowed per grade level.",
                     ]);
                 }
             }
+
+            $name = trim(
+                $validated['first_name'] . ' ' .
+                    ($validated['middle_name'] ?? '') . ' ' .
+                    $validated['last_name']
+            );
 
             $faculty->update([
                 'faculty_id' => $validated['faculty_id'],
@@ -244,32 +294,28 @@ class FacultyController extends Controller
                 'middle_name' => $validated['middle_name'] ?? null,
                 'last_name' => $validated['last_name'],
                 'email' => $validated['email'],
-                'status' => $validated['status'],
                 'role' => $role,
             ]);
 
-            // Update the linked login account without resetting its password
-            // or changing its account activation status.
-            if ($faculty->user) {
-                $faculty->user->update([
-                    'name' => trim(
-                        $validated['first_name'] . ' ' .
-                        ($validated['middle_name'] ?? '') . ' ' .
-                        $validated['last_name']
-                    ),
+            if ($account) {
+                // Keep the existing password and account status.
+                $account->update([
+                    'name' => $name,
                     'email' => $validated['email'],
                     'role' => $role,
                 ]);
             }
 
+            // Replace the previous assignments.
             $faculty->teachingAssignments()->delete();
             $faculty->advisoryAssignments()->delete();
 
             if ($validated['teacher']) {
-                foreach ($validated['assignments'] ?? [] as $assignment) {
+                foreach ($validated['assignments'] as $assignment) {
                     $faculty->teachingAssignments()->create([
                         'grade_level' => $assignment['grade_level'],
                         'subject' => $assignment['subject'],
+                        'school_year' => $validated['school_year'],
                     ]);
                 }
             }
@@ -277,43 +323,74 @@ class FacultyController extends Controller
             if ($validated['adviser']) {
                 $faculty->advisoryAssignments()->create([
                     'grade_level' => $validated['advisory_grade'],
-                    'school_year' => $validated['school_year'] ?? null,
+                    'school_year' => $validated['school_year'],
                 ]);
             }
-        });
 
-        return response()->json([
-            'message' => 'Faculty updated successfully.',
-            'faculty' => $faculty->fresh()->load([
+            // Create the login account only for an imported,
+            // unassigned Faculty record.
+            if ($isUnassignedImport) {
+                $setupUser = User::create([
+                    'name' => $name,
+                    'email' => $validated['email'],
+                    'password' => Str::random(64),
+                    'role' => $role,
+                    'account_status' => 'pending',
+                ]);
+
+                $faculty->update([
+                    'user_id' => $setupUser->id,
+                    'status' => 'pending',
+                ]);
+            }
+
+            return $faculty->fresh()->load([
                 'teachingAssignments',
                 'advisoryAssignments',
-            ]),
+            ]);
+        });
+
+        $emailSent = null;
+
+        if ($setupUser) {
+            try {
+                $accountSetup->sendSetupLink($setupUser);
+                $emailSent = true;
+            } catch (\Throwable $e) {
+                report($e);
+                $emailSent = false;
+            }
+        }
+
+        $message = 'Faculty updated successfully.';
+
+        if ($setupUser) {
+            $message = $emailSent
+                ? 'Faculty assignments saved successfully. A login account was created and a password setup link has been sent.'
+                : 'Faculty assignments saved and login account created, but the password setup email could not be sent. Please resend the setup link.';
+        }
+
+        return response()->json([
+            'message' => $message,
+            'email_sent' => $emailSent,
+            'faculty' => $faculty,
         ]);
     }
 
-    public function toggleStatus(int $id)
-    {
-        $faculty = DB::transaction(function () use ($id) {
-
-            $faculty = Faculty::whereKey($id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            $faculty->status = strtolower($faculty->status) === 'active'
-                ? 'inactive'
-                : 'active';
-
-            $faculty->save();
-
-            return $faculty;
-        });
+    public function toggleStatus(
+        int $id,
+        PersonRecordService $records
+    ) {
+        $status = $records->changeStatus('faculty', $id);
 
         return response()->json([
             'success' => true,
-            'status' => $faculty->status,
-            'message' => $faculty->status === 'active'
+            'status' => $status,
+            'message' => $status === 'active'
                 ? 'Faculty account has been reactivated successfully.'
-                : 'Faculty account has been deactivated successfully.',
+                : ($status === 'inactive'
+                    ? 'Faculty account has been deactivated successfully.'
+                    : 'Faculty account is still pending password setup.'),
         ]);
     }
 

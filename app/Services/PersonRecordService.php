@@ -9,10 +9,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\AccountSetupToken;
 
 class PersonRecordService
 {
-    public function __construct(private ActivityRecorder $audit) {}
+    public function __construct(
+        private ActivityRecorder $audit,
+        private AccountSetupService $accountSetup
+    ) {}
 
     public static function model(string $type): string
     {
@@ -52,8 +56,6 @@ class PersonRecordService
                 'middle_name',
                 'last_name',
                 'email',
-                'role',
-                'status',
             ],
             default => throw new \InvalidArgumentException('Unsupported record type.'),
         };
@@ -66,20 +68,19 @@ class PersonRecordService
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
         ];
 
         if ($type === 'students') {
             $rules += [
+                'status' => 'required|in:active,inactive,pending',
                 'grade_level' => 'required|string|max:255',
                 'sex' => 'required|in:Male,Female',
                 'school_year' => 'required|string|max:255',
-                'email' => 'nullable|email|max:255',
+                'email' => 'required|email|max:255',
             ];
         } elseif ($type === 'faculty') {
             $rules += [
                 'email' => 'required|email|max:255',
-                'role' => 'required|in:teacher,adviser,teacher_adviser',
             ];
         } else {
             throw new \InvalidArgumentException('Unsupported record type.');
@@ -88,28 +89,19 @@ class PersonRecordService
         return $rules;
     }
 
-    /**
-     * Student accounts use a generated email if none is supplied.
-     * Faculty accounts must use the faculty email.
-     */
     public static function accountEmail(string $type, array $data): string
     {
         $email = trim($data['email'] ?? '');
 
-        if ($email !== '') {
-            return $email;
+        if ($email === '') {
+            throw ValidationException::withMessages([
+                'email' => 'A valid email address is required.',
+            ]);
         }
 
-        if ($type === 'students') {
-            return $data['student_id'] . '@forbes.edu';
-        }
-
-        throw new \InvalidArgumentException('Faculty email is required.');
+        return $email;
     }
 
-    /**
-     * Returns the login role associated with a record.
-     */
     public static function accountRole(string $type, ?string $facultyRole = null): string
     {
         if ($type === 'students') {
@@ -132,7 +124,16 @@ class PersonRecordService
             return User::withTrashed()->find($record->user_id);
         }
 
-        $email = $record->email ?: $record->{self::key($type)} . '@forbes.edu';
+        // An imported Faculty may not have a role or User account yet.
+        if ($type === 'faculty' && !$record->role) {
+            return null;
+        }
+
+        $email = $record->email;
+
+        if (!$email) {
+            return null;
+        }
 
         $role = self::accountRole(
             $type,
@@ -153,23 +154,40 @@ class PersonRecordService
     ): void {
         $model = self::model($type);
         $key = self::key($type);
+        $setupUser = null;
 
-        DB::transaction(function () use ($type, $values, $record, $model, $key, $source) {
-            $data = array_intersect_key(
-                $values,
-                array_flip(self::columns($type))
-            );
+        $isFacultyImport = $type === 'faculty' && $source === 'csv_import';
+
+        DB::transaction(function () use (
+            $type,
+            $values,
+            $record,
+            $model,
+            $key,
+            $source,
+            $isFacultyImport,
+            &$setupUser
+        ) {
+            $data = $values;
 
             $data['middle_name'] = $data['middle_name'] ?? null;
-            $data['email'] = $data['email'] ?? null;
+            $data['email'] = trim($data['email'] ?? '');
 
             $email = self::accountEmail($type, $data);
-            $newRole = self::accountRole(
-                $type,
-                $type === 'faculty' ? ($data['role'] ?? null) : null
-            );
-
             $name = trim($data['first_name'] . ' ' . $data['last_name']);
+
+            if ($isFacultyImport) {
+                unset($data['role'], $data['user_id'], $data['status']);
+
+                if (!$record) {
+                    $data['status'] = 'pending';
+                }
+            } else {
+                self::accountRole(
+                    $type,
+                    $type === 'faculty' ? ($data['role'] ?? null) : null
+                );
+            }
 
             $existingId = $model::withTrashed()
                 ->where($key, $data[$key])
@@ -181,9 +199,10 @@ class PersonRecordService
                 ]);
             }
 
-            $account = $record ? $this->linkedAccount($type, $record) : null;
+            $account = $record
+                ? $this->linkedAccount($type, $record)
+                : null;
 
-            // Check the account against the record's CURRENT role before changing it.
             if ($record && $account) {
                 $currentRole = self::accountRole(
                     $type,
@@ -224,52 +243,56 @@ class PersonRecordService
                 if ($account) {
                     $account->name = $name;
                     $account->email = $email;
-                    $account->role = $newRole;
                     $account->save();
-                } elseif (!$record->user_id) {
-                    // Repair an older record that has no linked login account.
+                } elseif ($type === 'students' && !$record->user_id) {
+                    // Preserve the existing Student account repair behavior.
+                    $newRole = self::accountRole('students');
+
                     $account = User::create([
                         'name' => $name,
                         'email' => $email,
                         'password' => Hash::make(Str::random(48)),
                         'role' => $newRole,
+                        'account_status' => 'pending',
                     ]);
 
                     $record->user_id = $account->id;
                     $record->save();
 
-                    $this->audit->record(
-                        'create',
-                        'users',
-                        (string) $account->id,
-                        null,
-                        $account->only(['name', 'email', 'role']),
-                        [
-                            'source' => 'legacy_account_repair',
-                            'requires_password_setup' => true,
-                        ]
-                    );
-                } else {
+                    $setupUser = $account;
+                } elseif (!$isFacultyImport && !$account && $record->user_id) {
                     throw ValidationException::withMessages([
                         'email' => 'The linked login account is missing. Repair the association before editing.',
                     ]);
                 }
             } else {
-                // Create the linked login account first.
-                $account = User::create([
-                    'name' => $name,
-                    'email' => $email,
-                    'password' => Hash::make(Str::random(48)),
-                    'role' => $newRole,
-                ]);
+                if ($isFacultyImport) {
+                    // Create only the Faculty profile.
+                    // No User account and no setup email at this stage.
+                    $data['user_id'] = null;
+                    $record = $model::create($data);
+                } else {
+                    // Preserve the existing Student account creation workflow.
+                    $newRole = self::accountRole(
+                        $type,
+                        $type === 'faculty' ? ($data['role'] ?? null) : null
+                    );
 
-                $data['user_id'] = $account->id;
-                $record = $model::create($data);
-            }
+                    $account = User::create([
+                        'name' => $name,
+                        'email' => $email,
+                        'password' => Hash::make(Str::random(48)),
+                        'role' => $newRole,
+                        'account_status' => 'pending',
+                    ]);
 
-            if (!$record->user_id) {
-                $record->user_id = $account->id;
-                $record->save();
+                    $data['user_id'] = $account->id;
+                    $record = $model::create($data);
+
+                    if ($type === 'students') {
+                        $setupUser = $account;
+                    }
+                }
             }
 
             $after = $record->only(self::columns($type));
@@ -285,6 +308,12 @@ class PersonRecordService
                 );
             }
         });
+
+        // Only send setup links for the existing Student workflow here.
+        // Faculty setup links will be sent after Admin completes assignments.
+        if ($setupUser) {
+            $this->accountSetup->sendSetupLink($setupUser);
+        }
     }
 
     public function changeStatus(string $type, int $id): string
@@ -292,23 +321,78 @@ class PersonRecordService
         $model = self::model($type);
 
         return DB::transaction(function () use ($type, $id, $model) {
-            $record = $model::findOrFail($id);
+            $record = $model::whereKey($id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             $before = $record->only(self::columns($type));
             $account = $this->linkedAccount($type, $record);
 
-            $expectedRole = self::accountRole(
-                $type,
-                $type === 'faculty' ? $record->role : null
-            );
+            if ($type === 'faculty') {
+                // Imported Faculty without completed assignments.
+                if (!$record->user_id && !$record->role) {
+                    $record->status = $record->status === 'inactive'
+                        ? 'pending'
+                        : 'inactive';
 
-            if (!$account || $account->trashed() || $account->role !== $expectedRole) {
-                throw ValidationException::withMessages([
-                    'id' => 'The linked login account is unavailable or has the wrong role.',
-                ]);
+                    $record->save();
+                } else {
+                    if (
+                        !$account ||
+                        $account->trashed() ||
+                        $account->role !== $record->role
+                    ) {
+                        throw ValidationException::withMessages([
+                            'id' => 'The linked login account is unavailable or has the wrong role.',
+                        ]);
+                    }
+
+                    $completedSetup = $this->hasCompletedSetup($account);
+
+                    if ($record->status === 'active') {
+                        $record->status = 'inactive';
+
+                        if ($completedSetup) {
+                            $account->update([
+                                'account_status' => 'inactive',
+                            ]);
+                        }
+                    } else {
+                        if (!$completedSetup) {
+                            $record->status = 'pending';
+                            $account->update([
+                                'account_status' => 'pending',
+                            ]);
+                        } else {
+                            $record->status = 'active';
+                            $account->update([
+                                'account_status' => 'active',
+                            ]);
+                        }
+                    }
+
+                    $record->save();
+                }
+            } else {
+                // Preserve the existing Student status behavior.
+                $expectedRole = self::accountRole($type);
+
+                if (
+                    !$account ||
+                    $account->trashed() ||
+                    $account->role !== $expectedRole
+                ) {
+                    throw ValidationException::withMessages([
+                        'id' => 'The linked login account is unavailable or has the wrong role.',
+                    ]);
+                }
+
+                $record->status = $record->status === 'active'
+                    ? 'inactive'
+                    : 'active';
+
+                $record->save();
             }
-
-            $record->status = $record->status === 'active' ? 'inactive' : 'active';
-            $record->save();
 
             $this->audit->record(
                 'status_change',
@@ -321,6 +405,7 @@ class PersonRecordService
             return $record->status;
         });
     }
+
 
     public function setStatuses(string $type, array $ids, string $status): int
     {
@@ -343,45 +428,128 @@ class PersonRecordService
                 ]);
             }
 
+            /*
+         * Prepare and validate all Faculty account states first.
+         * This prevents partial updates if one record has an invalid account.
+         */
+            $facultyStates = [];
+
+            if ($type === 'faculty') {
+                foreach ($records as $record) {
+                    // Imported Faculty without assignments or a login account.
+                    if (!$record->user_id && !$record->role) {
+                        $facultyStates[$record->id] = [
+                            'faculty_status' => $status === 'active'
+                                ? 'pending'
+                                : 'inactive',
+                            'account' => null,
+                            'account_status' => null,
+                        ];
+
+                        continue;
+                    }
+
+                    $account = $this->linkedAccount($type, $record);
+
+                    if (
+                        !$account ||
+                        $account->trashed() ||
+                        $account->role !== $record->role
+                    ) {
+                        throw ValidationException::withMessages([
+                            'ids' => 'A linked login account is unavailable or has the wrong role. No records were changed.',
+                        ]);
+                    }
+
+                    $completedSetup = $this->hasCompletedSetup($account);
+
+                    $facultyStatus = $status === 'inactive'
+                        ? 'inactive'
+                        : ($completedSetup ? 'active' : 'pending');
+
+                    $accountStatus = $completedSetup
+                        ? $facultyStatus
+                        : 'pending';
+
+                    $facultyStates[$record->id] = [
+                        'faculty_status' => $facultyStatus,
+                        'account' => $account,
+                        'account_status' => $accountStatus,
+                    ];
+                }
+            }
+
             $changed = 0;
 
             foreach ($records as $record) {
-                if ($record->status === $status) {
-                    continue;
-                }
-
                 $before = $record->only(self::columns($type));
-                $account = $this->linkedAccount($type, $record);
+                $recordChanged = false;
 
-                $expectedRole = self::accountRole(
-                    $type,
-                    $type === 'faculty' ? $record->role : null
-                );
+                if ($type === 'faculty') {
+                    $state = $facultyStates[$record->id];
 
-                if (!$account || $account->trashed() || $account->role !== $expectedRole) {
-                    throw ValidationException::withMessages([
-                        'ids' => 'A linked login account is unavailable or has the wrong role. No records were changed.',
-                    ]);
+                    $newFacultyStatus = $state['faculty_status'];
+                    $account = $state['account'];
+                    $newAccountStatus = $state['account_status'];
+
+                    if ($record->status !== $newFacultyStatus) {
+                        $record->status = $newFacultyStatus;
+                        $record->save();
+                        $recordChanged = true;
+                    }
+
+                    if (
+                        $account &&
+                        $account->account_status !== $newAccountStatus
+                    ) {
+                        $account->update([
+                            'account_status' => $newAccountStatus,
+                        ]);
+
+                        $recordChanged = true;
+                    }
+                } else {
+                    // Preserve existing Student behavior.
+                    if ($record->status === $status) {
+                        continue;
+                    }
+
+                    $account = $this->linkedAccount($type, $record);
+                    $expectedRole = self::accountRole($type);
+
+                    if (
+                        !$account ||
+                        $account->trashed() ||
+                        $account->role !== $expectedRole
+                    ) {
+                        throw ValidationException::withMessages([
+                            'ids' => 'A linked login account is unavailable or has the wrong role. No records were changed.',
+                        ]);
+                    }
+
+                    $record->status = $status;
+                    $record->save();
+                    $recordChanged = true;
                 }
 
-                $record->status = $status;
-                $record->save();
+                if ($recordChanged) {
+                    $this->audit->record(
+                        'status_change',
+                        $type,
+                        (string) $record->{self::key($type)},
+                        $before,
+                        $record->only(self::columns($type)),
+                        ['source' => 'bulk_status']
+                    );
 
-                $this->audit->record(
-                    'status_change',
-                    $type,
-                    (string) $record->{self::key($type)},
-                    $before,
-                    $record->only(self::columns($type)),
-                    ['source' => 'bulk_status']
-                );
-
-                $changed++;
+                    $changed++;
+                }
             }
 
             return $changed;
         });
     }
+
 
     public function delete(string $type, array $ids, string $source = 'form'): int
     {
@@ -401,27 +569,36 @@ class PersonRecordService
             foreach ($records as $record) {
                 $account = $this->linkedAccount($type, $record);
 
-                $expectedRole = self::accountRole(
-                    $type,
-                    $type === 'faculty' ? $record->role : null
-                );
+                $unassignedFaculty = $type === 'faculty'
+                    && !$record->user_id
+                    && !$record->role;
 
-                if (!$account) {
-                    throw ValidationException::withMessages([
-                        'ids' => 'An associated login account is missing. Nothing was deleted.',
-                    ]);
-                }
+                if (!$unassignedFaculty) {
+                    $expectedRole = self::accountRole(
+                        $type,
+                        $type === 'faculty' ? $record->role : null
+                    );
 
-                if ($account->role !== $expectedRole) {
-                    throw ValidationException::withMessages([
-                        'ids' => 'Unexpected linked account role. Nothing was deleted.',
-                    ]);
+                    if (!$account) {
+                        throw ValidationException::withMessages([
+                            'ids' => 'An associated login account is missing. Nothing was deleted.',
+                        ]);
+                    }
+
+                    if ($account->role !== $expectedRole) {
+                        throw ValidationException::withMessages([
+                            'ids' => 'Unexpected linked account role. Nothing was deleted.',
+                        ]);
+                    }
                 }
 
                 $before = $record->only(self::columns($type));
 
                 $record->delete();
-                $account->delete();
+
+                if ($account) {
+                    $account->delete();
+                }
 
                 $this->audit->record(
                     'delete',
@@ -445,18 +622,29 @@ class PersonRecordService
             $record = $model::onlyTrashed()->findOrFail($id);
             $account = $this->linkedAccount($type, $record);
 
-            $expectedRole = self::accountRole(
-                $type,
-                $type === 'faculty' ? $record->role : null
-            );
+            $unassignedFaculty = $type === 'faculty'
+                && !$record->user_id
+                && !$record->role;
 
-            if (!$account || !$account->trashed() || $account->role !== $expectedRole) {
-                throw ValidationException::withMessages([
-                    'id' => 'The linked account cannot be restored automatically.',
-                ]);
+            if (!$unassignedFaculty) {
+                $expectedRole = self::accountRole(
+                    $type,
+                    $type === 'faculty' ? $record->role : null
+                );
+
+                if (
+                    !$account ||
+                    !$account->trashed() ||
+                    $account->role !== $expectedRole
+                ) {
+                    throw ValidationException::withMessages([
+                        'id' => 'The linked account cannot be restored automatically.',
+                    ]);
+                }
+
+                $account->restore();
             }
 
-            $account->restore();
             $record->restore();
 
             $this->audit->record(
@@ -467,5 +655,12 @@ class PersonRecordService
                 $record->only(self::columns($type))
             );
         });
+    }
+
+    private function hasCompletedSetup(User $user): bool
+    {
+        return AccountSetupToken::where('user_id', $user->id)
+            ->whereNotNull('used_at')
+            ->exists();
     }
 }

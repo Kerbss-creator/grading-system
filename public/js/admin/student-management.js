@@ -559,6 +559,264 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // ==========================================
+    // BULK ACTION ELEMENTS
+    // ==========================================
+
+    const selectAllStudents = document.getElementById("selectAllStudents");
+
+    const bulkActivateButton = document.querySelector(
+        '[data-bulk-status="active"]',
+    );
+
+    const bulkDeactivateButton = document.querySelector(
+        '[data-bulk-status="inactive"]',
+    );
+
+    const bulkDeleteButton = document.querySelector("[data-bulk-delete]");
+
+    const selectedCountElement = document.querySelector(
+        "[data-selected-count]",
+    );
+
+    // ==========================================
+    // GET SELECTED STUDENTS
+    // ==========================================
+
+    function getSelectedStudentCheckboxes() {
+        return Array.from(
+            studentTableBody.querySelectorAll("[data-record-checkbox]:checked"),
+        );
+    }
+
+    function getSelectedStudentIds() {
+        return getSelectedStudentCheckboxes().map((checkbox) => checkbox.value);
+    }
+
+    // ==========================================
+    // UPDATE BULK ACTION BUTTONS
+    // ==========================================
+
+    function updateBulkSelection() {
+        if (!studentTableBody) return;
+
+        const checkboxes = Array.from(
+            studentTableBody.querySelectorAll("[data-record-checkbox]"),
+        );
+
+        const visibleCheckboxes = checkboxes.filter((checkbox) => {
+            const row = checkbox.closest("tr");
+
+            return row && row.style.display !== "none";
+        });
+
+        const selectedCheckboxes = getSelectedStudentCheckboxes();
+        const selectedCount = selectedCheckboxes.length;
+
+        if (selectedCountElement) {
+            selectedCountElement.textContent = selectedCount;
+        }
+
+        if (bulkActivateButton) {
+            bulkActivateButton.disabled = selectedCount === 0;
+        }
+
+        if (bulkDeactivateButton) {
+            bulkDeactivateButton.disabled = selectedCount === 0;
+        }
+
+        if (bulkDeleteButton) {
+            bulkDeleteButton.disabled = selectedCount === 0;
+        }
+
+        if (selectAllStudents) {
+            const visibleSelected = visibleCheckboxes.filter(
+                (checkbox) => checkbox.checked,
+            ).length;
+
+            selectAllStudents.checked =
+                visibleCheckboxes.length > 0 &&
+                visibleSelected === visibleCheckboxes.length;
+
+            selectAllStudents.indeterminate =
+                visibleSelected > 0 &&
+                visibleSelected < visibleCheckboxes.length;
+
+            selectAllStudents.disabled = visibleCheckboxes.length === 0;
+        }
+    }
+
+    // ==========================================
+    // INDIVIDUAL STUDENT CHECKBOXES
+    // ==========================================
+
+    studentTableBody?.addEventListener("change", (event) => {
+        if (event.target.matches("[data-record-checkbox]")) {
+            updateBulkSelection();
+        }
+    });
+
+    // ==========================================
+    // SELECT ALL STUDENTS
+    // ==========================================
+
+    selectAllStudents?.addEventListener("change", function () {
+        const checkboxes = Array.from(
+            studentTableBody.querySelectorAll("[data-record-checkbox]"),
+        );
+
+        checkboxes.forEach((checkbox) => {
+            const row = checkbox.closest("tr");
+
+            if (row && row.style.display !== "none") {
+                checkbox.checked = this.checked;
+            }
+        });
+
+        updateBulkSelection();
+    });
+
+    // ==========================================
+    // BULK ACTIVATE / DEACTIVATE
+    // ==========================================
+
+    async function bulkUpdateStudentStatus(status, button) {
+        const ids = getSelectedStudentIds();
+
+        if (ids.length === 0) return;
+
+        const action = status === "active" ? "activate" : "deactivate";
+
+        const confirmed = window.confirm(
+            "Are you sure you want to " +
+                action +
+                " " +
+                ids.length +
+                " selected student(s)?",
+        );
+
+        if (!confirmed) return;
+
+        const originalText = button.innerHTML;
+
+        button.disabled = true;
+
+        if (bulkActivateButton) {
+            bulkActivateButton.disabled = true;
+        }
+
+        if (bulkDeactivateButton) {
+            bulkDeactivateButton.disabled = true;
+        }
+
+        if (bulkDeleteButton) {
+            bulkDeleteButton.disabled = true;
+        }
+
+        try {
+            const data = await sendRequest(
+                "/admin/students/bulk-status",
+                "PATCH",
+                {
+                    ids: ids,
+                    status: status,
+                },
+            );
+
+            showModal(
+                data.message || "Selected student statuses updated.",
+                "success",
+            );
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1200);
+        } catch (error) {
+            console.error("Bulk Status Error:", error);
+
+            showModal(
+                getErrorMessage(
+                    error,
+                    "Unable to update selected student statuses.",
+                ),
+                "error",
+            );
+
+            button.innerHTML = originalText;
+            updateBulkSelection();
+        }
+    }
+
+    bulkActivateButton?.addEventListener("click", function () {
+        bulkUpdateStudentStatus("active", this);
+    });
+
+    bulkDeactivateButton?.addEventListener("click", function () {
+        bulkUpdateStudentStatus("inactive", this);
+    });
+
+    // ==========================================
+    // BULK DELETE SELECTED STUDENTS
+    // ==========================================
+
+    bulkDeleteButton?.addEventListener("click", async function () {
+        const ids = getSelectedStudentIds();
+
+        if (ids.length === 0) return;
+
+        const confirmed = window.confirm(
+            "Are you sure you want to delete " +
+                ids.length +
+                " selected student(s)?\n\n" +
+                "These records will be moved to the Recycle Bin.",
+        );
+
+        if (!confirmed) return;
+
+        const originalText = bulkDeleteButton.innerHTML;
+
+        bulkDeleteButton.disabled = true;
+
+        if (bulkActivateButton) {
+            bulkActivateButton.disabled = true;
+        }
+
+        if (bulkDeactivateButton) {
+            bulkDeactivateButton.disabled = true;
+        }
+
+        try {
+            const data = await sendRequest(
+                "/admin/students/bulk-delete",
+                "DELETE",
+                {
+                    ids: ids,
+                },
+            );
+
+            showModal(
+                data.message || "Selected students moved to Recycle Bin.",
+                "success",
+            );
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1200);
+        } catch (error) {
+            console.error("Bulk Delete Error:", error);
+
+            showModal(
+                getErrorMessage(error, "Unable to delete selected students."),
+                "error",
+            );
+
+            bulkDeleteButton.innerHTML = originalText;
+            updateBulkSelection();
+        }
+    });
+
+    updateBulkSelection();
+
+    // ==========================================
     // SEARCH AND FILTERS
     // ==========================================
 
@@ -629,6 +887,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (serverEmptyRow) {
             serverEmptyRow.style.display = rows.length === 0 ? "" : "none";
         }
+
+        updateBulkSelection();
+
     }
 
     studentSearch?.addEventListener("input", filterStudents);

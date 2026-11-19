@@ -299,9 +299,9 @@ document.addEventListener("DOMContentLoaded", () => {
             button.disabled = selectedCount === 0;
         });
 
-        // Keep Bulk Delete disabled until its backend is implemented.
+        // Enable Bulk Delete when at least one faculty is selected.
         if (bulkDeleteButton) {
-            bulkDeleteButton.disabled = true;
+            bulkDeleteButton.disabled = selectedCount === 0;
         }
 
         if (selectAllCheckbox) {
@@ -619,6 +619,108 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateBulkControls();
             }
         });
+    });
+
+    // ==========================================
+    // BULK DELETE FACULTY
+    // ==========================================
+
+    bulkDeleteButton?.addEventListener("click", async () => {
+        const ids = getSelectedFacultyIds();
+
+        if (!ids.length) return;
+
+        const confirmed = window.confirm(
+            `Are you sure you want to delete ${ids.length} selected faculty member(s)?`,
+        );
+
+        if (!confirmed) return;
+
+        const csrfToken = getCsrfToken();
+
+        if (!csrfToken) {
+            showFacultyAlert(
+                "Security Error",
+                "CSRF token not found.",
+                "error",
+            );
+            return;
+        }
+
+        bulkDeleteButton.disabled = true;
+
+        const deletedIds = [];
+        const failedIds = [];
+
+        try {
+            // Reuse the existing individual DELETE endpoint.
+            for (const id of ids) {
+                try {
+                    const response = await fetch(
+                        `/admin/faculty-management/${id}`,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                Accept: "application/json",
+                                "X-CSRF-TOKEN": csrfToken,
+                                "X-Requested-With": "XMLHttpRequest",
+                            },
+                        },
+                    );
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            result.message || "Unable to delete faculty.",
+                        );
+                    }
+
+                    deletedIds.push(Number(id));
+                } catch (error) {
+                    console.error(`Failed to delete faculty ${id}:`, error);
+                    failedIds.push(Number(id));
+                }
+            }
+
+            // Remove successfully deleted records from the current table.
+            if (deletedIds.length > 0) {
+                facultyRecords = facultyRecords.filter(
+                    (record) => !deletedIds.includes(Number(record.id)),
+                );
+            }
+
+            renderTable();
+
+            if (failedIds.length === 0) {
+                showSuccessState(
+                    "Faculty Deleted Successfully!",
+                    `${deletedIds.length} selected faculty member(s) deleted successfully.`,
+                );
+            } else {
+                showFacultyAlert(
+                    "Partial Deletion",
+                    `${deletedIds.length} faculty member(s) deleted successfully. ${failedIds.length} faculty member(s) could not be deleted. Please try again.`,
+                    "error",
+                );
+            }
+        } catch (error) {
+            console.error("Bulk faculty deletion error:", error);
+
+            showFacultyAlert(
+                "Bulk Delete Failed",
+                error.message || "Unable to delete selected faculty.",
+                "error",
+            );
+        } finally {
+            resetBulkSelection();
+            updateBulkControls();
+
+            // Refresh the page after the deletion process.
+            if (deletedIds.length > 0) {
+                window.location.reload();
+            }
+        }
     });
 
     // ==========================================
@@ -1368,4 +1470,3 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTable();
     updateBulkControls();
 });
-z

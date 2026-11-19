@@ -1,5 +1,6 @@
-
-/* MAIN CONTENT */
+/* =========================================
+   MAIN CONTENT
+========================================= */
 
 .main-content {
     margin-left: 75px;
@@ -11,7 +12,6 @@
 .sidebar:hover ~ .main-content {
     margin-left: 280px;
 }
-
 
 /* =========================================
    RECYCLE BIN MAIN CONTAINER
@@ -249,6 +249,38 @@
 }
 
 /* =========================================
+   SELECTION TOOLBAR
+========================================= */
+
+.recycle-selection-toolbar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 14px;
+    padding: 13px 16px;
+    border: 1px solid #dceee3;
+    border-radius: 9px;
+    background: #f5fbf7;
+}
+
+.recycle-selection-toolbar form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+    margin: 0;
+}
+
+.selected-count {
+    margin-right: auto;
+    color: #036f35;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* =========================================
    TABLE CONTAINER
 ========================================= */
 
@@ -307,15 +339,62 @@
 }
 
 /* =========================================
-   RESTORE BUTTON
+   CHECKBOXES
 ========================================= */
 
-.restore-btn {
+.recycle-bin .recycle-checkbox-column {
+    width: 48px;
+    min-width: 48px;
+    text-align: center !important;
+}
+
+.recycle-bin input.recycle-checkbox {
+    display: inline-block;
+    width: 17px;
+    height: 17px;
+    margin: 0;
+    accent-color: #036f35;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.recycle-bin input.recycle-checkbox:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* =========================================
+   ACTION BUTTON LAYOUT
+========================================= */
+
+.recycle-action-buttons {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 8px;
+}
+
+.recycle-action-buttons form {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.recycle-action-buttons button {
+    min-height: 36px;
+}
+
+/* =========================================
+   INDIVIDUAL RESTORE BUTTON
+========================================= */
+
+.recycle-bin button.restore-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
-    min-height: 35px;
+    min-height: 36px;
     padding: 0 12px;
     border: 1px solid #cce8d6;
     border-radius: 7px;
@@ -329,11 +408,148 @@
     transition: 0.2s ease;
 }
 
-.restore-btn:hover {
+.recycle-bin button.restore-btn:hover {
     border-color: #036f35;
     background: #036f35;
     color: #fff;
     transform: translateY(-1px);
+}
+
+/* =========================================
+   BULK RESTORE SELECTED BUTTON
+========================================= */
+
+.recycle-bin button.restore-selected-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 16px;
+
+    border: 1px solid #078044;
+    border-radius: 7px;
+
+    background: #078044;
+    color: #fff;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+
+    white-space: nowrap;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.recycle-bin button.restore-selected-btn i {
+    font-size: 12px;
+}
+
+.recycle-bin button.restore-selected-btn:hover:not(:disabled) {
+    border-color: #056b38;
+    background: #056b38;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(3, 111, 53, 0.16);
+}
+
+.recycle-bin button.restore-selected-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.recycle-bin button.restore-selected-btn:disabled {
+    border-color: #cce8d6;
+    background: #dff1e5;
+    color: #8aab96;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* =========================================
+   PERMANENT DELETE BUTTONS
+========================================= */
+
+.recycle-bin button.permanent-delete-btn,
+.recycle-bin button.delete-selected-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 13px;
+    border: 1px solid #dc2626;
+    border-radius: 7px;
+    background: #dc2626;
+    color: #fff;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.recycle-bin button.permanent-delete-btn:hover,
+.recycle-bin button.delete-selected-btn:hover:not(:disabled) {
+    border-color: #b91c1c;
+    background: #b91c1c;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.recycle-bin button.delete-selected-btn:disabled {
+    border-color: #e5a0a0;
+    background: #e5a0a0;
+    color: #fff;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+}
+
+/* =========================================
+   ALERT MESSAGES
+========================================= */
+
+.recycle-bin .recycle-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 18px;
+    padding: 13px 15px;
+    border: 1px solid;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.recycle-bin .recycle-alert i {
+    flex-shrink: 0;
+    font-size: 15px;
+}
+
+.recycle-bin .recycle-alert-success {
+    border-color: #cce8d6;
+    background: #f0faf3;
+    color: #036f35;
+}
+
+.recycle-bin .recycle-alert-warning {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
 }
 
 /* =========================================
@@ -456,6 +672,29 @@
 
     .recycle-panel-header p {
         font-size: 10px;
+    }
+
+    .recycle-selection-toolbar {
+        padding: 11px;
+    }
+
+    .recycle-selection-toolbar form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .selected-count {
+        margin-right: 0;
+    }
+
+    .recycle-bin button.restore-selected-btn,
+    .recycle-bin button.delete-selected-btn {
+        width: 100%;
+    }
+
+    .recycle-action-buttons {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
 

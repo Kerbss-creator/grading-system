@@ -90,19 +90,6 @@
 @endsection
 @section('page-js')
 <script>
-    const busyModal = document.querySelector('#csvProcessingModal');
-
-    function showCsvProcessing(title, description) {
-        document.querySelector('#csvProcessingHeading').textContent = title;
-        document.querySelector('#csvProcessingMessage').textContent = description;
-        busyModal.hidden = false;
-    }
-    const uploadCsvForm = document.querySelector('#csvUploadForm');
-    uploadCsvForm?.addEventListener('submit', () => {
-        if (!uploadCsvForm.checkValidity()) return;
-        showCsvProcessing('Checking CSV file...', 'Uploading and validating records. The preview will appear when processing finishes.');
-        uploadCsvForm.querySelector('button[type="submit"]').disabled = true;
-    });
     const mode = document.querySelector('#mode');
     const rows = document.querySelectorAll('.csv-row');
 
@@ -110,29 +97,51 @@
         rows.forEach(box => {
             if (box.dataset.state === 'changed') {
                 box.disabled = mode.value !== 'add_and_update';
-                if (box.disabled) box.checked = false;
+
+                if (box.disabled) {
+                    box.checked = false;
+                }
             }
         });
     }
+
     mode?.addEventListener('change', changeMode);
     changeMode();
+
     const csvConfirmForm = document.querySelector('#csvConfirmForm');
+    const confirmImportButton = document.querySelector('#confirmImport');
+
     let csvApproved = false;
-    csvConfirmForm?.addEventListener('submit', async e => {
+
+    csvConfirmForm?.addEventListener('submit', e => {
         if (csvApproved) {
-            showCsvProcessing('Importing selected records...', 'Saving selected records to the database. Please do not submit again.');
-            document.querySelector('#confirmImport').disabled = true;
+            showCsvProcessing(
+                'Importing selected records...',
+                'Saving selected records to the database. Please do not submit again.'
+            );
+
+            confirmImportButton.disabled = true;
             return;
         }
+
         e.preventDefault();
-        const selected = [...rows].filter(b => b.checked && !b.disabled).length;
+
+        const selected = [...rows].filter(
+            box => box.checked && !box.disabled
+        ).length;
+
         if (!selected) {
-            await showModal('Select at least one valid record to import.', 'warning');
+            alert('Select at least one valid record to import.');
             return;
         }
-        if (await showConfirm(`Import ${selected} selected records? The change will be saved in the activity log.`)) {
+
+        const confirmed = window.confirm(
+            `Import ${selected} selected records? The change will be saved in the activity log.`
+        );
+
+        if (confirmed) {
             csvApproved = true;
-            csvConfirmForm.requestSubmit(e.submitter || undefined);
+            csvConfirmForm.requestSubmit();
         }
     });
 </script>

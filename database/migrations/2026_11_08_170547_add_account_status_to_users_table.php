@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('account_status')
                 ->default('active')
                 ->after('role');
-        });
+        }); 
     }
 
     /**

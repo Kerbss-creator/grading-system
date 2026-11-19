@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Services\AccountSetupService;
+
 
 class StudentController extends Controller
 {
@@ -23,7 +25,7 @@ class StudentController extends Controller
         return view('admin.student-management', compact('students'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, AccountSetupService $accountSetup)
     {
         $validated = $request->validate([
             'student_id' => [
@@ -51,11 +53,10 @@ class StudentController extends Controller
             ],
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $user = DB::transaction(function () use ($validated) {
             $fullName = $this->buildFullName($validated);
 
             // Create a pending login account.
-            // The User model's hashed cast hashes this random password.
             $user = User::create([
                 'name' => $fullName,
                 'email' => $validated['email'],
@@ -77,16 +78,24 @@ class StudentController extends Controller
                 'email' => $validated['email'],
                 'status' => $validated['status'],
             ]);
+
+            return $user;
         });
+
+        // Send the setup link after the database transaction succeeds.
+        $accountSetup->sendSetupLink($user);
 
         return response()->json([
             'success' => true,
-            'message' => 'Student and pending login account created successfully.',
+            'message' => 'Student created successfully. A password setup link has been sent to the student email.',
         ], 201);
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(
+        Request $request,
+        $id,
+        AccountSetupService $accountSetup
+    ) {
         $student = Student::with('user')->findOrFail($id);
 
         $validated = $request->validate([
@@ -111,17 +120,17 @@ class StudentController extends Controller
             ],
             'status' => [
                 'required',
-                Rule::in(['active', 'inactive']),
+                Rule::in(['active', 'inactive', 'pending']),
             ],
         ]);
 
-        DB::transaction(function () use ($student, $validated) {
-            // Lock the Student record while updating it.
+        $newAccount = false;
+
+        $user = DB::transaction(function () use ($student, $validated, &$newAccount) {
             $student = Student::whereKey($student->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            // Lock the linked User account, if one exists.
             $user = $student->user()
                 ->lockForUpdate()
                 ->first();
@@ -135,7 +144,6 @@ class StudentController extends Controller
             }
 
             if (!$user) {
-                // Create a pending account if the Student has no linked account.
                 $user = User::create([
                     'name' => $fullName,
                     'email' => $validated['email'],
@@ -143,9 +151,9 @@ class StudentController extends Controller
                     'role' => 'student',
                     'account_status' => 'pending',
                 ]);
+
+                $newAccount = true;
             } else {
-                // Update account details without changing its password,
-                // role, or account activation status.
                 $user->update([
                     'name' => $fullName,
                     'email' => $validated['email'],
@@ -164,11 +172,19 @@ class StudentController extends Controller
                 'email' => $validated['email'],
                 'status' => $validated['status'],
             ]);
+
+            return $user;
         });
+
+        if ($newAccount) {
+            $accountSetup->sendSetupLink($user);
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Student and login account updated successfully.',
+            'message' => $newAccount
+                ? 'Student updated successfully. A password setup link has been sent to the student email.'
+                : 'Student and login account updated successfully.',
         ]);
     }
 
@@ -213,6 +229,101 @@ class StudentController extends Controller
                 : 'Student status deactivated successfully.',
         ]);
     }
+
+
+    // ==========================================
+    // BULK ACTIVATE / DEACTIVATE STUDENTS
+    // ==========================================
+
+    public function bulkUpdateStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:students,id',
+            ],
+            'status' => [
+                'required',
+                Rule::in(['active', 'inactive']),
+            ],
+        ]);
+
+        $students = DB::transaction(function () use ($validated) {
+            $students = Student::whereIn('id', $validated['ids'])
+                ->lockForUpdate()
+                ->get();
+
+            if ($students->count() !== count($validated['ids'])) {
+                throw ValidationException::withMessages([
+                    'ids' => 'Some selected student records are no longer available.',
+                ]);
+            }
+
+            foreach ($students as $student) {
+                $student->status = $validated['status'];
+                $student->save();
+            }
+
+            return $students;
+        });
+
+        $action = $validated['status'] === 'active'
+            ? 'activated'
+            : 'deactivated';
+
+        return response()->json([
+            'success' => true,
+            'message' => $students->count() .
+                ' student(s) successfully ' . $action . '.',
+        ]);
+    }
+
+    // ==========================================
+    // BULK DELETE SELECTED STUDENTS
+    // ==========================================
+
+    public function bulkDestroy(
+        Request $request,
+        PersonRecordService $records,
+        SchoolCsvSnapshotService $snapshots
+    ) {
+        $validated = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:students,id',
+            ],
+        ]);
+
+        $ids = $validated['ids'];
+
+        $availableCount = Student::whereIn('id', $ids)->count();
+
+        if ($availableCount !== count($ids)) {
+            throw ValidationException::withMessages([
+                'ids' => 'Some selected student records are no longer available.',
+            ]);
+        }
+
+        // Use the existing service to soft-delete students
+        // and their linked accounts.
+        $records->delete('students', $ids);
+
+        // Refresh the Students CSV snapshot.
+        $snapshots->refresh('students');
+
+        return response()->json([
+            'success' => true,
+            'message' => count($ids) .
+                ' student(s) successfully moved to the Recycle Bin.',
+        ]);
+    }
+
 
     private function buildFullName(array $data): string
     {

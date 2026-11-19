@@ -28,7 +28,7 @@ return new class extends Migration
                 'teacher',
                 'adviser',
                 'teacher_adviser',
-            ])->default('teacher');
+            ])->nullable()->default(null);
 
             $table->enum('status', ['active', 'inactive'])
                 ->default('active');
