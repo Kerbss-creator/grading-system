@@ -237,3 +237,22 @@
 .sidebar::-webkit-scrollbar {
     display: none;
 }
+
+/* =========================================
+   ADMIN PROFILE PHOTO - TOP HEADER
+========================================= */
+
+.profile-icon,
+.profile-menu-icon {
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-icon img,
+.profile-menu-icon img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 50%;
+}

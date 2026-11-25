@@ -10,8 +10,9 @@
 
 @section('content')
     @php
-        $selectedSchoolYear = request('school_year', '2026-2027');
-        $selectedTerm = request('term', '1st-term');
+        // Use the values supplied by SubjectController.
+        $selectedSchoolYear = $selectedSchoolYear;
+        $selectedTerm = (int) $selectedTerm;
 
         $subjectStyles = [
             'Mathematics' => ['code' => 'MATH', 'icon' => 'fa-calculator', 'type' => 'mathematics'],
@@ -31,33 +32,34 @@
         <div class="selection-card">
             <div class="selection-group">
                 <label for="schoolYearSelect">School Year</label>
+
                 <div class="select-wrapper">
                     <i class="fa-solid fa-calendar-days"></i>
+
                     <select id="schoolYearSelect" name="school_year">
-                        <option value="2026-2027" @selected($selectedSchoolYear === '2026-2027')>
-                            2026 - 2027
-                        </option>
-                        <option value="2027-2028" @selected($selectedSchoolYear === '2027-2028')>
-                            2027 - 2028
-                        </option>
+                        @foreach ($schoolYears as $year)
+                            <option value="{{ $year->year_name }}" @selected($selectedSchoolYear === $year->year_name)>
+                                {{ str_replace('-', ' - ', $year->year_name) }}
+
+                                @if ($year->status === 'active')
+                                    (Current)
+                                @endif
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
 
             <div class="selection-group">
                 <label for="termSelect">Term</label>
+
                 <div class="select-wrapper">
                     <i class="fa-solid fa-book-open"></i>
+
                     <select id="termSelect" name="term">
-                        <option value="1st-term" @selected($selectedTerm === '1st-term')>
-                            1st Term
-                        </option>
-                        <option value="2nd-term" @selected($selectedTerm === '2nd-term')>
-                            2nd Term
-                        </option>
-                        <option value="3rd-term" @selected($selectedTerm === '3rd-term')>
-                            3rd Term
-                        </option>
+                        <option value="1" @selected($selectedTerm === 1)>Term 1</option>
+                        <option value="2" @selected($selectedTerm === 2)>Term 2</option>
+                        <option value="3" @selected($selectedTerm === 3)>Term 3</option>
                     </select>
                 </div>
             </div>

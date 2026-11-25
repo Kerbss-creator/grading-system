@@ -1,281 +1,205 @@
 @extends('layouts.student')
 
-@section('title', 'My Grades | Forbes Academy')
+@section('title', 'My Grades')
 
-@section('header', 'My Grades')
-@section('header-description', 'View your final grades and academic performance.')
-
-@section('page-css')
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/student/student-grades.css') }}">
-@endsection
+@endpush
 
 @section('content')
-    <div class="grades-page">
+    <div class="academic-report-page">
 
-        {{-- GRADE SUMMARY --}}
-        <section class="grades-summary">
+        <section class="academic-report">
 
-            <div class="grade-summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-book-open"></i>
+            <header class="report-header">
+
+                <img src="{{ asset('images/forbesologo.png') }}" alt="Forbes Academy Logo" class="report-school-logo">
+
+                <h2>FORBES ACADEMY</h2>
+                <p>Lakandula Drive, Legazpi City</p>
+
+                <h3>Scholastic and Behavioral Progress Report</h3>
+
+                @if($selectedTerm && $selectedSchoolYear)
+                    <p class="report-period">
+                        Term {{ $selectedTerm }} | School Year {{ $selectedSchoolYear }}
+                    </p>
+                @endif
+
+            </header>
+
+            <div class="learner-information">
+
+                <div class="learner-info-item">
+                    <span>Name of Learner:</span>
+                    <strong>
+                        {{ trim($student->first_name . ' ' . ($student->middle_name ?? '') . ' ' . $student->last_name) }}
+                    </strong>
                 </div>
 
-                <div class="summary-info">
-                    <p>Total Subjects</p>
-                    <h2 id="totalSubjects">8</h2>
-                    <span>Available subjects</span>
-                </div>
-            </div>
-
-            <div class="grade-summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-calendar-days"></i>
-                </div>
-
-                <div class="summary-info">
-                    <p>Selected Term</p>
-                    <h2 id="summaryTerm">1st Term</h2>
-                    <span id="summarySchoolYear">School Year 2026–2027</span>
-                </div>
-            </div>
-
-            <div class="grade-summary-card">
-                <div class="summary-icon">
-                    <i class="fa-solid fa-user-graduate"></i>
-                </div>
-
-                <div class="summary-info">
-                    <p>My Section</p>
-                    <h2>Grade 8 - Emerald</h2>
-                    <span>Junior High School</span>
-                </div>
-            </div>
-
-        </section>
-
-        {{-- GRADES CONTENT --}}
-        <section class="grades-panel">
-
-            <div class="grades-panel-heading">
-                <div>
-                    <h2>Grade Overview</h2>
-                    <p>Your final grades and remarks by subject.</p>
-                </div>
-
-                <div class="grades-status">
-                    <i class="fa-solid fa-circle-check"></i>
-                    Student View
-                </div>
-            </div>
-
-            {{-- FILTERS --}}
-            <div class="grades-filters">
-
-                <div class="grades-search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-
-                    <input type="search" id="subjectSearch" placeholder="Search subject..." aria-label="Search subjects">
-                </div>
-
-                <div class="filter-control">
-                    <label for="schoolYearFilter">School Year</label>
-
-                    <select id="schoolYearFilter">
-                        <option value="2026-2027">2026–2027</option>
-                        <option value="2027-2028">2027–2028</option>
-                    </select>
-                </div>
-
-                <div class="filter-control">
-                    <label for="termFilter">Grading Term</label>
-
-                    <select id="termFilter">
-                        <option value="1">1st Term</option>
-                        <option value="2">2nd Term</option>
-                        <option value="3">3rd Term</option>
-                    </select>
+                <div class="learner-info-item">
+                    <span>Grade Level:</span>
+                    <strong>{{ $student->grade_level }}</strong>
                 </div>
 
             </div>
 
-            {{-- GRADES TABLE --}}
-            <div class="grades-table-wrapper">
-
-                <table class="grades-table">
-                    <thead>
-                        <tr>
-                            <th>Subject</th>
-                            <th>Final Grade</th>
-                            <th>Remarks</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="gradesTableBody">
-
-                        {{-- SAMPLE DATA: Replace with database records later. --}}
-
-                        <tr data-subject="Mathematics" data-term-1="90" data-term-2="92" data-term-3="91">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-calculator"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Mathematics</strong>
-                                        <span>Core Subject</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="grade-value">90</td>
-                            <td><span class="remarks-text">Passed</span></td>
-                            <td><span class="grade-status">Released</span></td>
-                        </tr>
-
-                        <tr data-subject="English" data-term-1="92" data-term-2="91" data-term-3="93">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-book"></i>
-                                    </div>
-                                    <div>
-                                        <strong>English</strong>
-                                        <span>Core Subject</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="grade-value">92</td>
-                            <td><span class="remarks-text">Passed</span></td>
-                            <td><span class="grade-status">Released</span></td>
-                        </tr>
-
-                        <tr data-subject="Science" data-term-1="88" data-term-2="90" data-term-3="89">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-flask"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Science</strong>
-                                        <span>Core Subject</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="grade-value">88</td>
-                            <td><span class="remarks-text">Passed</span></td>
-                            <td><span class="grade-status">Released</span></td>
-                        </tr>
-
-                        <tr data-subject="Filipino" data-term-1="85" data-term-2="87" data-term-3="88">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-language"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Filipino</strong>
-                                        <span>Core Subject</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="grade-value">85</td>
-                            <td><span class="remarks-text">Passed</span></td>
-                            <td><span class="grade-status">Released</span></td>
-                        </tr>
-
-                        <tr data-subject="Araling Panlipunan" data-term-1="89" data-term-2="90" data-term-3="91">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-earth-asia"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Araling Panlipunan</strong>
-                                        <span>Core Subject</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="grade-value">89</td>
-                            <td><span class="remarks-text">Passed</span></td>
-                            <td><span class="grade-status">Released</span></td>
-                        </tr>
-
-                        <tr data-subject="TLE" data-term-1="91" data-term-2="92" data-term-3="90">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                                    </div>
-                                    <div>
-                                        <strong>TLE</strong>
-                                        <span>Core Subject</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="grade-value">91</td>
-                            <td><span class="remarks-text">Passed</span></td>
-                            <td><span class="grade-status">Released</span></td>
-                        </tr>
-
-                        <tr data-subject="MAPEH" data-term-1="93" data-term-2="94" data-term-3="92">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-music"></i>
-                                    </div>
-                                    <div>
-                                        <strong>MAPEH</strong>
-                                        <span>Core Subject</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="grade-value">93</td>
-                            <td><span class="remarks-text">Passed</span></td>
-                            <td><span class="grade-status">Released</span></td>
-                        </tr>
-
-                        <tr data-subject="Computer" data-term-1="90" data-term-2="91" data-term-3="92">
-                            <td>
-                                <div class="subject-cell">
-                                    <div class="subject-icon">
-                                        <i class="fa-solid fa-computer"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Computer</strong>
-                                        <span>Core Subject</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="grade-value">90</td>
-                            <td><span class="remarks-text">Passed</span></td>
-                            <td><span class="grade-status">Released</span></td>
-                        </tr>
-
-                    </tbody>
-                </table>
-
-                <div class="grades-empty-state" id="gradesEmptyState" hidden>
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <h3>No subjects found</h3>
-                    <p>Try another subject name or check your filters.</p>
-                </div>
-
-            </div>
-
-            <div class="grades-panel-footer">
-                <p>
+            @if(!$selectedSchoolYear)
+                <div class="publication-notice">
                     <i class="fa-solid fa-circle-info"></i>
-                    Only grades released by the school are displayed.
-                </p>
+                    No active school year is currently set.
+                </div>
+            @elseif(!$isPublished)
+                <div class="publication-notice">
+                    <i class="fa-solid fa-clock"></i>
+                    Grades for Term {{ $selectedTerm }} have not yet been published.
+                </div>
+            @endif
 
-                <span id="visibleSubjects">Showing 8 subjects</span>
+            <div class="report-tables">
+
+                {{-- SCHOLASTIC PROGRESS --}}
+                <section class="report-table-section">
+
+                    <h4>Scholastic Progress</h4>
+
+                    <table class="scholastic-table">
+
+                        <thead>
+                            <tr>
+                                <th>Learning Area</th>
+                                <th>Term Grade</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @php
+                                $reportSubjects = [
+                                    ['subject' => 'Filipino', 'component' => null],
+                                    ['subject' => 'English', 'component' => null],
+                                    ['subject' => 'Mathematics', 'component' => null],
+                                    ['subject' => 'Science', 'component' => null],
+                                    ['subject' => 'Araling Panlipunan', 'component' => null],
+                                    ['subject' => 'TLE', 'component' => null],
+                                    ['subject' => 'Values Education', 'component' => null],
+                                    ['subject' => 'MAPEH', 'component' => 'Music and Arts'],
+                                    ['subject' => 'MAPEH', 'component' => 'PE and Health'],
+                                    ['subject' => 'Computer', 'component' => null],
+                                ];
+                            @endphp
+
+                            @foreach($reportSubjects as $item)
+
+                                                @php
+                                                    $record = $grades->first(function ($grade) use ($item) {
+                                                        $assignment = $grade->teachingAssignment;
+
+                                                        if (!$assignment) {
+                                                            return false;
+                                                        }
+
+                                                        $sameSubject = strtolower(trim($assignment->subject))
+                                                            === strtolower($item['subject']);
+
+                                                        if (!$sameSubject) {
+                                                            return false;
+                                                        }
+
+                                                        if ($item['component'] !== null) {
+                                                            return strtolower(trim($assignment->component ?? ''))
+                                                                === strtolower($item['component']);
+                                                        }
+
+                                                        return true;
+                                                    });
+                                                @endphp
+
+                                                <tr>
+                                                    <td>
+                                                        {{ $item['component'] ?? $item['subject'] }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $record && $record->term_grade !== null
+                                ? number_format((float) $record->term_grade, 0)
+                                : '—' }}
+                                                    </td>
+                                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                </section>
+
+                {{-- BEHAVIORAL PROGRESS --}}
+                <section class="report-table-section">
+
+                    <h4>Behavioral Progress</h4>
+
+                    <table class="behavioral-table">
+
+                        <thead>
+                            <tr>
+                                <th>Core Values</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @for($i = 0; $i < 8; $i++)
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            @endfor
+                        </tbody>
+
+                    </table>
+
+                </section>
+
             </div>
+
+            {{-- REPORT SIGNATORIES --}}
+            <footer class="report-signatories">
+
+                <div class="signatory">
+
+                    <div class="signature-line"></div>
+
+                    <strong>
+                        {{ $adviser
+        ? trim($adviser->first_name . ' ' . ($adviser->middle_name ?? '') . ' ' . $adviser->last_name)
+        : 'Not Yet Assigned' }}
+                    </strong>
+
+                    <span>Class Adviser</span>
+
+                </div>
+
+                <div class="signatory">
+
+                    <div class="signature-line"></div>
+
+                    <strong>
+                        {{ $administrator?->name ?? 'Not Yet Assigned' }}
+                    </strong>
+
+                    <span>Administrator</span>
+
+                </div>
+
+            </footer>
 
         </section>
 
     </div>
 @endsection
 
-@section('page-js')
+@push('scripts')
     <script src="{{ asset('js/student/student-grades.js') }}"></script>
-@endsection
+@endpush

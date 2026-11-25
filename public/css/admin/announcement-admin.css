@@ -36,6 +36,227 @@
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
 }
 
+/* =========================================
+   ANNOUNCEMENT TOOLBAR
+========================================= */
+
+.announcement-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 13px 16px;
+    border: 1px solid #e5ebe7;
+    border-radius: 10px;
+    background: #f8fbf9;
+}
+
+.select-all-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #39483e;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.select-all-label input,
+.announcement-select {
+    width: 16px;
+    height: 16px;
+    accent-color: #036f35;
+    cursor: pointer;
+}
+
+.bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+#selectedAnnouncementCount {
+    color: #77827b;
+    font-size: 11px;
+}
+
+#deleteSelectedAnnouncements {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 35px;
+    padding: 0 13px;
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+    background: #fff1f1;
+    color: #c62828;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#deleteSelectedAnnouncements:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+#deleteSelectedAnnouncements:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* =========================================
+   ANNOUNCEMENT CARD CHECKBOX
+========================================= */
+
+.announcement-select-wrap {
+    display: flex;
+    align-items: center;
+    padding-top: 15px;
+    flex-shrink: 0;
+}
+
+/* =========================================
+   KEBAB MENU
+========================================= */
+
+.announcement-heading {
+    align-items: flex-start;
+}
+
+.announcement-heading-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.announcement-menu {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.announcement-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border: 1px solid #e5ebe7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #58665d;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.announcement-menu-toggle:hover,
+.announcement-menu-toggle[aria-expanded="true"] {
+    background: #eaf5ed;
+    border-color: #c8dfce;
+    color: #036f35;
+}
+
+.announcement-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: 0;
+    z-index: 100;
+    display: none;
+    width: 155px;
+    padding: 6px;
+    border: 1px solid #e7ece8;
+    border-radius: 9px;
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.announcement-menu-dropdown.show {
+    display: block;
+    animation: announcementMenuIn 0.15s ease;
+}
+
+.announcement-menu-dropdown button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #39443d;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+
+.announcement-menu-dropdown button:hover {
+    background: #f2f6f3;
+}
+
+.announcement-menu-dropdown .view-btn i {
+    color: #2563eb;
+}
+
+.announcement-menu-dropdown .edit-btn i {
+    color: #d97706;
+}
+
+.announcement-menu-dropdown .delete-btn {
+    color: #dc2626;
+}
+
+.announcement-menu-dropdown .delete-btn i {
+    color: #dc2626;
+}
+
+.announcement-menu-dropdown .delete-btn:hover {
+    background: #fff1f1;
+}
+
+@keyframes announcementMenuIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================
+   RESPONSIVE TOOLBAR
+========================================= */
+
+@media (max-width: 480px) {
+    .announcement-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .bulk-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .announcement-select-wrap {
+        padding-top: 12px;
+    }
+
+    .announcement-menu-dropdown {
+        right: 0;
+    }
+}
+
 /* SECTION TOP */
 
 .section-top {
@@ -369,7 +590,12 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.45);
+
+    /* Background blur */
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -382,7 +608,16 @@
     pointer-events: auto;
 }
 
+/* Disable background scrolling */
+body.modal-open {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+/* Keep modal content clear */
 .modal-box {
+    position: relative;
+    z-index: 1;
     width: 100%;
     max-width: 520px;
     max-height: 90vh;
@@ -933,5 +1168,501 @@
 
     .success-modal h2 {
         font-size: 20px;
+    }
+}
+
+/* =========================================
+   BULK DELETE CONFIRMATION MODAL
+========================================= */
+
+.bulk-delete-modal {
+    width: 100%;
+    max-width: 430px;
+    padding: 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+    animation: bulkDeleteModalIn 0.2s ease;
+}
+
+.bulk-delete-modal .modal-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 25px;
+}
+
+.bulk-delete-modal .delete-icon {
+    color: #c2413b;
+    background: #fff0ef;
+}
+
+.bulk-delete-modal .modal-content h2 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #26332a;
+}
+
+.bulk-delete-modal .modal-content p {
+    margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #6b756e;
+}
+
+.bulk-delete-modal .delete-warning {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: #c2413b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.bulk-delete-modal .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 27px;
+}
+
+.bulk-delete-modal .modal-actions button {
+    min-width: 125px;
+    padding: 11px 17px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.bulk-delete-modal .cancel-btn {
+    background: #f0f2f0;
+    color: #465149;
+}
+
+.bulk-delete-modal .cancel-btn:hover {
+    background: #e3e8e4;
+}
+
+.bulk-delete-modal .delete-confirm-btn {
+    background: #c2413b;
+    color: #ffffff;
+}
+
+.bulk-delete-modal .delete-confirm-btn:hover {
+    background: #a9322d;
+}
+
+.bulk-delete-modal .delete-confirm-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@keyframes bulkDeleteModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* BULK DELETE MODAL - BLUR AND CENTER */
+
+#bulkDeleteModal {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    z-index: 99999;
+}
+
+#bulkDeleteModal.show {
+    display: flex !important;
+}
+
+#bulkDeleteModal .bulk-delete-modal {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    margin: auto;
+}
+
+/* =========================================
+   PROFESSIONAL ANNOUNCEMENT MODAL DESIGN
+========================================= */
+
+/* Main Modal Overlay */
+.modal {
+    padding: 20px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* Modal Container */
+.modal-box {
+    width: 100%;
+    max-width: 560px;
+    padding: 30px;
+    border: 1px solid #e5ece7;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+}
+
+/* Modal Header */
+.modal-header {
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #edf1ee;
+}
+
+.modal-header h2 {
+    color: #036f35;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+.modal-header p {
+    color: #7b8580;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Close Button */
+.modal-header button {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e5ebe7;
+    border-radius: 9px;
+    background: #f8faf8;
+    color: #68736c;
+    transition: 0.2s ease;
+}
+
+.modal-header button:hover {
+    background: #fff0f0;
+    border-color: #f2d5d5;
+    color: #c0392b;
+}
+
+/* Form Labels */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #34443a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Inputs and Select */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    border: 1px solid #dfe7e1;
+    border-radius: 9px;
+    background: #fbfcfb;
+    color: #26352b;
+    font-size: 13px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.form-group input,
+.form-group select {
+    min-height: 46px;
+    padding: 0 13px;
+}
+
+.form-group textarea {
+    min-height: 145px;
+    padding: 13px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #036f35;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.09);
+}
+
+/* Modal Action Buttons */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 20px;
+    margin-top: 10px;
+    border-top: 1px solid #edf1ee;
+}
+
+.modal-actions button {
+    min-height: 42px;
+    padding: 0 19px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+/* Cancel Button */
+.cancel-btn {
+    background: #ffffff;
+    border: 1px solid #dfe6e1;
+    color: #58645c;
+}
+
+.cancel-btn:hover {
+    background: #f3f6f4;
+    border-color: #cbd6ce;
+}
+
+/* Save Button */
+.save-btn {
+    background: #036f35;
+    color: #ffffff;
+    border: 1px solid #036f35;
+    box-shadow: 0 4px 10px rgba(3, 111, 53, 0.14);
+}
+
+.save-btn:hover {
+    background: #025a2b;
+    border-color: #025a2b;
+    transform: translateY(-1px);
+}
+
+/* =========================================
+   VIEW ANNOUNCEMENT MODAL
+========================================= */
+
+.view-box {
+    max-width: 580px;
+}
+
+.view-title {
+    padding: 18px;
+    border: 1px solid #e5eee8;
+    border-radius: 12px;
+    background: #f8fbf9;
+}
+
+.view-title h2 {
+    color: #263d2e;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.view-title p {
+    margin-top: 7px;
+    color: #89938c;
+    font-size: 12px;
+}
+
+.view-details > div {
+    padding: 15px;
+    border: 1px solid #e8eee9;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.view-details span,
+.message-box span {
+    color: #7a867e;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.view-details strong {
+    color: #34443a;
+    font-size: 13px;
+}
+
+.message-box {
+    padding: 18px;
+    border: 1px solid #e5ece7;
+    border-radius: 12px;
+    background: #f9fbf9;
+}
+
+.message-box p {
+    color: #46534a;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+/* =========================================
+   DELETE ANNOUNCEMENT MODAL
+========================================= */
+
+.delete-box {
+    max-width: 430px;
+    text-align: center;
+}
+
+.delete-content h3 {
+    margin-top: 15px;
+    color: #29372e;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.delete-content p {
+    margin-top: 9px;
+    color: #7a847d;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.delete-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: #fff1f0;
+    color: #d64545;
+}
+
+.delete-confirm-btn {
+    background: #c0392b;
+    border: 1px solid #c0392b;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(192, 57, 43, 0.12);
+}
+
+.delete-confirm-btn:hover {
+    background: #a93226;
+    border-color: #a93226;
+}
+
+/* =========================================
+   BULK DELETE MODAL
+========================================= */
+
+.bulk-delete-modal {
+    max-width: 430px;
+    padding: 32px;
+    border: 1px solid #f0e2e2;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+}
+
+.bulk-delete-modal .modal-content h2 {
+    color: #29372e;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.bulk-delete-modal .modal-content p {
+    color: #7a847d;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* =========================================
+   SUCCESS MODAL
+========================================= */
+
+.success-modal {
+    max-width: 420px;
+    padding: 32px;
+    border: 1px solid #e5ece7;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.18);
+}
+
+.success-modal h2 {
+    color: #036f35;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.success-modal p {
+    color: #77827a;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.success-modal button {
+    min-height: 44px;
+    border-radius: 9px;
+    background: #036f35;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.success-modal button:hover {
+    background: #025a2b;
+}
+
+/* =========================================
+   RESPONSIVE MODALS
+========================================= */
+
+@media (max-width: 600px) {
+    .modal {
+        padding: 14px;
+    }
+
+    .modal-box {
+        padding: 23px 19px;
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modal-actions button {
+        width: 100%;
+    }
+
+    .bulk-delete-modal,
+    .success-modal {
+        padding: 24px 19px;
     }
 }

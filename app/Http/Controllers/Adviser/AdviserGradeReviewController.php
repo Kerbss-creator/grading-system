@@ -7,17 +7,44 @@ use App\Models\Faculty;
 use App\Models\AdvisoryAssignment;
 use App\Models\TeachingAssignment;
 use App\Models\GradeRecord;
+use App\Models\SchoolYear;
+use App\Services\ActivityRecorder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdviserGradeReviewController extends Controller
 {
+    protected ActivityRecorder $activityRecorder;
+
+    public function __construct(ActivityRecorder $activityRecorder)
+    {
+        $this->activityRecorder = $activityRecorder;
+    }
+
+    /**
+     * Get the currently active school year.
+     */
+    private function getActiveSchoolYear(): SchoolYear
+    {
+        return SchoolYear::query()
+            ->where('status', 'active')
+            ->firstOrFail();
+    }
+
     /**
      * Get the active faculty and advisory grade levels
      * assigned to the logged-in adviser.
      */
     private function getAdviserContext(string $schoolYear): array
     {
+        $activeSchoolYear = $this->getActiveSchoolYear();
+
+        abort_unless(
+            $activeSchoolYear->year_name === $schoolYear,
+            404,
+            'You can only access the active school year.'
+        );
+
         $faculty = Faculty::where('user_id', auth()->id())
             ->where('status', 'active')
             ->first();
@@ -28,10 +55,7 @@ class AdviserGradeReviewController extends Controller
             'faculty_id',
             $faculty->id
         )
-            ->where(function ($query) use ($schoolYear) {
-                $query->where('school_year', $schoolYear)
-                    ->orWhereNull('school_year');
-            })
+            ->where('school_year', $schoolYear)
             ->get();
 
         $assignedGradeLevels = $advisoryAssignments
@@ -47,7 +71,7 @@ class AdviserGradeReviewController extends Controller
 
     /**
      * Validate that the teaching assignment belongs
-     * to the adviser's assigned grade level.
+     * to the adviser's assigned grade level and school year.
      */
     private function getAuthorizedAssignment(
         int $assignmentId,
@@ -61,7 +85,9 @@ class AdviserGradeReviewController extends Controller
             'You have no advisory assignment for this school year.'
         );
 
-        return TeachingAssignment::whereKey($assignmentId)
+        return TeachingAssignment::query()
+            ->whereKey($assignmentId)
+            ->where('school_year', $schoolYear)
             ->whereIn(
                 'grade_level',
                 $context['assignedGradeLevels']
@@ -74,7 +100,17 @@ class AdviserGradeReviewController extends Controller
      */
     public function index(Request $request)
     {
-        $schoolYear = '2026-2027';
+        $activeSchoolYear = $this->getActiveSchoolYear();
+
+        $schoolYear = $activeSchoolYear->year_name;
+
+        // Prevent accessing another school year's review records.
+        if (
+            $request->filled('school_year') &&
+            $request->query('school_year') !== $schoolYear
+        ) {
+            abort(404);
+        }
 
         $context = $this->getAdviserContext($schoolYear);
 
@@ -97,37 +133,31 @@ class AdviserGradeReviewController extends Controller
                     'approved',
                     'returned',
                 ])
-                ->whereHas('teachingAssignment', function ($query) use ($assignedGradeLevels) {
-                    $query->whereIn(
-                        'grade_level',
-                        $assignedGradeLevels
-                    );
+                ->whereHas('teachingAssignment', function ($query) use ($assignedGradeLevels, $schoolYear) {
+                    $query->where('school_year', $schoolYear)
+                        ->whereIn(
+                            'grade_level',
+                            $assignedGradeLevels
+                        );
                 })
                 ->get();
 
-            // Group records into one batch per assignment,
-            // school year, and term.
+            /**
+             * Separate records by assignment, school year,
+             * term, and status.
+             */
             $submissions = $records
                 ->groupBy(function ($record) {
                     return $record->teaching_assignment_id
                         . '|' . $record->school_year
-                        . '|' . $record->term;
+                        . '|' . $record->term
+                        . '|' . $record->status;
                 })
                 ->map(function ($group) {
 
                     $latestRecord = $group
                         ->sortByDesc('submitted_at')
                         ->first();
-
-                    $statuses = $group
-                        ->pluck('status')
-                        ->unique()
-                        ->values();
-
-                    // A batch must have one consistent status.
-                    $batchStatus = $statuses->count() === 1
-                        ? $statuses->first()
-                        : 'inconsistent';
 
                     return (object) [
                         'teaching_assignment_id' =>
@@ -154,22 +184,24 @@ class AdviserGradeReviewController extends Controller
                         'student_count' =>
                             $group->count(),
 
-                        'status' => $batchStatus,
+                        'status' =>
+                            $latestRecord->status,
                     ];
                 })
                 ->values();
 
+            // Only currently submitted records appear here.
             $pendingReviews = $submissions
                 ->where('status', 'submitted')
                 ->sortByDesc('submitted_at')
                 ->values();
 
+            // Previously reviewed records remain in history.
             $reviewHistory = $submissions
                 ->whereIn('status', [
                     'forwarded_to_admin',
                     'approved',
                     'returned',
-                    'inconsistent',
                 ])
                 ->sortByDesc('submitted_at')
                 ->values();
@@ -203,7 +235,7 @@ class AdviserGradeReviewController extends Controller
     }
 
     /**
-     * Display the detailed student grades for one batch.
+     * Display only currently submitted student grades.
      */
     public function show(
         Request $request,
@@ -227,39 +259,17 @@ class AdviserGradeReviewController extends Controller
             ->where('teaching_assignment_id', $assignment->id)
             ->where('school_year', $schoolYear)
             ->where('term', $term)
-            ->orderBy(
-                'student_id'
-            )
+            ->where('status', 'submitted')
+            ->orderBy('student_id')
             ->get();
 
         abort_if(
             $gradeRecords->isEmpty(),
             404,
-            'No grade records found for this submission.'
+            'No pending submitted grade records found.'
         );
 
-        $statuses = $gradeRecords
-            ->pluck('status')
-            ->unique()
-            ->values();
-
-        abort_unless(
-            $statuses->count() === 1,
-            409,
-            'This submission has inconsistent student record statuses. Please contact the administrator.'
-        );
-
-        $batchStatus = $statuses->first();
-
-        abort_unless(
-            in_array($batchStatus, [
-                'submitted',
-                'forwarded_to_admin',
-                'approved',
-                'returned',
-            ], true),
-            404
-        );
+        $batchStatus = 'submitted';
 
         $gradeRecords = $gradeRecords
             ->sortBy(function ($record) {
@@ -278,7 +288,7 @@ class AdviserGradeReviewController extends Controller
     }
 
     /**
-     * Forward the entire grade submission batch to Admin.
+     * Forward only currently submitted records to Admin.
      */
     public function forward(
         Request $request,
@@ -289,6 +299,20 @@ class AdviserGradeReviewController extends Controller
         abort_unless(in_array($term, [1, 2, 3], true), 404);
 
         DB::transaction(function () use ($assignmentId, $schoolYear, $term) {
+
+            // Lock the active school year before forwarding.
+            $activeSchoolYear = SchoolYear::query()
+                ->where('status', 'active')
+                ->lockForUpdate()
+                ->first();
+
+            if (
+                !$activeSchoolYear ||
+                $activeSchoolYear->year_name !== $schoolYear
+            ) {
+                abort(409, 'The selected school year is no longer active.');
+            }
+
             $assignment = $this->getAuthorizedAssignment(
                 $assignmentId,
                 $schoolYear
@@ -300,24 +324,14 @@ class AdviserGradeReviewController extends Controller
             )
                 ->where('school_year', $schoolYear)
                 ->where('term', $term)
+                ->where('status', 'submitted')
                 ->lockForUpdate()
                 ->get();
 
             abort_if(
                 $gradeRecords->isEmpty(),
-                404,
-                'No grade records found.'
-            );
-
-            $statuses = $gradeRecords
-                ->pluck('status')
-                ->unique();
-
-            abort_unless(
-                $statuses->count() === 1
-                && $statuses->first() === 'submitted',
                 409,
-                'This batch is no longer awaiting adviser review.'
+                'There are no pending submitted grades to forward.'
             );
 
             GradeRecord::whereIn(
@@ -328,18 +342,42 @@ class AdviserGradeReviewController extends Controller
                         'adviser_reviewed_at' => now(),
                         'updated_at' => now(),
                     ]);
+
+            // Audit log: Adviser forwarded grades to Administrator.
+            $this->activityRecorder->record(
+                action: 'forward',
+                type: 'grade_review',
+                key: $assignment->id . '|' .
+                $schoolYear . '|' .
+                $term,
+                before: [
+                    'status' => 'submitted',
+                ],
+                after: [
+                    'status' => 'forwarded_to_admin',
+                ],
+                details: [
+                    'teaching_assignment_id' => $assignment->id,
+                    'grade_level' => $assignment->grade_level,
+                    'subject' => $assignment->subject,
+                    'school_year' => $schoolYear,
+                    'term' => $term,
+                    'student_count' => $gradeRecords->count(),
+                    'description' => 'Adviser forwarded submitted grades to the Administrator for approval.',
+                ]
+            );
         });
 
         return redirect()
             ->route('adviser.grade-review')
             ->with(
                 'success',
-                'Grade submission successfully forwarded to the Administrator.'
+                'Submitted student grades successfully forwarded to the Administrator.'
             );
     }
 
     /**
-     * Return the entire grade submission batch to the Teacher.
+     * Return only currently submitted records to the Teacher.
      */
     public function returnToTeacher(
         Request $request,
@@ -349,7 +387,33 @@ class AdviserGradeReviewController extends Controller
     ) {
         abort_unless(in_array($term, [1, 2, 3], true), 404);
 
-        DB::transaction(function () use ($assignmentId, $schoolYear, $term) {
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $reason = trim($validated['reason']);
+
+        abort_if(
+            $reason === '',
+            422,
+            'Please provide a valid reason for returning the grades.'
+        );
+
+        DB::transaction(function () use ($assignmentId, $schoolYear, $term, $reason) {
+
+            // Lock the active school year before returning grades.
+            $activeSchoolYear = SchoolYear::query()
+                ->where('status', 'active')
+                ->lockForUpdate()
+                ->first();
+
+            if (
+                !$activeSchoolYear ||
+                $activeSchoolYear->year_name !== $schoolYear
+            ) {
+                abort(409, 'The selected school year is no longer active.');
+            }
+
             $assignment = $this->getAuthorizedAssignment(
                 $assignmentId,
                 $schoolYear
@@ -361,24 +425,14 @@ class AdviserGradeReviewController extends Controller
             )
                 ->where('school_year', $schoolYear)
                 ->where('term', $term)
+                ->where('status', 'submitted')
                 ->lockForUpdate()
                 ->get();
 
             abort_if(
                 $gradeRecords->isEmpty(),
-                404,
-                'No grade records found.'
-            );
-
-            $statuses = $gradeRecords
-                ->pluck('status')
-                ->unique();
-
-            abort_unless(
-                $statuses->count() === 1
-                && $statuses->first() === 'submitted',
                 409,
-                'This batch is no longer awaiting adviser review.'
+                'There are no pending submitted grades to return.'
             );
 
             GradeRecord::whereIn(
@@ -387,15 +441,42 @@ class AdviserGradeReviewController extends Controller
             )->update([
                         'status' => 'returned',
                         'adviser_reviewed_at' => now(),
+                        'adviser_return_reason' => $reason,
+                        'admin_return_reason' => null,
                         'updated_at' => now(),
                     ]);
+
+            // Audit log: Adviser returned grades to Teacher.
+            $this->activityRecorder->record(
+                action: 'return',
+                type: 'grade_review',
+                key: $assignment->id . '|' .
+                $schoolYear . '|' .
+                $term,
+                before: [
+                    'status' => 'submitted',
+                ],
+                after: [
+                    'status' => 'returned',
+                ],
+                details: [
+                    'teaching_assignment_id' => $assignment->id,
+                    'grade_level' => $assignment->grade_level,
+                    'subject' => $assignment->subject,
+                    'school_year' => $schoolYear,
+                    'term' => $term,
+                    'student_count' => $gradeRecords->count(),
+                    'return_reason' => $reason,
+                    'description' => 'Adviser returned submitted grades to the Teacher for correction.',
+                ]
+            );
         });
 
         return redirect()
             ->route('adviser.grade-review')
             ->with(
                 'success',
-                'Grade submission successfully returned to the Teacher.'
+                'Submitted student grades successfully returned to the Teacher with your feedback.'
             );
     }
 }

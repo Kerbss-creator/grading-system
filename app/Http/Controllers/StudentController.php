@@ -6,13 +6,13 @@ use App\Models\Student;
 use App\Models\User;
 use App\Services\PersonRecordService;
 use App\Services\SchoolCsvSnapshotService;
+use App\Services\AccountSetupService;
+use App\Services\ActivityRecorder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use App\Services\AccountSetupService;
-
 
 class StudentController extends Controller
 {
@@ -25,8 +25,11 @@ class StudentController extends Controller
         return view('admin.student-management', compact('students'));
     }
 
-    public function store(Request $request, AccountSetupService $accountSetup)
-    {
+    public function store(
+        Request $request,
+        AccountSetupService $accountSetup,
+        ActivityRecorder $audit
+    ) {
         $validated = $request->validate([
             'student_id' => [
                 'required',
@@ -34,12 +37,14 @@ class StudentController extends Controller
                 'max:255',
                 'unique:students,student_id',
             ],
+
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'grade_level' => ['required', 'string', 'max:255'],
             'sex' => ['required', 'string', 'max:255'],
             'school_year' => ['required', 'string', 'max:255'],
+
             'email' => [
                 'required',
                 'email',
@@ -47,13 +52,14 @@ class StudentController extends Controller
                 'unique:students,email',
                 'unique:users,email',
             ],
+
             'status' => [
                 'required',
                 Rule::in(['active', 'inactive']),
             ],
         ]);
 
-        $user = DB::transaction(function () use ($validated) {
+        $user = DB::transaction(function () use ($validated, $audit) {
             $fullName = $this->buildFullName($validated);
 
             // Create a pending login account.
@@ -66,7 +72,7 @@ class StudentController extends Controller
             ]);
 
             // Create the Student record and link its login account.
-            Student::create([
+            $student = Student::create([
                 'user_id' => $user->id,
                 'student_id' => $validated['student_id'],
                 'first_name' => $validated['first_name'],
@@ -78,6 +84,25 @@ class StudentController extends Controller
                 'email' => $validated['email'],
                 'status' => $validated['status'],
             ]);
+
+            $audit->record(
+                'create',
+                'students',
+                (string) $student->student_id,
+                null,
+                $student->only([
+                    'student_id',
+                    'first_name',
+                    'middle_name',
+                    'last_name',
+                    'grade_level',
+                    'sex',
+                    'school_year',
+                    'email',
+                    'status',
+                ]),
+                ['source' => 'student_management']
+            );
 
             return $user;
         });
@@ -94,7 +119,8 @@ class StudentController extends Controller
     public function update(
         Request $request,
         $id,
-        AccountSetupService $accountSetup
+        AccountSetupService $accountSetup,
+        ActivityRecorder $audit
     ) {
         $student = Student::with('user')->findOrFail($id);
 
@@ -105,12 +131,14 @@ class StudentController extends Controller
                 'max:255',
                 Rule::unique('students', 'student_id')->ignore($student->id),
             ],
+
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'grade_level' => ['required', 'string', 'max:255'],
             'sex' => ['required', 'string', 'max:255'],
             'school_year' => ['required', 'string', 'max:255'],
+
             'email' => [
                 'required',
                 'email',
@@ -118,6 +146,7 @@ class StudentController extends Controller
                 Rule::unique('students', 'email')->ignore($student->id),
                 Rule::unique('users', 'email')->ignore($student->user_id),
             ],
+
             'status' => [
                 'required',
                 Rule::in(['active', 'inactive', 'pending']),
@@ -126,10 +155,22 @@ class StudentController extends Controller
 
         $newAccount = false;
 
-        $user = DB::transaction(function () use ($student, $validated, &$newAccount) {
+        $user = DB::transaction(function () use ($student, $validated, &$newAccount, $audit) {
             $student = Student::whereKey($student->id)
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            $before = $student->only([
+                'student_id',
+                'first_name',
+                'middle_name',
+                'last_name',
+                'grade_level',
+                'sex',
+                'school_year',
+                'email',
+                'status',
+            ]);
 
             $user = $student->user()
                 ->lockForUpdate()
@@ -173,6 +214,29 @@ class StudentController extends Controller
                 'status' => $validated['status'],
             ]);
 
+            $after = $student->fresh()->only([
+                'student_id',
+                'first_name',
+                'middle_name',
+                'last_name',
+                'grade_level',
+                'sex',
+                'school_year',
+                'email',
+                'status',
+            ]);
+
+            if ($before !== $after) {
+                $audit->record(
+                    'update',
+                    'students',
+                    (string) $student->student_id,
+                    $before,
+                    $after,
+                    ['source' => 'student_management']
+                );
+            }
+
             return $user;
         });
 
@@ -205,38 +269,29 @@ class StudentController extends Controller
         ]);
     }
 
-    public function toggleStatus($id)
-    {
-        $student = DB::transaction(function () use ($id) {
-            $student = Student::whereKey($id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            $student->status = $student->status === 'active'
-                ? 'inactive'
-                : 'active';
-
-            $student->save();
-
-            return $student;
-        });
+    public function toggleStatus(
+        $id,
+        PersonRecordService $records
+    ) {
+        $status = $records->changeStatus('students', (int) $id);
 
         return response()->json([
             'success' => true,
-            'status' => $student->status,
-            'message' => $student->status === 'active'
+            'status' => $status,
+            'message' => $status === 'active'
                 ? 'Student status activated successfully.'
                 : 'Student status deactivated successfully.',
         ]);
     }
 
-
     // ==========================================
     // BULK ACTIVATE / DEACTIVATE STUDENTS
     // ==========================================
 
-    public function bulkUpdateStatus(Request $request)
-    {
+    public function bulkUpdateStatus(
+        Request $request,
+        PersonRecordService $records
+    ) {
         $validated = $request->validate([
             'ids' => ['required', 'array', 'min:1'],
             'ids.*' => [
@@ -251,24 +306,11 @@ class StudentController extends Controller
             ],
         ]);
 
-        $students = DB::transaction(function () use ($validated) {
-            $students = Student::whereIn('id', $validated['ids'])
-                ->lockForUpdate()
-                ->get();
-
-            if ($students->count() !== count($validated['ids'])) {
-                throw ValidationException::withMessages([
-                    'ids' => 'Some selected student records are no longer available.',
-                ]);
-            }
-
-            foreach ($students as $student) {
-                $student->status = $validated['status'];
-                $student->save();
-            }
-
-            return $students;
-        });
+        $changed = $records->setStatuses(
+            'students',
+            array_map('intval', $validated['ids']),
+            $validated['status']
+        );
 
         $action = $validated['status'] === 'active'
             ? 'activated'
@@ -276,8 +318,8 @@ class StudentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => $students->count() .
-                ' student(s) successfully ' . $action . '.',
+            'message' => $changed . ' student(s) successfully ' . $action . '.',
+            'changed' => $changed,
         ]);
     }
 
@@ -323,7 +365,6 @@ class StudentController extends Controller
                 ' student(s) successfully moved to the Recycle Bin.',
         ]);
     }
-
 
     private function buildFullName(array $data): string
     {

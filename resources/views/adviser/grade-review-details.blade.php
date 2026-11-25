@@ -31,6 +31,8 @@
             'PT' => ['PT1', 'PT2'],
             'EX' => ['SA', 'SB', 'SC', 'TE'],
         ];
+
+        $showReturnModal = $errors->has('reason');
     @endphp
 
     <div class="grade-review-details-page">
@@ -116,7 +118,6 @@
                 <table class="student-assessment-table">
 
                     <thead>
-
                         <tr class="assessment-group-row">
                             <th rowspan="2" class="student-column">
                                 Student Information
@@ -140,7 +141,6 @@
                         </tr>
 
                         <tr class="assessment-code-row">
-
                             @foreach($assessmentCodes['WW'] as $code)
                                 <th>{{ $code }}</th>
                             @endforeach
@@ -152,9 +152,7 @@
                             @foreach($assessmentCodes['EX'] as $code)
                                 <th>{{ $code }}</th>
                             @endforeach
-
                         </tr>
-
                     </thead>
 
                     <tbody>
@@ -163,7 +161,6 @@
 
                                         @php
                                             $scores = $record->assessmentScores->keyBy('assessment_code');
-
                                             $student = $record->student;
                                         @endphp
 
@@ -171,7 +168,6 @@
 
                                             {{-- STUDENT --}}
                                             <td class="student-column">
-
                                                 <div class="student-name">
                                                     {{ $student?->last_name }},
                                                     {{ $student?->first_name }}
@@ -181,12 +177,10 @@
                                                 <div class="student-id">
                                                     ID: {{ $student?->student_id ?? 'N/A' }}
                                                 </div>
-
                                             </td>
 
                                             {{-- WRITTEN WORKS --}}
                                             @foreach($assessmentCodes['WW'] as $code)
-
                                                 @php
                                                     $score = $scores->get($code);
                                                 @endphp
@@ -195,18 +189,18 @@
                                                     @if($score && $score->score !== null)
                                                         <span class="score-value">
                                                             {{ number_format((float) $score->score, 2) }}
-                                                            <small>/ {{ number_format((float) $score->highest_possible_score, 2) }}</small>
+                                                            <small>
+                                                                / {{ number_format((float) $score->highest_possible_score, 2) }}
+                                                            </small>
                                                         </span>
                                                     @else
                                                         <span class="missing-score">—</span>
                                                     @endif
                                                 </td>
-
                                             @endforeach
 
                                             {{-- PERFORMANCE TASKS --}}
                                             @foreach($assessmentCodes['PT'] as $code)
-
                                                 @php
                                                     $score = $scores->get($code);
                                                 @endphp
@@ -215,18 +209,18 @@
                                                     @if($score && $score->score !== null)
                                                         <span class="score-value">
                                                             {{ number_format((float) $score->score, 2) }}
-                                                            <small>/ {{ number_format((float) $score->highest_possible_score, 2) }}</small>
+                                                            <small>
+                                                                / {{ number_format((float) $score->highest_possible_score, 2) }}
+                                                            </small>
                                                         </span>
                                                     @else
                                                         <span class="missing-score">—</span>
                                                     @endif
                                                 </td>
-
                                             @endforeach
 
                                             {{-- EXAMINATION --}}
                                             @foreach($assessmentCodes['EX'] as $code)
-
                                                 @php
                                                     $score = $scores->get($code);
                                                 @endphp
@@ -235,13 +229,14 @@
                                                     @if($score && $score->score !== null)
                                                         <span class="score-value">
                                                             {{ number_format((float) $score->score, 2) }}
-                                                            <small>/ {{ number_format((float) $score->highest_possible_score, 2) }}</small>
+                                                            <small>
+                                                                / {{ number_format((float) $score->highest_possible_score, 2) }}
+                                                            </small>
                                                         </span>
                                                     @else
                                                         <span class="missing-score">—</span>
                                                     @endif
                                                 </td>
-
                                             @endforeach
 
                                             {{-- COMPUTED GRADES --}}
@@ -293,20 +288,11 @@
 
                 <div class="review-action-buttons">
 
-                    {{-- RETURN TO TEACHER --}}
-                    <form method="POST" action="{{ route('adviser.grade-review.return', [
-                'assignmentId' => $assignment->id,
-                'schoolYear' => $schoolYear,
-                'term' => $term
-            ]) }}"
-                        onsubmit="return confirm('Are you sure you want to return the entire grade submission to the Teacher?');">
-                        @csrf
-
-                        <button type="submit" class="return-grade-btn">
-                            <i class="fas fa-rotate-left"></i>
-                            Return to Teacher
-                        </button>
-                    </form>
+                    {{-- RETURN TO TEACHER: OPENS CUSTOM MODAL --}}
+                    <button type="button" class="return-grade-btn" id="openReturnModal">
+                        <i class="fas fa-rotate-left"></i>
+                        Return to Teacher
+                    </button>
 
                     {{-- FORWARD TO ADMIN --}}
                     <form method="POST" action="{{ route('adviser.grade-review.forward', [
@@ -344,4 +330,161 @@
 
     </div>
 
+    {{-- RETURN TO TEACHER MODAL --}}
+    @if($batchStatus === 'submitted')
+
+        <div class="return-modal-overlay {{ $showReturnModal ? 'active' : '' }}" id="returnModal"
+            aria-hidden="{{ $showReturnModal ? 'false' : 'true' }}">
+
+            <div class="return-modal" role="dialog" aria-modal="true" aria-labelledby="returnModalTitle">
+
+                <div class="return-modal-icon">
+                    <i class="fas fa-rotate-left"></i>
+                </div>
+
+                <h3 id="returnModalTitle">Return Grades to Teacher?</h3>
+
+                <p class="return-modal-description">
+                    Please provide a clear reason for returning this grade submission.
+                    The Teacher will use your feedback to make the necessary corrections.
+                </p>
+
+                <form method="POST" action="{{ route('adviser.grade-review.return', [
+                'assignmentId' => $assignment->id,
+                'schoolYear' => $schoolYear,
+                'term' => $term
+            ]) }}" id="returnGradeForm">
+                    @csrf
+
+                    <label for="returnReason">
+                        Reason for Returning Grades
+                    </label>
+
+                    <textarea name="reason" id="returnReason" maxlength="2000" required
+                        placeholder="Explain what needs to be corrected...">{{ old('reason') }}</textarea>
+
+                    <div class="return-modal-counter">
+                        <span id="reasonCounter">0</span>/2000 characters
+                    </div>
+
+                    @if($errors->has('reason'))
+                        <div class="return-modal-error show" id="returnModalError">
+                            {{ $errors->first('reason') }}
+                        </div>
+                    @else
+                        <div class="return-modal-error" id="returnModalError">
+                            Please provide a reason before returning the grades.
+                        </div>
+                    @endif
+
+                    <div class="return-modal-actions">
+
+                        <button type="button" class="return-modal-cancel" id="closeReturnModal">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="return-modal-confirm" id="confirmReturnButton">
+                            <i class="fas fa-rotate-left"></i>
+                            Confirm Return
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    @endif
+
+@endsection
+
+@section('page-js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const modal = document.getElementById('returnModal');
+            const openButton = document.getElementById('openReturnModal');
+            const closeButton = document.getElementById('closeReturnModal');
+            const reasonInput = document.getElementById('returnReason');
+            const reasonCounter = document.getElementById('reasonCounter');
+            const errorMessage = document.getElementById('returnModalError');
+            const returnForm = document.getElementById('returnGradeForm');
+
+            if (!modal || !reasonInput || !returnForm) {
+                return;
+            }
+
+            function openModal() {
+                modal.classList.add('active');
+                modal.setAttribute('aria-hidden', 'false');
+
+                setTimeout(function () {
+                    reasonInput.focus();
+                }, 100);
+            }
+
+            function closeModal() {
+                modal.classList.remove('active');
+                modal.setAttribute('aria-hidden', 'true');
+
+                if (openButton) {
+                    openButton.focus();
+                }
+            }
+
+            function updateCounter() {
+                reasonCounter.textContent = reasonInput.value.length;
+            }
+
+            if (openButton) {
+                openButton.addEventListener('click', openModal);
+            }
+
+            if (closeButton) {
+                closeButton.addEventListener('click', closeModal);
+            }
+
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (
+                    event.key === 'Escape' &&
+                    modal.classList.contains('active')
+                ) {
+                    closeModal();
+                }
+            });
+
+            reasonInput.addEventListener('input', function () {
+                updateCounter();
+
+                if (reasonInput.value.trim().length > 0) {
+                    errorMessage.classList.remove('show');
+                }
+            });
+
+            returnForm.addEventListener('submit', function (event) {
+                if (!reasonInput.value.trim()) {
+                    event.preventDefault();
+
+                    errorMessage.textContent =
+                        'Please provide a reason before returning the grades.';
+
+                    errorMessage.classList.add('show');
+                    reasonInput.focus();
+
+                    return;
+                }
+            });
+
+            updateCounter();
+
+        });
+    </script>
 @endsection

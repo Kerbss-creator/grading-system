@@ -40,14 +40,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
 
     function openModal(modal) {
-        if (modal) {
-            modal.classList.add("show");
-        }
+        if (!modal) return;
+
+        modal.classList.add("show");
+        document.body.classList.add("modal-open");
+        document.documentElement.classList.add("modal-open");
     }
 
     function closeModal(modal) {
-        if (modal) {
-            modal.classList.remove("show");
+        if (!modal) return;
+
+        modal.classList.remove("show");
+
+        if (!document.querySelector(".modal-overlay.show")) {
+            document.body.classList.remove("modal-open");
+            document.documentElement.classList.remove("modal-open");
         }
     }
 
@@ -58,9 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
             viewStudentModal,
             deleteStudentModal,
             notificationModal,
-        ].forEach(closeModal);
-    }
+        ].forEach((modal) => {
+            if (modal) modal.classList.remove("show");
+        });
 
+        document.body.classList.remove("modal-open");
+        document.documentElement.classList.remove("modal-open");
+    }
     // ==========================================
     // NOTIFICATION MODAL
     // ==========================================

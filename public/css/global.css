@@ -522,6 +522,8 @@ a {
     animation: pageFadeIn 0.8s ease;
 }
 
+
+
 @keyframes pageFadeIn {
     from {
         opacity: 0;
@@ -553,7 +555,7 @@ a {
     pointer-events: none;
     transition:
         opacity 0.2s ease,
-        visibility .2s ease;
+        visibility 0.2s ease;
 }
 
 .logout-loader.show {
@@ -662,8 +664,6 @@ a {
     border-radius: 50%;
     animation: logoutSpin 0.8s linear infinite;
 }
-
-
 
 @keyframes logoutSpin {
     to {

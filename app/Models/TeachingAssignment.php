@@ -11,6 +11,7 @@ class TeachingAssignment extends Model
         'faculty_id',
         'grade_level',
         'subject',
+        'component',
         'school_year',
     ];
 

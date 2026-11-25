@@ -37,191 +37,154 @@
       </div>
     </div>
 
-    {{-- SUBJECT TABLE --}}
-    <div class="subject-table-container">
+    
+{{-- SUBJECT TABLE --}}
+<div class="subject-table-container">
 
-      <table class="subject-table">
+    <table class="subject-table">
 
         <thead>
-          <tr>
-            <th>Subject Name</th>
-            <th>Grade Levels</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
+            <tr>
+                <th>Subject Name</th>
+                <th>Grade Levels</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
         </thead>
 
         <tbody id="subjectTableBody">
 
-          {{-- Sample predefined subjects --}}
-          <tr data-grades="7,8,9,10" data-status="active">
-            <td>
-              <div class="subject-name">
-                <span class="subject-icon">
-                  <i class="fa-solid fa-calculator"></i>
-                </span>
-                <span>Mathematics</span>
-              </div>
-            </td>
-            <td>Grades 7-10</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button type="button" class="view-btn" data-subject="Mathematics" aria-label="View Mathematics details"
-                title="View Details">
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
+            @forelse($subjects as $subject)
 
-          <tr data-grades="7,8,9,10" data-status="active">
-            <td>
-              <div class="subject-name">
-                <span class="subject-icon">
-                  <i class="fa-solid fa-flask"></i>
-                </span>
-                <span>Science</span>
-              </div>
-            </td>
-            <td>Grades 7-10</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button type="button" class="view-btn" data-subject="Science" aria-label="View Science details"
-                title="View Details">
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
+                @php
+                    $grades = $subject->gradeLevels
+                        ->pluck('grade_level')
+                        ->map(fn($grade) => (int) filter_var($grade, FILTER_SANITIZE_NUMBER_INT))
+                        ->sort()
+                        ->values();
 
-          <tr data-grades="7,8,9,10" data-status="active">
-            <td>
-              <div class="subject-name">
-                <span class="subject-icon">
-                  <i class="fa-solid fa-book-open"></i>
-                </span>
-                <span>English</span>
-              </div>
-            </td>
-            <td>Grades 7-10</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button type="button" class="view-btn" data-subject="English" aria-label="View English details"
-                title="View Details">
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
+                    $gradeNumbers = $grades->implode(',');
+                @endphp
 
-          <tr data-grades="7,8,9,10" data-status="active">
-            <td>
-              <div class="subject-name">
-                <span class="subject-icon">
-                  <i class="fa-solid fa-language"></i>
-                </span>
-                <span>Filipino</span>
-              </div>
-            </td>
-            <td>Grades 7-10</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button type="button" class="view-btn" data-subject="Filipino" aria-label="View Filipino details"
-                title="View Details">
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
+                <tr
+                    data-grades="{{ $gradeNumbers }}"
+                    data-status="{{ strtolower($subject->status) }}"
+                >
 
-          <tr data-grades="7,8,9,10" data-status="active">
-            <td>
-              <div class="subject-name">
-                <span class="subject-icon">
-                  <i class="fa-solid fa-earth-asia"></i>
-                </span>
-                <span>Araling Panlipunan</span>
-              </div>
-            </td>
-            <td>Grades 7-10</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button type="button" class="view-btn" data-subject="Araling Panlipunan"
-                aria-label="View Araling Panlipunan details" title="View Details">
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
+                    <td>
+                        <div class="subject-name">
 
-          <tr data-grades="7,8,9,10" data-status="active">
-            <td>
-              <div class="subject-name">
-                <span class="subject-icon">
-                  <i class="fa-solid fa-screwdriver-wrench"></i>
-                </span>
-                <span>TLE</span>
-              </div>
-            </td>
-            <td>Grades 7-10</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button type="button" class="view-btn" data-subject="TLE" aria-label="View TLE details"
-                title="View Details">
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
+                            <span class="subject-icon">
+                                @switch(strtolower($subject->subject_name))
+                                    @case('mathematics')
+                                        <i class="fa-solid fa-calculator"></i>
+                                        @break
 
-          <tr data-grades="7,8,9,10" data-status="active">
-            <td>
-              <div class="subject-name">
-                <span class="subject-icon">
-                  <i class="fa-solid fa-music"></i>
-                </span>
-                <span>MAPEH</span>
-              </div>
-            </td>
-            <td>Grades 7-10</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button type="button" class="view-btn" data-subject="MAPEH" aria-label="View MAPEH details"
-                title="View Details">
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
+                                    @case('science')
+                                        <i class="fa-solid fa-flask"></i>
+                                        @break
 
-          <tr data-grades="7,8,9,10" data-status="active">
-            <td>
-              <div class="subject-name">
-                <span class="subject-icon">
-                  <i class="fa-solid fa-heart"></i>
-                </span>
-                <span>Values Education</span>
-              </div>
-            </td>
-            <td>Grades 7–10</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button type="button" class="view-btn" data-subject="Values Education"
-                aria-label="View Values Education details" title="View Details">
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </td>
-          </tr>
+                                    @case('computer')
+                                        <i class="fa-solid fa-computer"></i>
+                                        @break
+
+                                    @case('english')
+                                        <i class="fa-solid fa-book-open"></i>
+                                        @break
+
+                                    @case('filipino')
+                                        <i class="fa-solid fa-language"></i>
+                                        @break
+
+                                    @case('araling panlipunan')
+                                        <i class="fa-solid fa-earth-asia"></i>
+                                        @break
+
+                                    @case('tle')
+                                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                                        @break
+
+                                    @case('mapeh')
+                                        <i class="fa-solid fa-music"></i>
+                                        @break
+
+                                    @case('values education')
+                                        <i class="fa-solid fa-heart"></i>
+                                        @break
+
+                                    @default
+                                        <i class="fa-solid fa-book"></i>
+                                @endswitch
+                            </span>
+
+                            <span>{{ $subject->subject_name }}</span>
+
+                        </div>
+                    </td>
+
+                    <td>
+                        @if($grades->isNotEmpty())
+                            Grades {{ $grades->implode(', ') }}
+                        @else
+                            —
+                        @endif
+                    </td>
+
+                    <td>
+                        <span class="status-badge {{ strtolower($subject->status) }}">
+                            {{ ucfirst($subject->status) }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <button
+                            type="button"
+                            class="view-btn"
+                            data-subject="{{ $subject->subject_name }}"
+                            data-code="{{ $subject->subject_code }}"
+                            aria-label="View {{ $subject->subject_name }} details"
+                            title="View Details"
+                        >
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </td>
+
+                </tr>
+
+            @empty
+
+                <tr>
+                    <td colspan="4">
+                        <div class="subject-empty-state">
+                            <i class="fa-solid fa-book-open"></i>
+                            <h3>No Subjects Found</h3>
+                            <p>There are currently no subjects in the database.</p>
+                        </div>
+                    </td>
+                </tr>
+
+            @endforelse
 
         </tbody>
-      </table>
 
-      {{-- Empty state --}}
-      <div class="subject-empty-state" id="subjectEmptyState" hidden>
+    </table>
+
+    {{-- Empty state for search and filters --}}
+    <div class="subject-empty-state" id="subjectEmptyState" hidden>
         <i class="fa-solid fa-book-open"></i>
         <h3>No Subjects Found</h3>
         <p>Try changing your search or filter selections.</p>
-      </div>
-
     </div>
 
-    {{-- Total count --}}
-    <div class="subject-table-footer">
-      <span id="subjectCount">Showing 8 subjects</span>
-    </div>
+</div>
+
+{{-- Total count --}}
+<div class="subject-table-footer">
+    <span id="subjectCount">
+        Showing {{ $subjects->count() }} subjects
+    </span>
+</div>
+
 
   </div>
 

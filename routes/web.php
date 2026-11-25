@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -21,16 +20,25 @@ use App\Http\Controllers\SubjectController as AdminSubjectController;
 use App\Http\Controllers\Admin\GradebookController;
 use App\Http\Controllers\Admin\AdminGradeApprovalController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\SchoolYearController;
+use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\GradeLevelController;
+use App\Http\Controllers\Admin\DatabaseBackupController;
 
 use App\Http\Controllers\Adviser\AdviserClassController;
 use App\Http\Controllers\Adviser\AdviserStudentController;
 use App\Http\Controllers\Adviser\AdviserGradeReviewController;
+use App\Http\Controllers\Adviser\AdviserGradeManagementController;
+use App\Http\Controllers\Adviser\AdviserSubjectController;
 
 use App\Http\Controllers\Teacher\GradeManagementController;
 use App\Http\Controllers\Teacher\GradeSubmissionController;
 use App\Http\Controllers\Teacher\GradeReviewController;
 use App\Http\Controllers\Teacher\SubjectController;
+use App\Http\Controllers\Admin\GradePublicationController;
 
+use App\Http\Controllers\Student\StudentGradesController;
+use App\Http\Controllers\Student\StudentSubjectsController;
 use App\Models\Announcement;
 
 
@@ -205,6 +213,11 @@ Route::middleware(['auth', 'school.role:admin'])
         Route::get('/activity-log', [ActivityLogController::class, 'index'])
             ->name('activity-log');
 
+
+        Route::get('/activity-log/{log}', [ActivityLogController::class, 'show'])
+            ->name('activity-log.show');
+
+
         Route::get('/recycle-bin', [ActivityLogController::class, 'trash'])
             ->name('recycle-bin');
 
@@ -235,9 +248,8 @@ Route::middleware(['auth', 'school.role:admin'])
 
 
         // Grade Level Management
-        Route::get('/grade-level', function () {
-            return view('admin.grade-level');
-        })->name('grade-level');
+        Route::get('/grade-level', [GradeLevelController::class, 'index'])
+            ->name('grade-level');
 
         Route::get('/grade-level/{grade}', function (int $grade) {
 
@@ -298,6 +310,11 @@ Route::middleware(['auth', 'school.role:admin'])
             ->whereNumber('term')
             ->name('grade-approval.show');
 
+        Route::get('/grade-publications', [GradePublicationController::class, 'index'])
+            ->name('grade-publications.index');
+
+        Route::post('/grade-publications/{schoolYear}/{term}/publish', [GradePublicationController::class, 'publish'])
+            ->name('grade-publications.publish');
 
         // Announcements
         Route::get('/announcement', [
@@ -320,11 +337,75 @@ Route::middleware(['auth', 'school.role:admin'])
             'destroy'
         ])->name('announcement.destroy');
 
+        // Admin Profile
+        Route::get('/profile', [AdminProfileController::class, 'index'])
+            ->name('profile');
+
+        Route::put('/profile', [AdminProfileController::class, 'update'])
+            ->name('profile.update');
+
+        Route::put('/profile/password', [AdminProfileController::class, 'updatePassword'])
+            ->name('profile.password');
+
+        Route::post('/profile/photo', [AdminProfileController::class, 'updatePhoto'])
+            ->name('profile.photo.update');
+
+        Route::delete('/profile/photo', [AdminProfileController::class, 'removePhoto'])
+            ->name('profile.photo.remove');
+
 
         // Settings
-        Route::get('/settings', function () {
-            return view('admin.settings');
-        })->name('settings');
+        Route::get('/settings', [SchoolYearController::class, 'index'])
+            ->name('settings');
+
+        // School Year Management
+        Route::post(
+            '/settings/school-years',
+            [SchoolYearController::class, 'store']
+        )->name('settings.school-years.store');
+
+        // Update Upcoming School Year
+        Route::patch(
+            '/settings/school-years/{schoolYear}',
+            [SchoolYearController::class, 'update']
+        )->name('settings.school-years.update');
+
+        Route::patch(
+            '/settings/school-years/{schoolYear}/activate',
+            [SchoolYearController::class, 'activate']
+        )->name('settings.school-years.activate');
+
+        Route::patch(
+            '/settings/school-years/{schoolYear}/term',
+            [SchoolYearController::class, 'updateTerm']
+        )->name('settings.school-years.term');
+
+        // Database Backup Management
+        Route::get(
+            '/settings/backups',
+            [DatabaseBackupController::class, 'index']
+        )->name('settings.backups.index');
+
+        Route::post(
+            '/settings/backups',
+            [DatabaseBackupController::class, 'store']
+        )->name('settings.backups.store');
+
+        Route::get(
+            '/settings/backups/{filename}/download',
+            [DatabaseBackupController::class, 'download']
+        )->where('filename', '[A-Za-z0-9_.-]+')
+            ->name('settings.backups.download');
+            
+        Route::post(
+            '/settings/backups/{filename}/restore',
+            [DatabaseBackupController::class, 'restore']
+        )->where('filename', '[A-Za-z0-9_.-]+')
+            ->name('settings.backups.restore');
+
+
+
+
     });
 
 
@@ -447,12 +528,62 @@ Route::middleware(['auth', 'school.role:adviser,teacher_adviser'])
             [AdviserClassController::class, 'index']
         )->name('classes');
 
+        // My Subjects
+        Route::get(
+            '/subjects',
+            [AdviserSubjectController::class, 'index']
+        )->name('subjects');
+
+        // Adviser Grade Management
+        Route::get(
+            '/grade-management',
+            [AdviserGradeManagementController::class, 'index']
+        )->name('grade-management');
+
+        // Load Assessment Scores
+        Route::get(
+            '/grade-management/load',
+            [AdviserGradeManagementController::class, 'load']
+        )->name('grade-management.load');
+
+        // Save Assessment Scores
+        Route::post(
+            '/grade-management/save',
+            [AdviserGradeManagementController::class, 'save']
+        )->name('grade-management.save');
+
+        // Update Assessment Settings
+        Route::post(
+            '/grade-management/assessment-settings',
+            [AdviserGradeManagementController::class, 'updateAssessmentSettings']
+        )->name('grade-management.assessment-settings');
+
+        // Reset Assessment Settings
+        Route::post(
+            '/grade-management/reset',
+            [AdviserGradeManagementController::class, 'reset']
+        )->name('grade-management.reset');
+
+        // Clear Assessment Scores
+        Route::post(
+            '/grade-management/clear-scores',
+            [AdviserGradeManagementController::class, 'clearScores']
+        )->name('grade-management.clear-scores');
+
+        // Submit Grades
+        Route::post(
+            '/grade-management/submit',
+            [AdviserGradeManagementController::class, 'submit']
+        )->name('grade-management.submit');
+
 
         // My Students
         Route::get(
             '/students',
             [AdviserStudentController::class, 'index']
         )->name('students');
+
+
 
 
         // Academic Records
@@ -533,8 +664,12 @@ Route::middleware(['auth', 'school.role:student'])
 
 
         // Grades
-        Route::view('/grades', 'student.grades')
+        Route::get('/grades', [StudentGradesController::class, 'index'])
             ->name('grades');
+
+        // My Subjects
+        Route::get('/subjects', [StudentSubjectsController::class, 'index'])
+            ->name('subjects');
 
 
         // Announcements

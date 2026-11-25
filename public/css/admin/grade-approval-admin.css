@@ -863,3 +863,557 @@
         flex-wrap: wrap;
     }
 }
+
+/* ==========================================
+   GRADE APPROVAL - TYPOGRAPHY IMPROVEMENTS
+   ========================================== */
+
+/* Make small interface text readable */
+.toolbar,
+.toolbar input,
+.toolbar select,
+.toolbar label,
+.search-box input,
+.section-header p,
+.summary-info span,
+.approval-table th,
+.approval-table td,
+.grade-cell strong,
+.grade-cell span,
+.subject-cell,
+.view-details,
+.status,
+.review-details span,
+.review-details strong,
+.review-note p,
+.approve-note p,
+.return-warning p,
+.approve-info span,
+.approve-info strong,
+.form-group label,
+.form-group textarea,
+.modal-actions button,
+.modal-header p,
+.empty-state p {
+    font-size: 12px;
+}
+
+/* Main headings */
+.section-header h2 {
+    font-size: 18px;
+}
+
+.summary-info h2 {
+    font-size: 24px;
+}
+
+.modal-header h2 {
+    font-size: 19px;
+}
+
+.review-title h2 {
+    font-size: 18px;
+}
+
+.approve-content h3 {
+    font-size: 18px;
+}
+
+.empty-state h3 {
+    font-size: 17px;
+}
+
+/* ==========================================
+   MODAL BACKDROP - BLUR EFFECT
+   ========================================== */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(12, 25, 17, 0.48);
+
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.modal.show {
+    display: flex;
+}
+
+/* Prevent background page scrolling */
+body.modal-open {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+}
+
+/* ==========================================
+   MODAL CONTAINER
+   ========================================== */
+
+.modal-box {
+    width: 100%;
+    max-width: 540px;
+
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    padding: 26px;
+
+    background: #fff;
+    border: 1px solid rgba(3, 111, 53, 0.1);
+    border-radius: 18px;
+
+    box-shadow:
+        0 22px 65px rgba(0, 0, 0, 0.2),
+        0 5px 18px rgba(0, 0, 0, 0.06);
+
+    animation: gradeModalAppear 0.22s ease;
+}
+
+/* Approve modal slightly narrower */
+.approve-box {
+    max-width: 480px;
+}
+
+/* Modal animation */
+@keyframes gradeModalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Modal scrollbar */
+.modal-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-box::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-box::-webkit-scrollbar-thumb {
+    background: #d5e0d8;
+    border-radius: 10px;
+}
+
+/* ==========================================
+   MODAL HEADER
+   ========================================== */
+
+.modal-header {
+    padding-bottom: 17px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #edf1ee;
+}
+
+.modal-header h2 {
+    color: #183c29;
+    font-weight: 700;
+}
+
+.modal-header p {
+    color: #78857d;
+    line-height: 1.5;
+}
+
+.modal-header button {
+    width: 36px;
+    height: 36px;
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #f1f5f2;
+    color: #53645a;
+
+    font-size: 15px;
+    transition: 0.2s ease;
+}
+
+.modal-header button:hover {
+    background: #e3eee7;
+    color: #036f35;
+}
+
+/* ==========================================
+   REVIEW TITLE
+   ========================================== */
+
+.review-title {
+    padding: 16px;
+    margin-bottom: 20px;
+
+    background: #f3f8f5;
+    border: 1px solid #e5efe8;
+    border-radius: 13px;
+}
+
+.large-review-icon {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+
+    background: #e2f1e7;
+    color: #036f35;
+
+    border-radius: 12px;
+    font-size: 21px;
+}
+
+.review-title h2 {
+    color: #183c29;
+    font-weight: 700;
+}
+
+.review-title p {
+    color: #738077;
+    font-size: 12px;
+}
+
+/* ==========================================
+   REVIEW DETAILS
+   ========================================== */
+
+.review-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+
+    border-top: none;
+}
+
+.review-details > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+
+    padding: 13px;
+
+    background: #fafcfb;
+    border: 1px solid #edf1ee;
+    border-radius: 11px;
+}
+
+.review-details span {
+    color: #7b8980;
+}
+
+.review-details strong {
+    color: #263c2e;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   RETURN REASON
+   ========================================== */
+
+.review-return-reason {
+    margin-top: 16px;
+    padding: 15px;
+
+    background: #fff8ed;
+    border: 1px solid #f3dfbf;
+    border-radius: 11px;
+}
+
+.review-return-reason strong {
+    display: block;
+    color: #995b16;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.review-return-reason p {
+    color: #745630;
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   MODAL INFORMATION NOTES
+   ========================================== */
+
+.review-note,
+.approve-note {
+    padding: 13px 14px;
+    margin-top: 17px;
+
+    background: #f1f7f3;
+    border: 1px solid #e3eee6;
+    border-radius: 10px;
+}
+
+.review-note p,
+.approve-note p,
+.return-warning p {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #53645a;
+}
+
+/* ==========================================
+   APPROVE MODAL
+   ========================================== */
+
+.approve-icon {
+    width: 62px;
+    height: 62px;
+
+    margin: 5px auto 16px;
+
+    background: #e5f3e9;
+    color: #087a3e;
+
+    font-size: 27px;
+}
+
+.approve-content h3 {
+    color: #183c29;
+    font-weight: 700;
+}
+
+.approve-content > p {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #6d7b72;
+}
+
+.approve-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+
+    border: none;
+    overflow: visible;
+}
+
+.approve-info > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+
+    padding: 13px;
+
+    background: #fafcfb;
+    border: 1px solid #edf1ee;
+    border-radius: 10px;
+}
+
+.approve-info span {
+    color: #78857d;
+}
+
+.approve-info strong {
+    color: #263c2e;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   RETURN MODAL
+   ========================================== */
+
+.return-warning {
+    padding: 14px;
+    background: #fff8ed;
+    border: 1px solid #f3dfbf;
+    border-radius: 10px;
+}
+
+.return-warning i {
+    color: #c88800;
+}
+
+.return-warning p {
+    color: #73552f;
+}
+
+.form-group {
+    margin-top: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #35483b;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-group textarea {
+    min-height: 110px;
+    padding: 12px;
+
+    border: 1px solid #dce5df;
+    border-radius: 10px;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    line-height: 1.6;
+
+    resize: vertical;
+    transition: 0.2s ease;
+}
+
+.form-group textarea:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.09);
+}
+
+/* ==========================================
+   MODAL BUTTONS
+   ========================================== */
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+
+    margin-top: 22px;
+    padding-top: 17px;
+
+    border-top: 1px solid #edf1ee;
+}
+
+.modal-actions button {
+    min-height: 40px;
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 9px;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.modal-actions button:hover {
+    transform: translateY(-1px);
+}
+
+.modal-actions button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.cancel-btn {
+    background: #f0f2f1;
+    color: #526057;
+}
+
+.cancel-btn:hover {
+    background: #e3e8e5;
+}
+
+.approve-modal-btn {
+    background: #036f35;
+    color: #fff;
+}
+
+.approve-modal-btn:hover {
+    background: #025a2b;
+}
+
+.return-modal-btn,
+.return-submit-btn {
+    background: #c0392b;
+    color: #fff;
+}
+
+.return-modal-btn:hover,
+.return-submit-btn:hover {
+    background: #a92e22;
+}
+
+/* ==========================================
+   MOBILE MODAL
+   ========================================== */
+
+@media (max-width: 600px) {
+    .modal {
+        padding: 12px;
+        align-items: center;
+    }
+
+    .modal-box {
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .review-details,
+    .approve-info {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-actions {
+        flex-wrap: wrap;
+    }
+
+    .modal-actions button {
+        flex: 1;
+    }
+}
+
+/* ==========================================
+   GRADE APPROVAL - MODAL CLOSE BUTTON
+   Same hover style as Announcement Modal
+========================================== */
+
+.modal-header button {
+    width: 36px;
+    height: 36px;
+
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    border: 1px solid #e6ebe7;
+    border-radius: 9px;
+
+    background: #f8faf8;
+    color: #68736c;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-header button:hover {
+    background: #fff0f0;
+    border-color: #f2d5d5;
+    color: #c0392b;
+}

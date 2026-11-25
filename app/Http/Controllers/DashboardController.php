@@ -7,12 +7,13 @@ use App\Models\Student;
 use App\Models\AdvisoryAssignment;
 use App\Models\GradeRecord;
 use App\Models\TeachingAssignment;
+use App\Models\SchoolYear;
+use App\Models\ActivityLog;
+use App\Models\Announcement;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-
-
     public function admin()
     {
         // Get total student records.
@@ -22,12 +23,12 @@ class DashboardController extends Controller
         $totalFaculties = Faculty::count();
 
         // Get the 3 latest announcements for the dashboard.
-        $latestAnnouncements = \App\Models\Announcement::latest()
+        $latestAnnouncements = Announcement::latest()
             ->take(3)
             ->get();
 
         // Get all announcements for the View All modal.
-        $allAnnouncements = \App\Models\Announcement::latest()
+        $allAnnouncements = Announcement::latest()
             ->get();
 
         return view('admin.dashboard-admin', compact(
@@ -38,13 +39,195 @@ class DashboardController extends Controller
         ));
     }
 
-
+    /**
+     * Display the dynamic teacher dashboard.
+     */
     public function teacher()
     {
-        return view('teacher.dashboard');
+        // Get the active school year and current term.
+        $activeSchoolYear = SchoolYear::active();
+
+        $schoolYear = $activeSchoolYear?->year_name;
+        $term = $activeSchoolYear?->current_term;
+
+        // Default dashboard values.
+        $faculty = null;
+        $assignedClasses = collect();
+
+        $totalClasses = 0;
+        $totalStudents = 0;
+        $pendingGrades = 0;
+        $completedGrades = 0;
+        $submittedGrades = 0;
+
+        $overallCompletionPercentage = 0;
+
+        $recentActivities = collect();
+        $announcements = collect();
+
+        // Get the logged-in teacher's active faculty record.
+        $faculty = Faculty::where('user_id', auth()->id())
+            ->where('status', 'active')
+            ->first();
+
+        if ($faculty && $activeSchoolYear && in_array($term, [1, 2, 3], true)) {
+
+            // Get only this teacher's assignments for the active school year.
+            $assignedClasses = $faculty->teachingAssignments()
+                ->where('school_year', $schoolYear)
+                ->orderBy('grade_level')
+                ->orderBy('subject')
+                ->get();
+
+            $totalClasses = $assignedClasses->count();
+
+            $uniqueStudentIds = collect();
+
+            $requiredAssessmentCodes = [
+                'WW1',
+                'WW2',
+                'WW3',
+                'WW4',
+                'PT1',
+                'PT2',
+                'SA',
+                'SB',
+                'SC',
+                'TE',
+            ];
+
+            // Calculate grade completion for every teaching assignment.
+            foreach ($assignedClasses as $assignment) {
+
+                // Get active students for this assignment's grade level.
+                $students = Student::where(
+                    'grade_level',
+                    $assignment->grade_level
+                )
+                    ->where('school_year', $schoolYear)
+                    ->where('status', 'active')
+                    ->get(['id']);
+
+                $studentIds = $students->pluck('id');
+
+                // Merge IDs to prevent duplicate overall student counts.
+                $uniqueStudentIds = $uniqueStudentIds->merge($studentIds);
+
+                $assignment->total_students = $studentIds->count();
+
+                // Get grade records for this assignment and active term.
+                $gradeRecords = GradeRecord::with('assessmentScores')
+                    ->where('teaching_assignment_id', $assignment->id)
+                    ->where('school_year', $schoolYear)
+                    ->where('term', $term)
+                    ->whereIn('student_id', $studentIds)
+                    ->get()
+                    ->keyBy('student_id');
+
+                $assignmentCompleted = 0;
+                $assignmentSubmitted = 0;
+
+                foreach ($studentIds as $studentId) {
+
+                    $record = $gradeRecords->get($studentId);
+
+                    $isComplete = false;
+
+                    if ($record) {
+                        $scores = $record->assessmentScores
+                            ->keyBy('assessment_code');
+
+                        $isComplete = collect($requiredAssessmentCodes)
+                            ->every(function ($code) use ($scores) {
+                                $assessment = $scores->get($code);
+
+                                return $assessment
+                                    && $assessment->score !== null
+                                    && (float) $assessment->highest_possible_score > 0;
+                            });
+
+                        if (
+                            $record->status === 'submitted'
+                            && $record->submitted_at !== null
+                        ) {
+                            $assignmentSubmitted++;
+                        }
+                    }
+
+                    if ($isComplete) {
+                        $assignmentCompleted++;
+                    }
+                }
+
+                $assignment->completed_students = $assignmentCompleted;
+
+                $assignment->pending_students =
+                    $assignment->total_students - $assignmentCompleted;
+
+                $assignment->submitted_students = $assignmentSubmitted;
+
+                $assignment->completion_percentage =
+                    $assignment->total_students > 0
+                    ? round(
+                        ($assignmentCompleted / $assignment->total_students) * 100,
+                        2
+                    )
+                    : 0;
+
+                // Update overall counts.
+                $completedGrades += $assignmentCompleted;
+                $pendingGrades += $assignment->pending_students;
+                $submittedGrades += $assignmentSubmitted;
+            }
+
+            // Count each student only once across all assigned classes.
+            $totalStudents = $uniqueStudentIds->unique()->count();
+
+            // Calculate overall assessment completion percentage.
+            $totalAssignedStudentSubjects = $completedGrades + $pendingGrades;
+
+            $overallCompletionPercentage = $totalAssignedStudentSubjects > 0
+                ? round(
+                    ($completedGrades / $totalAssignedStudentSubjects) * 100,
+                    2
+                )
+                : 0;
+
+            // Get this teacher's actual activity logs.
+            $recentActivities = ActivityLog::where(
+                'actor_id',
+                auth()->id()
+            )
+                ->latest('created_at')
+                ->take(5)
+                ->get();
+
+        }
+
+        // Get announcements intended for all users and teachers.
+        $announcements = Announcement::whereIn(
+            'audience',
+            ['all', 'teachers']
+        )
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('teacher.dashboard', compact(
+            'faculty',
+            'schoolYear',
+            'term',
+            'assignedClasses',
+            'totalClasses',
+            'totalStudents',
+            'pendingGrades',
+            'completedGrades',
+            'submittedGrades',
+            'overallCompletionPercentage',
+            'recentActivities',
+            'announcements'
+        ));
     }
-
-
 
     public function adviser(Request $request)
     {
@@ -107,40 +290,40 @@ class DashboardController extends Controller
                     $assignment->subjectProgress = $teachingAssignments->map(
                         function ($teachingAssignment) use ($classStudentIds, $studentCount, $schoolYear, $term) {
 
-                            $submittedCount = 0;
+                        $submittedCount = 0;
 
-                            if ($studentCount > 0) {
-                                $submittedCount = GradeRecord::where(
-                                    'teaching_assignment_id',
-                                    $teachingAssignment->id
-                                )
-                                    ->where('school_year', $schoolYear)
-                                    ->where('term', $term)
-                                    ->where('status', 'submitted')
-                                    ->whereNotNull('submitted_at')
-                                    ->whereIn('student_id', $classStudentIds)
-                                    ->distinct()
-                                    ->count('student_id');
-                            }
-
-                            // Determine submission status.
-                            if ($studentCount > 0 && $submittedCount >= $studentCount) {
-                                $status = 'Submitted';
-                            } elseif ($submittedCount > 0) {
-                                $status = 'Partial';
-                            } else {
-                                $status = 'Not Submitted';
-                            }
-
-                            return (object) [
-                                'teachingAssignment' => $teachingAssignment,
-                                'subject' => $teachingAssignment->subject,
-                                'faculty' => $teachingAssignment->faculty,
-                                'total_students' => $studentCount,
-                                'submitted_count' => $submittedCount,
-                                'status' => $status,
-                            ];
+                        if ($studentCount > 0) {
+                            $submittedCount = GradeRecord::where(
+                                'teaching_assignment_id',
+                                $teachingAssignment->id
+                            )
+                                ->where('school_year', $schoolYear)
+                                ->where('term', $term)
+                                ->where('status', 'submitted')
+                                ->whereNotNull('submitted_at')
+                                ->whereIn('student_id', $classStudentIds)
+                                ->distinct()
+                                ->count('student_id');
                         }
+
+                        // Determine submission status.
+                        if ($studentCount > 0 && $submittedCount >= $studentCount) {
+                            $status = 'Submitted';
+                        } elseif ($submittedCount > 0) {
+                            $status = 'Partial';
+                        } else {
+                            $status = 'Not Submitted';
+                        }
+
+                        return (object) [
+                            'teachingAssignment' => $teachingAssignment,
+                            'subject' => $teachingAssignment->subject,
+                            'faculty' => $teachingAssignment->faculty,
+                            'total_students' => $studentCount,
+                            'submitted_count' => $submittedCount,
+                            'status' => $status,
+                        ];
+                    }
                     );
 
                     // Calculate grade-level submission progress.
@@ -228,8 +411,6 @@ class DashboardController extends Controller
             'recentSubmissions'
         ));
     }
-
-
 
     public function student()
     {

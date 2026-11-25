@@ -2,8 +2,7 @@
 
 @section('title', 'Grade Level Management')
 @section('header', 'Grade Level Management')
-@section('header-description', 'View grade levels, assigned advisers, subjects, and academic records.')
-
+@section('header-description', 'View assigned teachers, class advisers, subject assignments, and academic records.')
 @section('page-css')
   <link rel="stylesheet" href="{{ asset('css/admin/grade-level-admin.css') }}">
 @endsection
@@ -31,7 +30,9 @@
         </div>
         <div>
           <span>School Year</span>
-          <h2 class="school-year-value">2026-2027</h2>
+          <h2 class="school-year-value">
+            {{ $schoolYear ?? 'Not Set' }}
+          </h2>
           <small>Junior High School</small>
         </div>
       </div>
@@ -42,8 +43,8 @@
       <div>
         <h2>Grade Levels</h2>
         <p>
-          Select a grade level to view its adviser, subject assignments,
-          and learners' academic records.
+          Select a grade level to view its assigned teachers, class adviser,
+          subject assignments, and learners' academic records.
         </p>
       </div>
 
@@ -54,15 +55,16 @@
     </div>
 
     {{-- GRADE LEVEL CARDS --}}
+
     <div class="grade-grid" id="gradeGrid">
-      @foreach ([
-          ['grade' => 'Grade 7', 'students' => 168],
-          ['grade' => 'Grade 8', 'students' => 167],
-          ['grade' => 'Grade 9', 'students' => 166],
-          ['grade' => 'Grade 10', 'students' => 167],
-        ] as $grade)
+
+      @foreach ($grades as $grade)
+
         <a href="#grade-details" class="grade-card" data-grade="{{ $grade['grade'] }}"
-          data-students="{{ $grade['students'] }}" aria-label="View {{ $grade['grade'] }} details">
+          data-students="{{ $grade['students'] }}" data-adviser="{{ $grade['adviser'] ?? '' }}"
+          data-subjects="{{ $grade['subjects']->toJson() }}" data-school-year="{{ $schoolYear ?? '' }}"
+          aria-label="View {{ $grade['grade'] }} details">
+
           <div class="grade-card-top">
             <div class="grade-icon">
               <i class="fa-solid fa-address-book"></i>
@@ -81,26 +83,54 @@
           </div>
 
           <div class="grade-card-bottom">
-            <div class="grade-student-info">
-              <span class="student-icon">
-                <i class="fa-solid fa-users"></i>
-              </span>
 
-              <div>
-                <strong>{{ $grade['students'] }}</strong>
-                <span>Students</span>
+            <div class="grade-card-assignment-info">
+
+              {{-- Assigned Teachers --}}
+              <div class="grade-card-metric">
+                <span class="student-icon">
+                  <i class="fa-solid fa-chalkboard-user"></i>
+                </span>
+
+                <div>
+                  <strong>{{ $grade['teachers'] }}</strong>
+                  <span>Teachers</span>
+                </div>
               </div>
+
+              {{-- Assigned Adviser --}}
+              <div class="grade-card-adviser">
+                <span class="student-icon">
+                  <i class="fa-solid fa-user-tie"></i>
+                </span>
+
+                <div>
+                  <strong>Class Adviser</strong>
+                  <span>{{ $grade['adviser'] }}</span>
+                </div>
+              </div>
+
             </div>
 
             <span class="grade-view-link">
               View details
               <i class="fa-solid fa-arrow-right"></i>
             </span>
+
           </div>
+
         </a>
+
       @endforeach
+
     </div>
+
   </div>
+
+
+
+
+
 
   {{-- GRADE LEVEL DETAILS --}}
   <div id="gradeDetailsView" hidden>
@@ -148,7 +178,7 @@
         </div>
         <div>
           <span>Assigned Adviser</span>
-          <h3 class="summary-placeholder">Not assigned</h3>
+          <h3 id="detailsAdviserSummary">Not assigned</h3>
         </div>
       </div>
 
@@ -158,37 +188,13 @@
         </div>
         <div>
           <span>School Year</span>
-          <h3>2026-2027</h3>
+          <h3 id="detailsSchoolYear">{{ $schoolYear ?? 'Not Set' }}</h3>
         </div>
       </div>
     </div>
 
-    {{-- ASSIGNED ADVISER --}}
-    <section class="details-panel">
-      <div class="panel-heading">
-        <div class="panel-heading-icon">
-          <i class="fa-solid fa-user-tie"></i>
-        </div>
 
-        <div>
-          <h3>Assigned Adviser</h3>
-          <p>Teacher assigned to this grade level.</p>
-        </div>
-      </div>
-
-      <div class="empty-state compact-empty-state">
-        <span class="empty-state-icon">
-          <i class="fa-regular fa-user"></i>
-        </span>
-        <h4>No Adviser Information Yet</h4>
-        <p>
-          The assigned adviser's information will appear here once
-          connected to the system records.
-        </p>
-      </div>
-    </section>
-
-    {{-- SUBJECT ASSIGNMENTS --}}
+    {{-- SUBJECT TEACHERS --}}
     <section class="details-panel">
       <div class="panel-heading">
         <div class="panel-heading-icon">
@@ -196,86 +202,22 @@
         </div>
 
         <div>
-          <h3>Subject Assignments</h3>
+          <h3>Subject Teachers</h3>
           <p>Subjects and teachers assigned to this grade level.</p>
         </div>
       </div>
 
-      <div class="empty-state compact-empty-state">
-        <span class="empty-state-icon">
-          <i class="fa-regular fa-folder-open"></i>
-        </span>
-        <h4>No Subject Assignments Yet</h4>
-        <p>
-          Subject and teacher assignments will appear here once
-          the records are available.
-        </p>
-      </div>
-    </section>
-
-    {{-- LEARNERS' ACADEMIC RECORDS --}}
-    <section class="details-panel academic-records-panel">
-      <div class="panel-heading">
-        <div class="panel-heading-icon">
-          <i class="fa-solid fa-file-lines"></i>
+      <div id="subjectAssignmentsList" class="subject-assignments-list">
+        <div class="empty-state compact-empty-state">
+          <span class="empty-state-icon">
+            <i class="fa-regular fa-folder-open"></i>
+          </span>
+          <h4>No Subject Assignments Yet</h4>
+          <p>
+            Subject and teacher assignments will appear here once
+            the records are available.
+          </p>
         </div>
-
-        <div>
-          <h3>Learners' Academic Records</h3>
-          <p>School Year 2026-2027</p>
-          <p id="academicRecordsGradeLabel">Grade 7</p>
-        </div>
-      </div>
-
-      {{-- SINGLE TERM DROPDOWN --}}
-      <div class="academic-records-toolbar">
-        <div class="records-filter-group">
-          <label for="byTermFilter">By Term</label>
-
-          <select id="byTermFilter" class="records-filter-select">
-            <option value="overall">Overall Term</option>
-            <option value="term1">Term 1</option>
-            <option value="term2">Term 2</option>
-            <option value="term3">Term 3</option>
-          </select>
-        </div>
-      </div>
-
-      {{-- ACADEMIC RECORDS TABLE --}}
-      <div class="records-table-wrapper">
-        <table class="records-table academic-records-table">
-          <thead>
-            <tr>
-              <th>Learners</th>
-              <th data-term-column="term1">Term 1</th>
-              <th data-term-column="term2">Term 2</th>
-              <th data-term-column="term3">Term 3</th>
-              <th>Final Grade</th>
-              <th>Descriptor</th>
-              <th>Remark</th>
-            </tr>
-          </thead>
-
-          <tbody id="academicRecordsBody">
-            {{-- EMPTY STATE: no academic records yet --}}
-            <tr>
-              <td colspan="7" class="academic-records-empty">
-                <div class="table-empty-state">
-                  <span class="empty-state-icon">
-                    <i class="fa-regular fa-folder-open"></i>
-                  </span>
-
-                  <h4>No Academic Records Yet</h4>
-                  <p>
-                    Learners' grades will appear here once
-                    academic records are available for this
-                    grade level and school year.
-                  </p>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </section>
   </div>

@@ -1,0 +1,658 @@
+/* MAIN CONTENT */
+
+.main-content {
+    margin-left: 75px;
+    min-height: 100vh;
+    padding: 35px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar:hover ~ .main-content {
+    margin-left: 280px;
+}
+
+
+/* =========================================================
+   ADMIN GRADE PUBLICATION
+========================================================= */
+
+.grade-publications-page {
+    width: 100%;
+    padding-bottom: 30px;
+    font-family: "Poppins", sans-serif;
+    color: #263238;
+}
+
+/* PAGE HEADER */
+
+.grade-publications-page .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.grade-publications-page .page-header h1 {
+    font-size: 25px;
+    font-weight: 700;
+    color: #183b2a;
+    margin: 0 0 5px;
+}
+
+.grade-publications-page .page-header p {
+    font-size: 13px;
+    color: #7b8580;
+    margin: 0;
+}
+
+/* ALERTS */
+
+.grade-publications-page .alert {
+    padding: 13px 17px;
+    border-radius: 9px;
+    margin-bottom: 18px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.grade-publications-page .alert-success {
+    background: #e8f6ed;
+    color: #176b37;
+    border: 1px solid #c8e8d2;
+}
+
+.grade-publications-page .alert-danger {
+    background: #fff0f0;
+    color: #b42318;
+    border: 1px solid #f5cccc;
+}
+
+/* ACTIVE SCHOOL YEAR CARD */
+
+.publication-info-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #ffffff;
+    padding: 22px 25px;
+    border-radius: 13px;
+    border: 1px solid #e9efeb;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+    margin-bottom: 22px;
+}
+
+.publication-info-icon {
+    width: 55px;
+    height: 55px;
+    min-width: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9f5ed;
+    color: #036f35;
+    border-radius: 12px;
+    font-size: 23px;
+}
+
+.publication-info-card span {
+    display: block;
+    color: #7b8580;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.publication-info-card h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0;
+    color: #183b2a;
+}
+
+.publication-info-card p {
+    font-size: 12px;
+    color: #68746d;
+    margin: 5px 0 0;
+}
+
+/* FILTER CARD */
+
+.publication-filter-card {
+    background: #ffffff;
+    padding: 22px 24px;
+    border-radius: 13px;
+    border: 1px solid #e9efeb;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+    margin-bottom: 22px;
+}
+
+.publication-filter-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.filter-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #45534a;
+}
+
+.filter-group select {
+    width: 100%;
+    height: 43px;
+    padding: 0 13px;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #34443a;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+.filter-group select:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.09);
+}
+
+.filter-button {
+    height: 43px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    background: #edf5ef;
+    color: #036f35;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.filter-button:hover {
+    background: #dcefe2;
+}
+
+/* PUBLICATION STATUS CARD */
+
+.publication-status-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 13px;
+    border: 1px solid #e9efeb;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+}
+
+.publication-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #edf1ee;
+}
+
+.section-label {
+    display: block;
+    font-size: 11px;
+    color: #87928b;
+    margin-bottom: 6px;
+}
+
+.publication-status-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #183b2a;
+    margin: 0;
+}
+
+/* STATUS BADGES */
+
+.publication-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.publication-badge.published {
+    background: #e7f6ec;
+    color: #08743a;
+}
+
+.publication-badge.unpublished {
+    background: #fff4df;
+    color: #a86b08;
+}
+
+/* PUBLICATION DETAILS */
+
+.publication-details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    padding: 22px 0;
+}
+
+.publication-detail-item {
+    padding: 16px;
+    background: #f8faf8;
+    border: 1px solid #edf1ee;
+    border-radius: 10px;
+}
+
+.publication-detail-item span {
+    display: block;
+    font-size: 11px;
+    color: #87928b;
+    margin-bottom: 8px;
+}
+
+.publication-detail-item strong {
+    display: block;
+    color: #263b2e;
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+/* NOTICES */
+
+.publication-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    background: #f2f7f3;
+    color: #47634f;
+    border-radius: 9px;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.publication-notice i {
+    color: #036f35;
+    margin-top: 3px;
+}
+
+.publication-notice.published-notice {
+    background: #eaf6ee;
+    color: #23613a;
+}
+
+/* PUBLISH ACTION */
+
+.publication-action {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+}
+
+.publish-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 8px;
+    background: #036f35;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.publish-button:hover:not(:disabled) {
+    background: #025a2b;
+    transform: translateY(-1px);
+}
+
+.publish-button:disabled {
+    background: #aab8ae;
+    cursor: not-allowed;
+}
+
+.publication-action small {
+    color: #a36b22;
+    font-size: 11px;
+}
+
+/* EMPTY STATE */
+
+.empty-publication-state {
+    padding: 55px 20px;
+    background: #ffffff;
+    border: 1px solid #e9efeb;
+    border-radius: 13px;
+    text-align: center;
+}
+
+.empty-publication-state > i {
+    font-size: 38px;
+    color: #a7b7ac;
+    margin-bottom: 15px;
+}
+
+.empty-publication-state h3 {
+    font-size: 17px;
+    color: #34483a;
+    margin: 0 0 7px;
+}
+
+.empty-publication-state p {
+    font-size: 12px;
+    color: #89938c;
+    margin: 0;
+}
+
+/* CONFIRMATION MODAL */
+
+.publication-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 30, 20, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+.publication-modal-overlay.show {
+    display: flex;
+}
+
+.publication-modal {
+    width: 100%;
+    max-width: 440px;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+    animation: publicationModalIn 0.2s ease;
+}
+
+@keyframes publicationModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.publication-modal .modal-icon {
+    width: 62px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 17px;
+    background: #e9f5ed;
+    color: #036f35;
+    border-radius: 50%;
+    font-size: 25px;
+}
+
+.publication-modal h2 {
+    color: #203b2b;
+    font-size: 20px;
+    margin: 0 0 10px;
+}
+
+.publication-modal p {
+    color: #748078;
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 8px 0;
+}
+
+.publication-modal .modal-period {
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 8px;
+    background: #f0f6f1;
+    color: #036f35;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.publication-modal .modal-warning {
+    padding: 11px;
+    background: #fff7e8;
+    border-radius: 8px;
+    color: #8b641e;
+    font-size: 11px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 23px;
+}
+
+.modal-actions button {
+    min-height: 40px;
+    padding: 0 17px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.cancel-button {
+    background: #edf0ee;
+    color: #526057;
+}
+
+.cancel-button:hover {
+    background: #dfe5e1;
+}
+
+.confirm-publish-button {
+    background: #036f35;
+    color: #ffffff;
+}
+
+.confirm-publish-button:hover {
+    background: #025a2b;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+    .publication-details {
+        grid-template-columns: 1fr;
+    }
+
+    .publication-filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .filter-button {
+        width: 100%;
+    }
+
+    .publication-status-card {
+        padding: 18px;
+    }
+
+    .publication-modal {
+        padding: 23px 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modal-actions form,
+    .modal-actions button {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   PUBLICATION HISTORY
+========================================================= */
+
+.publication-history-card {
+    background: #ffffff;
+    padding: 25px;
+    margin-top: 22px;
+    border-radius: 13px;
+    border: 1px solid #e9efeb;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+}
+
+.publication-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.publication-history-header h2 {
+    margin: 0 0 5px;
+    color: #183b2a;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.publication-history-header p {
+    margin: 0;
+    color: #87928b;
+    font-size: 12px;
+}
+
+.history-count {
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: #e9f5ed;
+    color: #036f35;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.publication-history-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.publication-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+.publication-history-table th {
+    padding: 14px 15px;
+    background: #f5f8f6;
+    color: #66736a;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.publication-history-table td {
+    padding: 16px 15px;
+    border-bottom: 1px solid #edf1ee;
+    color: #46534a;
+    font-size: 12px;
+}
+
+.publication-history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.publication-history-table tbody tr:hover {
+    background: #fafcfb;
+}
+
+.publication-history-table td strong {
+    color: #263b2e;
+    font-weight: 600;
+}
+
+.history-term {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: #f0f6f1;
+    color: #036f35;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.history-empty-state {
+    padding: 35px 15px;
+    text-align: center;
+}
+
+.history-empty-state i {
+    color: #a7b7ac;
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.history-empty-state h3 {
+    margin: 0 0 6px;
+    color: #34483a;
+    font-size: 15px;
+}
+
+.history-empty-state p {
+    margin: 0;
+    color: #89938c;
+    font-size: 11px;
+}
+
+@media (max-width: 768px) {
+    .publication-history-card {
+        padding: 18px;
+    }
+
+    .publication-history-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

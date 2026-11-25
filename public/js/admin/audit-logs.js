@@ -1,4 +1,47 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // =========================================
+    // AUTOMATIC AUDIT LOG FILTERS
+    // =========================================
+
+    const filterForm = document.getElementById("auditFilterForm");
+
+    if (filterForm) {
+        const searchInput = filterForm.querySelector('input[name="search"]');
+        const filterSelects = filterForm.querySelectorAll("select");
+        const dateInputs = filterForm.querySelectorAll('input[type="date"]');
+
+        let searchTimeout;
+
+        // Search automatically after user stops typing
+        if (searchInput) {
+            searchInput.addEventListener("input", () => {
+                clearTimeout(searchTimeout);
+
+                searchTimeout = setTimeout(() => {
+                    filterForm.requestSubmit();
+                }, 400);
+            });
+        }
+
+        // Automatically filter when a dropdown changes
+        filterSelects.forEach((select) => {
+            select.addEventListener("change", () => {
+                filterForm.requestSubmit();
+            });
+        });
+
+        // Automatically filter when dates change
+        dateInputs.forEach((dateInput) => {
+            dateInput.addEventListener("change", () => {
+                filterForm.requestSubmit();
+            });
+        });
+    }
+
+    // =========================================
+    // AUDIT DETAILS MODAL
+    // =========================================
+
     const modal = document.getElementById("auditModal");
     const modalBody = document.getElementById("auditModalBody");
 
@@ -9,8 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("closeAuditModalBottom"),
     ];
 
-    // Gumawa ng HTML elements gamit ang textContent
-    // upang hindi ma-interpret bilang HTML ang database text.
     function addDetail(label, value) {
         const item = document.createElement("div");
         item.className = "audit-detail-item";
@@ -21,20 +62,88 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const content = document.createElement("div");
         content.className = "audit-detail-value";
-        content.textContent = value ?? "Not available";
+
+        content.textContent =
+            value !== null && value !== undefined && value !== ""
+                ? String(value)
+                : "Not available";
+
+        item.append(title, content);
+        modalBody.appendChild(item);
+    }
+
+    function addDetail(label, value) {
+        const item = document.createElement("div");
+        item.className = "audit-detail-item";
+
+        const title = document.createElement("span");
+        title.className = "audit-detail-label";
+        title.textContent = label;
+
+        const content = document.createElement("div");
+        content.className = "audit-detail-value";
+
+        content.textContent =
+            value !== null && value !== undefined && value !== ""
+                ? String(value)
+                : "Not available";
 
         item.append(title, content);
         modalBody.appendChild(item);
     }
 
     function addJsonDetail(label, value) {
-        if (!value || Object.keys(value).length === 0) return;
+        if (
+            !value ||
+            typeof value !== "object" ||
+            Object.keys(value).length === 0
+        ) {
+            return;
+        }
 
-        addDetail(label, JSON.stringify(value, null, 2));
+        const item = document.createElement("div");
+        item.className = "audit-detail-item audit-json-detail";
+
+        const title = document.createElement("span");
+        title.className = "audit-detail-label";
+        title.textContent = label;
+
+        const list = document.createElement("div");
+        list.className = "audit-json-list";
+
+        Object.entries(value).forEach(([key, val]) => {
+            const row = document.createElement("div");
+            row.className = "audit-json-row";
+
+            const field = document.createElement("span");
+            field.className = "audit-json-key";
+            field.textContent = key.replaceAll("_", " ");
+
+            const fieldValue = document.createElement("span");
+            fieldValue.className = "audit-json-value";
+
+            let displayValue = val;
+
+            if (val === null || val === undefined || val === "") {
+                displayValue = "Not available";
+            } else if (typeof val === "object") {
+                displayValue = JSON.stringify(val, null, 2);
+            } else {
+                displayValue = String(val);
+            }
+
+            fieldValue.textContent = displayValue;
+
+            row.append(field, fieldValue);
+            list.appendChild(row);
+        });
+
+        item.append(title, list);
+        modalBody.appendChild(item);
     }
 
-    // Open a specific audit record
-    document.querySelectorAll(".audit-view-btn").forEach((button) => {
+    // Match the actual Blade button class
+    document.querySelectorAll(".audit-details-button").forEach((button) => {
         button.addEventListener("click", async () => {
             modal.hidden = false;
             modalBody.replaceChildren();
@@ -57,18 +166,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 const log = await response.json();
+
                 modalBody.replaceChildren();
 
                 addDetail("Date & Time", log.created_at);
-                addDetail("User", log.user_name);
-                addDetail("Role", log.user_role);
+                addDetail("User", log.actor_name);
+                addDetail("Email", log.actor_email);
+                addDetail("User ID", log.actor_id);
                 addDetail("Action", log.action);
-                addDetail("Module", log.module);
-                addDetail("Description", log.description);
+                addDetail("Module", log.record_type);
+                addDetail("Record Reference", log.record_key);
+                addDetail("Description", log.details?.description);
                 addDetail("IP Address", log.ip_address);
 
-                addJsonDetail("Previous Values", log.old_values);
-                addJsonDetail("New Values", log.new_values);
+                addJsonDetail("Previous Values", log.before);
+                addJsonDetail("New Values", log.after);
+                addJsonDetail("Additional Details", log.details);
             } catch (error) {
                 modalBody.replaceChildren();
 
@@ -81,6 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // =========================================
+    // CLOSE MODAL
+    // =========================================
+
     function closeModal() {
         modal.hidden = true;
     }
@@ -90,7 +207,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     modal.addEventListener("click", (event) => {
-        if (event.target === modal) closeModal();
+        if (event.target === modal) {
+            closeModal();
+        }
     });
 
     document.addEventListener("keydown", (event) => {

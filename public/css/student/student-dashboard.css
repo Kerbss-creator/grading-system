@@ -1,10 +1,11 @@
-
-/* MAIN CONTENT */
+/* =========================================
+   MAIN CONTENT
+========================================= */
 
 .student-main-content {
     min-height: 100vh;
     margin-left: 75px;
-    padding: 25px 35px;
+    padding: 30px 35px;
     transition: margin-left 0.3s ease;
     box-sizing: border-box;
 }
@@ -13,102 +14,135 @@
     margin-left: 280px;
 }
 
-/* DASHBOARD */
+/* =========================================
+   DASHBOARD
+========================================= */
 
 .student-dashboard {
     width: 100%;
     box-sizing: border-box;
 }
 
-/* DASHBOARD CONTAINER */
-
 .student-container {
     width: 100%;
-    min-height: calc(100vh - 120px);
     display: flex;
     flex-direction: column;
-    gap: 25px;
-    padding: 25px;
-    border: 1px solid #e9eee9;
-    border-radius: 18px;
-    background: #ffffff;
-    box-shadow: 0 3px 20px rgba(0, 0, 0, 0.04);
+    gap: 24px;
     box-sizing: border-box;
 }
 
-/* WELCOME CARD */
+/* =========================================
+   WELCOME CARD
+========================================= */
 
 .welcome-card {
+    position: relative;
     width: 100%;
-    min-height: 185px;
-    padding: 30px;
+    min-height: 205px;
+    padding: 32px 38px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    border-radius: 15px;
-    background: #036f35;
-    color: #ffffff;
+    gap: 25px;
     overflow: hidden;
+    border-radius: 18px;
+    background: linear-gradient(115deg, #025b2c 0%, #036f35 55%, #078849 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(3, 111, 53, 0.13);
     box-sizing: border-box;
 }
 
+.welcome-card::before,
+.welcome-card::after {
+    content: "";
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.welcome-card::before {
+    width: 290px;
+    height: 290px;
+    right: 40px;
+    top: -170px;
+}
+
+.welcome-card::after {
+    width: 230px;
+    height: 230px;
+    right: -70px;
+    bottom: -155px;
+}
+
 .welcome-text {
+    position: relative;
+    z-index: 1;
     min-width: 0;
 }
 
-.welcome-text span {
+.welcome-text > span {
     display: block;
-    font-size: 11px;
+    margin-bottom: 10px;
+    font-size: 10px;
     font-weight: 600;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
     opacity: 0.75;
 }
 
 .welcome-text h2 {
-    margin: 8px 0;
-    font-size: 25px;
+    margin: 0 0 9px;
+    font-size: 27px;
     font-weight: 600;
+    line-height: 1.35;
 }
 
 .welcome-text p {
-    max-width: 550px;
-    margin: 0 0 20px;
+    max-width: 520px;
+    margin: 0 0 23px;
     font-size: 12px;
-    line-height: 1.6;
+    line-height: 1.7;
     opacity: 0.82;
 }
 
-/* WELCOME DETAILS */
+/* =========================================
+   WELCOME DETAILS
+========================================= */
 
 .welcome-details {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 22px;
 }
 
 .welcome-detail {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
 }
 
 .welcome-detail > i {
-    font-size: 15px;
-    opacity: 0.9;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.13);
+    font-size: 14px;
 }
 
 .welcome-detail small {
     display: block;
-    margin-bottom: 2px;
-    font-size: 9px;
-    opacity: 0.65;
+    margin-bottom: 3px;
+    font-size: 10px;
+    opacity: 0.7;
 }
 
 .welcome-detail strong {
     display: block;
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .welcome-divider {
@@ -117,208 +151,365 @@
     background: rgba(255, 255, 255, 0.25);
 }
 
-/* WELCOME ICON */
+/* =========================================
+   WELCOME LOGO
+========================================= */
 
 .welcome-icon {
-    width: 120px;
-    height: 120px;
-    margin-right: 30px;
+    position: relative;
+    z-index: 1;
+    width: 125px;
+    height: 125px;
+    min-width: 125px;
+    margin-right: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.17);
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    overflow: hidden;
+    background: rgba(255, 255, 255, 0.11);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
 .welcome-icon img {
-    width: 85%;
-    height: 85%;
+    width: 82%;
+    height: 82%;
     object-fit: contain;
 }
 
-/* ANNOUNCEMENTS SECTION */
+/* =========================================
+   STUDENT PROFILE NOTICE
+========================================= */
+
+.student-profile-notice {
+    width: 100%;
+    padding: 16px 19px;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    border: 1px solid #f0dfb7;
+    border-radius: 12px;
+    background: #fffaf0;
+    color: #8a6418;
+    box-sizing: border-box;
+}
+
+.student-profile-notice > i {
+    margin-top: 2px;
+    font-size: 17px;
+}
+
+.student-profile-notice strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.student-profile-notice p {
+    margin: 0;
+    color: #8b7954;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* =========================================
+   ANNOUNCEMENTS SECTION
+========================================= */
 
 .student-announcements-section {
     width: 100%;
-    margin: 0;
-    padding: 25px;
-    background: #ffffff;
+    padding: 26px;
     border: 1px solid #e9eee9;
-    border-radius: 14px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.025);
     box-sizing: border-box;
-    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
 .student-announcements-section:hover {
     border-color: #dce8df;
-    box-shadow: 0 6px 20px rgba(3, 111, 53, 0.06);
+    box-shadow: 0 7px 22px rgba(3, 111, 53, 0.045);
 }
 
-/* ANNOUNCEMENTS HEADER */
+/* =========================================
+   ANNOUNCEMENTS HEADER
+========================================= */
 
 .student-section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 22px;
+    gap: 15px;
+    margin-bottom: 23px;
 }
 
 .student-section-heading {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 13px;
 }
 
 .student-section-icon {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 11px;
     background: #e8f5ed;
     color: #036f35;
-    border-radius: 11px;
     font-size: 17px;
 }
 
 .student-section-heading h2 {
     margin: 0 0 5px;
     color: #222222;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
 }
 
 .student-section-heading p {
     margin: 0;
     color: #888888;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.6;
 }
 
-/* EMPTY ANNOUNCEMENTS STATE */
+/* VIEW ALL */
+
+.view-all-announcements {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    border: 1px solid #dcebe1;
+    border-radius: 8px;
+    color: #036f35;
+    background: #f5faf6;
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.view-all-announcements:hover {
+    background: #036f35;
+    border-color: #036f35;
+    color: #ffffff;
+}
+
+.view-all-announcements i {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.view-all-announcements:hover i {
+    transform: translateX(3px);
+}
+
+/* =========================================
+   ANNOUNCEMENT ITEM
+========================================= */
+
+.student-announcement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 18px 0;
+    border-top: 1px solid #edf1ed;
+}
+
+.student-announcement-item:first-of-type {
+    border-top: none;
+}
+
+.student-announcement-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #edf7f0;
+    color: #036f35;
+    font-size: 15px;
+}
+
+.student-announcement-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.student-announcement-content h3 {
+    margin: 0 0 7px;
+    color: #303630;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.student-announcement-content p {
+    margin: 0 0 10px;
+    color: #777f78;
+    font-size: 11px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.student-announcement-content small {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #9a9f9a;
+    font-size: 10px;
+}
+
+.student-announcement-content small i {
+    color: #036f35;
+}
+
+/* =========================================
+   EMPTY ANNOUNCEMENTS STATE
+========================================= */
 
 .student-announcement-empty {
-    min-height: 240px;
+    min-height: 230px;
     padding: 30px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box;
-    background: #fbfdfb;
     border: 1px dashed #d8e4da;
     border-radius: 12px;
+    background: #fbfdfb;
     text-align: center;
+    box-sizing: border-box;
 }
 
 .student-empty-icon {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 16px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
     background: #e8f5ed;
     color: #036f35;
-    border-radius: 50%;
-    font-size: 25px;
+    font-size: 23px;
 }
 
 .student-announcement-empty h3 {
     margin: 0 0 8px;
     color: #333333;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
 }
 
 .student-announcement-empty p {
-    max-width: 340px;
+    max-width: 350px;
     margin: 0;
     color: #929292;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.8;
 }
 
-/* TABLET */
+/* =========================================
+   TABLET
+========================================= */
 
 @media (max-width: 768px) {
     .student-main-content {
-        padding: 20px;
+        padding: 22px 20px;
     }
 
     .student-container {
-        min-height: auto;
-        padding: 18px;
         gap: 20px;
     }
 
     .welcome-card {
-        padding: 24px;
+        min-height: 190px;
+        padding: 25px;
     }
 
     .welcome-text h2 {
-        font-size: 21px;
+        font-size: 22px;
     }
 
     .welcome-icon {
-        width: 90px;
-        height: 90px;
-        min-width: 90px;
+        width: 95px;
+        height: 95px;
+        min-width: 95px;
         margin-right: 0;
-        font-size: 40px;
     }
 
     .student-announcements-section {
-        padding: 20px;
-    }
-
-    .student-announcement-empty {
-        min-height: 220px;
+        padding: 21px;
     }
 }
 
-/* MOBILE */
+/* =========================================
+   MOBILE
+========================================= */
 
 @media (max-width: 480px) {
     .student-main-content {
-        padding: 15px;
+        padding: 16px 13px;
     }
 
     .student-container {
-        padding: 12px;
         gap: 16px;
-        border-radius: 14px;
     }
 
     .welcome-card {
         min-height: auto;
-        padding: 20px 16px;
-        gap: 10px;
+        padding: 23px 18px;
+        border-radius: 14px;
     }
 
-    .welcome-text span {
+    .welcome-text > span {
         font-size: 9px;
+        letter-spacing: 1.5px;
     }
 
     .welcome-text h2 {
-        font-size: 18px;
+        font-size: 19px;
     }
 
     .welcome-text p {
-        margin-bottom: 16px;
+        margin-bottom: 17px;
         font-size: 11px;
     }
 
     .welcome-details {
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 13px;
     }
 
     .welcome-detail {
-        gap: 6px;
+        gap: 7px;
+    }
+
+    .welcome-detail > i {
+        width: 29px;
+        height: 29px;
+        font-size: 12px;
+    }
+
+    .welcome-detail small {
+        font-size: 9px;
+    }
+
+    .welcome-detail strong {
+        font-size: 10px;
     }
 
     .welcome-divider {
@@ -329,12 +520,18 @@
         display: none;
     }
 
+    .student-profile-notice {
+        padding: 14px;
+    }
+
     .student-announcements-section {
-        padding: 16px;
-        border-radius: 12px;
+        padding: 17px;
+        border-radius: 13px;
     }
 
     .student-section-header {
+        align-items: flex-start;
+        gap: 10px;
         margin-bottom: 18px;
     }
 
@@ -348,7 +545,7 @@
         height: 38px;
         min-width: 38px;
         border-radius: 9px;
-        font-size: 15px;
+        font-size: 14px;
     }
 
     .student-section-heading h2 {
@@ -359,16 +556,42 @@
         font-size: 10px;
     }
 
+    .view-all-announcements {
+        padding: 8px 9px;
+        gap: 5px;
+        font-size: 9px;
+    }
+
+    .student-announcement-item {
+        gap: 11px;
+        padding: 15px 0;
+    }
+
+    .student-announcement-icon {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        font-size: 13px;
+    }
+
+    .student-announcement-content h3 {
+        font-size: 12px;
+    }
+
+    .student-announcement-content p {
+        font-size: 10px;
+    }
+
     .student-announcement-empty {
         min-height: 190px;
         padding: 22px 12px;
     }
 
     .student-empty-icon {
-        width: 54px;
-        height: 54px;
-        margin-bottom: 13px;
-        font-size: 21px;
+        width: 52px;
+        height: 52px;
+        margin-bottom: 12px;
+        font-size: 20px;
     }
 
     .student-announcement-empty h3 {
@@ -376,6 +599,500 @@
     }
 
     .student-announcement-empty p {
+        font-size: 10px;
+    }
+}
+
+/* =========================================
+   MY ACADEMIC INFORMATION
+========================================= */
+
+.student-academic-section {
+    width: 100%;
+    padding: 25px;
+    border: 1px solid #e9eee9;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.025);
+    box-sizing: border-box;
+}
+
+.student-academic-header {
+    margin-bottom: 22px;
+}
+
+.student-academic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.student-academic-item {
+    min-width: 0;
+    min-height: 85px;
+    padding: 17px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    border: 1px solid #edf1ed;
+    border-radius: 12px;
+    background: #fbfdfb;
+    box-sizing: border-box;
+}
+
+.student-academic-item-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #e8f5ed;
+    color: #036f35;
+    font-size: 15px;
+}
+
+.student-academic-item small {
+    display: block;
+    margin-bottom: 6px;
+    color: #929a93;
+    font-size: 10px;
+}
+
+.student-academic-item strong {
+    display: block;
+    color: #303630;
+    font-size: 12px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+    .student-academic-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .student-academic-section {
+        padding: 17px;
+    }
+
+    .student-academic-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .student-academic-item {
+        min-height: 72px;
+        padding: 13px;
+    }
+}
+/* =========================================
+   QUICK ACCESS SECTION
+========================================= */
+
+.student-quick-access-section {
+    width: 100%;
+    padding: 25px;
+    background: #ffffff;
+    border: 1px solid #e9eee9;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.025);
+    box-sizing: border-box;
+}
+
+.student-quick-access-section > .student-section-heading {
+    margin-bottom: 22px;
+}
+
+.student-quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.student-quick-access-card {
+    min-width: 0;
+    min-height: 115px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    background: #fbfdfb;
+    border: 1px solid #edf1ed;
+    border-radius: 13px;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+/* GREEN TOP HOVER LINE */
+.student-quick-access-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: #036f35;
+    transition: width 0.3s ease;
+}
+
+.student-quick-access-card:hover::before {
+    width: 100%;
+}
+
+.student-quick-access-card:hover {
+    background: #f3faf5;
+    border-color: #b9ddc6;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(3, 111, 53, 0.07);
+}
+
+.quick-access-icon {
+    width: 43px;
+    height: 43px;
+    min-width: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    font-size: 16px;
+}
+
+.grades-icon {
+    color: #036f35;
+    background: #e8f5ed;
+}
+
+.announcements-icon {
+    color: #b7791f;
+    background: #fff5df;
+}
+
+.profile-icon {
+    color: #3975b7;
+    background: #eaf2fc;
+}
+
+.quick-access-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.quick-access-content h3 {
+    margin: 0 0 6px;
+    color: #303630;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.quick-access-content p {
+    margin: 0;
+    color: #929a93;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.quick-access-arrow {
+    color: #a2aaa3;
+    font-size: 12px;
+    transition: all 0.25s ease;
+}
+
+.student-quick-access-card:hover .quick-access-arrow {
+    color: #036f35;
+    transform: translateX(4px);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .student-quick-access-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .student-quick-access-section {
+        padding: 17px;
+    }
+
+    .student-quick-access-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .student-quick-access-card {
+        min-height: 90px;
+        padding: 14px;
+    }
+}
+
+/* =========================================
+   MY SUBJECT TEACHERS SECTION
+========================================= */
+
+.student-subjects-section {
+    width: 100%;
+    padding: 25px;
+    border: 1px solid #e9eee9;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.025);
+    box-sizing: border-box;
+}
+
+.student-subjects-section > .student-section-heading {
+    margin-bottom: 22px;
+}
+
+/* SUBJECT GRID */
+
+.student-subjects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+/* SUBJECT CARD */
+
+.student-subject-card {
+    min-width: 0;
+    padding: 17px;
+    border: 1px solid #edf1ed;
+    border-radius: 12px;
+    background: #fbfdfb;
+    box-sizing: border-box;
+    transition: all 0.25s ease;
+}
+
+.student-subject-card:hover {
+    border-color: #c8dfcf;
+    background: #f7fbf8;
+    box-shadow: 0 5px 14px rgba(3, 111, 53, 0.05);
+    transform: translateY(-2px);
+}
+
+/* SUBJECT HEADER */
+
+.student-subject-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9eee9;
+}
+
+.student-subject-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #e8f5ed;
+    color: #036f35;
+    font-size: 15px;
+}
+
+.student-subject-info {
+    min-width: 0;
+}
+
+.student-subject-info h3 {
+    margin: 0 0 4px;
+    color: #303630;
+    font-size: 12px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.student-subject-info span {
+    color: #929a93;
+    font-size: 10px;
+}
+
+/* SUBJECT TEACHER DETAILS */
+
+.student-subject-teachers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 14px;
+}
+
+.student-subject-teacher {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.student-teacher-icon {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #edf7f0;
+    color: #036f35;
+    font-size: 12px;
+}
+
+.student-teacher-info {
+    min-width: 0;
+}
+
+.student-teacher-info small {
+    display: block;
+    margin-bottom: 4px;
+    color: #929a93;
+    font-size: 10px;
+}
+
+.student-teacher-info strong {
+    display: block;
+    color: #303630;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* NO ASSIGNED TEACHER */
+
+.student-no-teacher {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px;
+    border: 1px solid #f0e6cc;
+    border-radius: 9px;
+    background: #fffcf5;
+    color: #9a762c;
+}
+
+.student-no-teacher > i {
+    margin-top: 2px;
+    font-size: 13px;
+}
+
+.student-no-teacher strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #80621f;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.student-no-teacher p {
+    margin: 0;
+    color: #9a895f;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+/* EMPTY SUBJECT LIST */
+
+.student-subjects-empty {
+    grid-column: 1 / -1;
+    min-height: 210px;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #d8e4da;
+    border-radius: 12px;
+    background: #fbfdfb;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.student-subjects-empty h3 {
+    margin: 0 0 8px;
+    color: #333333;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.student-subjects-empty p {
+    max-width: 360px;
+    margin: 0;
+    color: #929292;
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+/* =========================================
+   SUBJECTS RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 900px) {
+    .student-subjects-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .student-subjects-section {
+        padding: 17px;
+        border-radius: 13px;
+    }
+
+    .student-subjects-section > .student-section-heading {
+        margin-bottom: 17px;
+    }
+
+    .student-subjects-grid {
+        grid-template-columns: 1fr;
+        gap: 11px;
+    }
+
+    .student-subject-card {
+        padding: 14px;
+    }
+
+    .student-subject-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        font-size: 13px;
+    }
+
+    .student-subject-info h3 {
+        font-size: 12px;
+    }
+
+    .student-teacher-info strong {
         font-size: 11px;
     }
+
+    .student-subjects-empty {
+        min-height: 180px;
+        padding: 20px 12px;
+    }
+}
+
+/* =========================================
+   SUBJECT TEACHERS - 12PX TYPOGRAPHY
+========================================= */
+
+.student-subject-info h3,
+.student-subject-info span,
+.student-teacher-info small,
+.student-teacher-info strong,
+.student-no-teacher strong,
+.student-no-teacher p,
+.student-subjects-empty h3,
+.student-subjects-empty p {
+    font-size: 12px;
 }

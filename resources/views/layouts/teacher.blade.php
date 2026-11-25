@@ -326,9 +326,11 @@
 
 
                         <div class="profile-icon">
-
-                            <i class="fa-solid fa-chalkboard-user"></i>
-
+                            @if (Auth::user()?->profile_photo_path)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="Teacher Profile">
+                            @else
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            @endif
                         </div>
 
                         <div class="profile-info">
@@ -363,9 +365,12 @@
 
 
                             <div class="profile-menu-icon">
-
-                                <i class="fa-solid fa-chalkboard-user"></i>
-
+                                @if (Auth::user()?->profile_photo_path)
+                                    <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}"
+                                        alt="Teacher Profile">
+                                @else
+                                    <i class="fa-solid fa-chalkboard-user"></i>
+                                @endif
                             </div>
 
 

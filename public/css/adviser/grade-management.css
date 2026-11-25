@@ -1,0 +1,1256 @@
+/* =========================================================
+   FORBES ACADEMY — ADVISER GRADE MANAGEMENT
+   Adapted from Teacher Grade Management
+   ========================================================= */
+
+/* =========================================================
+   1. DESIGN TOKENS
+   ========================================================= */
+
+:root {
+    --grade-green: #036f35;
+    --grade-green-dark: #025c2c;
+    --grade-text: #18332a;
+    --grade-muted: #6b7d75;
+    --grade-border: #dce8e1;
+    --grade-surface: #ffffff;
+    --grade-page: #f5f8f6;
+
+    --grade-blue: #eaf3ff;
+    --grade-purple: #f1edff;
+    --grade-teal: #e8f7f1;
+
+    --grade-danger: #dc2626;
+    --grade-danger-bg: #fff1f1;
+
+    --grade-shadow: 0 8px 24px rgba(24, 62, 42, 0.06);
+}
+
+/* =========================================================
+   2. BACK BUTTON
+   ========================================================= */
+
+.grade-management-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 16px;
+    color: #ffffff;
+    background-color: var(--grade-green);
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.back-button:hover {
+    color: #ffffff;
+    background-color: var(--grade-green-dark);
+    transform: translateX(-2px);
+}
+
+.back-button:focus-visible {
+    outline: 2px solid var(--grade-green);
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   3. MAIN GRADEBOOK LAYOUT
+   ========================================================= */
+
+.gradebook-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+    color: var(--grade-text);
+}
+
+.gradebook-tabs-card {
+    min-width: 0;
+    overflow: hidden;
+    background: var(--grade-surface);
+    border: 1px solid var(--grade-border);
+    border-radius: 16px;
+    box-shadow: var(--grade-shadow);
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+/* =========================================================
+   4. GRADEBOOK OVERVIEW
+   ========================================================= */
+
+.gradebook-overview {
+    display: grid;
+    grid-template-columns:
+        minmax(220px, 1fr)
+        minmax(270px, 0.95fr)
+        minmax(230px, 1fr);
+    align-items: center;
+    gap: 22px;
+    padding: 22px;
+    background: var(--grade-surface);
+    border: 1px solid var(--grade-border);
+    border-radius: 16px;
+    box-shadow: var(--grade-shadow);
+}
+
+.gradebook-subject {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+}
+
+.gradebook-subject-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 58px;
+    height: 58px;
+    color: var(--grade-green);
+    background: #e7f6ec;
+    border-radius: 16px;
+    font-size: 25px;
+}
+
+.subject-title-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.subject-title-line h2 {
+    margin: 0;
+    color: #18382a;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.subject-code {
+    padding: 5px 9px;
+    color: var(--grade-green);
+    background: #eaf7ee;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.gradebook-subject p {
+    margin: 8px 0 0;
+    color: var(--grade-muted);
+    font-size: 13px;
+}
+
+.meta-dot {
+    padding: 0 5px;
+}
+
+/* =========================================================
+   5. GRADEBOOK FILTERS
+   ========================================================= */
+
+.gradebook-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.gradebook-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.gradebook-filter label {
+    color: #52685d;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.gradebook-filter select {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    color: var(--grade-text);
+    background: #ffffff;
+    border: 1px solid var(--grade-border);
+    border-radius: 9px;
+    font: inherit;
+    font-size: 13px;
+}
+
+.gradebook-filter select:focus,
+.score-input:focus {
+    outline: 2px solid rgba(3, 111, 53, 0.18);
+    border-color: var(--grade-green);
+}
+
+/* =========================================================
+   6. POLICY NOTE
+   ========================================================= */
+
+.policy-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 14px;
+    color: #101010;
+    background: #c6f9d5;
+    border: 1px solid #dce8fb;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.policy-note > i {
+    margin-top: 2px;
+    font-size: 17px;
+}
+
+.policy-note strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.policy-note p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   7. GRADEBOOK TABS
+   ========================================================= */
+
+.gradebook-tabs {
+    display: flex;
+    gap: 5px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--grade-border);
+    overflow-x: auto;
+}
+
+.gradebook-tab {
+    flex: 0 0 auto;
+    padding: 12px 20px;
+    color: #53695d;
+    background: transparent;
+    border: 0;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        color 0.22s ease,
+        background 0.22s ease;
+}
+
+.gradebook-tab:hover {
+    color: var(--grade-green);
+    background: #f0f8f2;
+}
+
+.gradebook-tab.is-active {
+    color: #ffffff;
+    background: var(--grade-green);
+    box-shadow: 0 5px 12px rgba(3, 111, 53, 0.16);
+}
+
+.gradebook-tab:focus-visible,
+.btn:focus-visible {
+    outline: 3px solid rgba(3, 111, 53, 0.24);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   8. GRADEBOOK TOOLBAR
+   ========================================================= */
+
+.gradebook-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 20px;
+}
+
+.gradebook-toolbar h3 {
+    margin: 0 0 5px;
+    color: #18382a;
+    font-size: 16px;
+}
+
+.gradebook-toolbar p {
+    margin: 0;
+    color: var(--grade-muted);
+    font-size: 12px;
+}
+
+.gradebook-toolbar-actions,
+.gradebook-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+}
+
+/* =========================================================
+   9. GRADEBOOK TABLE
+   ========================================================= */
+
+.gradebook-table-wrap {
+    width: 100%;
+    overflow: auto;
+    border-top: 1px solid var(--grade-border);
+    border-bottom: 1px solid var(--grade-border);
+}
+
+.gradebook-table {
+    width: 100%;
+    min-width: 1450px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+}
+
+.gradebook-table th,
+.gradebook-table td {
+    padding: 9px 8px;
+    text-align: center;
+    white-space: nowrap;
+    border-right: 1px solid #e5eee8;
+    border-bottom: 1px solid #e5eee8;
+}
+
+.gradebook-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    color: #304c3d;
+    background: #f7faf8;
+    font-weight: 700;
+}
+
+.gradebook-table thead tr:first-child th {
+    height: 48px;
+}
+
+.gradebook-table thead tr:nth-child(2) th {
+    top: 48px;
+    height: 48px;
+}
+
+.gradebook-table th span {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.gradebook-table th small {
+    display: block;
+    margin-top: 5px;
+    color: #718379;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.gradebook-table tbody tr {
+    transition: background 0.18s ease;
+}
+
+.gradebook-table tbody tr:hover td {
+    background-color: #f4faf6;
+}
+
+.gradebook-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Sticky First Two Columns */
+
+.gradebook-table .col-number {
+    position: sticky;
+    left: 0;
+    z-index: 6;
+    width: 42px;
+    min-width: 42px;
+    background: #f7faf8;
+}
+
+.gradebook-table .col-learner {
+    position: sticky;
+    left: 42px;
+    z-index: 5;
+    min-width: 185px;
+    text-align: left;
+    background: #f7faf8;
+}
+
+.gradebook-table tbody .row-number {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    color: #7c8d83;
+    background: #fbfdfb;
+}
+
+.gradebook-table tbody .learner-name {
+    position: sticky;
+    left: 42px;
+    z-index: 3;
+    min-width: 185px;
+    color: #2c4437;
+    text-align: left;
+    background: #ffffff;
+    font-weight: 600;
+}
+
+.gradebook-table tbody tr:hover .row-number,
+.gradebook-table tbody tr:hover .learner-name {
+    background: #f4faf6;
+}
+
+.gradebook-table .row-number {
+    color: #7c8d83;
+    background: #fbfdfb;
+}
+
+/* Assessment Group Colors */
+
+.group-ww {
+    background: #ffe8c2 !important;
+}
+
+.group-pt {
+    background: #9eb7e5 !important;
+}
+
+.group-ex {
+    background: #bdd2a6 !important;
+}
+
+.assessment-heading {
+    min-width: 82px;
+}
+
+.computed-heading {
+    min-width: 74px;
+    background: #f3f7f4 !important;
+}
+
+.initial-heading {
+    background: #e8f4ed !important;
+}
+
+/* =========================================================
+   10. SCORE INPUTS
+   ========================================================= */
+
+.score-cell {
+    background: #ffffff;
+}
+
+.score-input {
+    width: 66px;
+    max-width: 100%;
+    padding: 8px 5px;
+    color: #243d30;
+    text-align: center;
+    background: #ffffff;
+    border: 1px solid #d8e5dc;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 12px;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.gradebook-table .score-input {
+    display: block;
+    width: 100%;
+    min-width: 65px;
+    min-height: 36px;
+    padding: 6px;
+    box-sizing: border-box;
+    text-align: center;
+    cursor: cell;
+}
+
+.gradebook-table .score-input:focus {
+    position: relative;
+    z-index: 1;
+    outline: 2px solid var(--grade-green);
+    outline-offset: -2px;
+    background-color: #effaf3;
+    border-color: var(--grade-green);
+}
+
+.gradebook-table .learner-row:focus-within {
+    background-color: #f8fcf9;
+}
+
+/* Invalid Score */
+
+.score-input:invalid,
+.score-input.is-invalid {
+    background: #fff3f2;
+    border-color: var(--grade-danger);
+}
+
+.gradebook-table .score-input.is-invalid {
+    background-color: var(--grade-danger-bg);
+    border-color: #dc3545;
+}
+
+.gradebook-table .score-input.is-invalid:focus {
+    outline-color: #dc3545;
+}
+
+/* =========================================================
+   11. COMPUTED GRADES
+   ========================================================= */
+
+.computed-cell {
+    background: #fbfdfb;
+    font-variant-numeric: tabular-nums;
+}
+
+.ww-ps,
+.ww-ws {
+    background: #f0f6ff !important;
+}
+
+.pt-ps,
+.pt-ws {
+    background: #effaf4 !important;
+}
+
+.ex-ps,
+.ex-ws {
+    background: #f6f3ff !important;
+}
+
+.initial-grade {
+    color: #075e32;
+    background: #edf8f0 !important;
+    font-weight: 800;
+}
+
+.grade-failed {
+    color: var(--grade-danger) !important;
+    font-weight: 700;
+}
+
+/* =========================================================
+   12. GRADE DESCRIPTORS AND STATUS
+   ========================================================= */
+
+.status-pending {
+    display: inline-block;
+    padding: 5px 8px;
+    color: #6b7280;
+    background: #f0f2f1;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.status-failed {
+    color: var(--grade-danger) !important;
+    font-weight: 600;
+}
+
+/* =========================================================
+   13. GRADEBOOK FOOTER AND ACTION BUTTONS
+   ========================================================= */
+
+.gradebook-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 20px;
+}
+
+.computation-legend {
+    min-width: 0;
+}
+
+.computation-legend strong {
+    color: var(--grade-green);
+    font-size: 12px;
+}
+
+.computation-legend p {
+    margin: 7px 0 0;
+    color: #62766a;
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+/* General Buttons */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    color: inherit;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-light {
+    color: #405b4b;
+    background: #ffffff;
+    border-color: var(--grade-border);
+}
+
+.btn-light:hover {
+    color: var(--grade-green);
+    background: #f7fbf8;
+    border-color: #b7d6c1;
+}
+
+.btn-primary {
+    color: #ffffff;
+    background: var(--grade-green);
+    border-color: var(--grade-green);
+}
+
+.btn-primary:hover {
+    background: var(--grade-green-dark);
+    border-color: var(--grade-green-dark);
+}
+
+/* =========================================================
+   14. SUMMARY OF GRADES
+   ========================================================= */
+
+.summary-view {
+    width: 100%;
+    min-height: 330px;
+    padding: 24px;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+.summary-school-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid #e8eee9;
+}
+
+.summary-school-logo {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+
+.summary-school-title {
+    flex: 1;
+    padding-right: 72px;
+    text-align: center;
+}
+
+.summary-school-title h3 {
+    margin: 0 0 6px;
+    color: #222222;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.summary-school-title p {
+    color: #555555;
+    font-size: 13px;
+}
+
+/* Summary Table */
+
+.summary-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #222222;
+}
+
+.summary-grades-table {
+    width: 100%;
+    min-width: 850px;
+    color: #222222;
+    background: #ffffff;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.summary-grades-table th,
+.summary-grades-table td {
+    padding: 10px 12px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #222222;
+}
+
+.summary-grades-table thead th {
+    background: #ffffff;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.summary-grades-table .summary-number-column {
+    width: 42px;
+}
+
+.summary-grades-table .summary-learner-column {
+    min-width: 190px;
+    text-align: left;
+}
+
+.summary-grades-table .summary-final-column {
+    min-width: 105px;
+    background: #eaf5ed;
+}
+
+.summary-grades-table .summary-result-column {
+    min-width: 120px;
+}
+
+.summary-grades-table tbody tr:hover {
+    background: #f5faf6;
+}
+
+.summary-grades-table .summary-number {
+    background: #f4f8f4;
+}
+
+.summary-grades-table .summary-learner-name {
+    text-align: left;
+    font-weight: 500;
+}
+
+.summary-grades-table .summary-final-grade {
+    background: #f0f8f1;
+    font-weight: 700;
+}
+
+.summary-grades-table .summary-pending {
+    color: #777777;
+    font-size: 12px;
+}
+
+.summary-grades-table .summary-no-learners {
+    padding: 28px;
+    color: #777777;
+}
+
+/* Summary Footer Note */
+
+.summary-footer-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    color: #555555;
+    background: #f3f8f4;
+    border-left: 4px solid var(--grade-green);
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.summary-footer-note i {
+    margin-top: 3px;
+    color: var(--grade-green);
+}
+
+/* Summary Empty State */
+
+.summary-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 15px;
+    color: var(--grade-green);
+    background: #e9f7ee;
+    border-radius: 18px;
+    font-size: 25px;
+}
+
+.summary-view p {
+    max-width: 480px;
+    margin: 0 auto;
+    color: var(--grade-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* =========================================================
+   15. ASSESSMENT SETTINGS MODAL
+   ========================================================= */
+
+.assessment-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.assessment-modal-overlay.is-hidden {
+    display: none;
+}
+
+.assessment-modal {
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+}
+
+.assessment-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 22px 24px;
+    border-bottom: 1px solid #e8ece9;
+}
+
+.assessment-modal-header h3 {
+    margin: 0 0 5px;
+    color: #173c29;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.assessment-modal-header p {
+    margin: 0;
+    color: #758078;
+    font-size: 13px;
+}
+
+.assessment-modal-close {
+    width: 32px;
+    height: 32px;
+    color: #555555;
+    background: #f2f5f3;
+    border: none;
+    border-radius: 7px;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.assessment-modal-body {
+    padding: 22px 24px;
+}
+
+/* Fixed Assessment Weights */
+
+.assessment-fixed-weights {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 13px;
+    background: #f3faf5;
+    border: 1px solid #dcece1;
+    border-radius: 9px;
+    font-size: 12px;
+}
+
+.assessment-fixed-weights strong {
+    width: 100%;
+    color: #245b38;
+    font-size: 13px;
+}
+
+.assessment-fixed-weights span {
+    padding: 5px 9px;
+    color: #245b38;
+    background: #ffffff;
+    border-radius: 5px;
+    font-weight: 700;
+}
+
+/* Assessment Setting Rows */
+
+.assessment-setting-row {
+    display: grid;
+    grid-template-columns: 1fr 110px 45px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.assessment-setting-row label {
+    color: #35443a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.assessment-setting-row input {
+    width: 100%;
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid #d9e1dc;
+    border-radius: 7px;
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.assessment-setting-row input:focus {
+    border-color: var(--grade-green);
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.1);
+}
+
+.assessment-group-label {
+    color: #53665a;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.assessment-settings-note {
+    margin: 18px 0 0;
+    padding: 12px;
+    color: #6d786f;
+    background: #f6f7f6;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.assessment-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #e8ece9;
+}
+
+/* Blur Background While Modal Is Open */
+
+.gradebook-page:has(.assessment-modal-overlay:not(.is-hidden))
+    > *:not(#assessmentSettingsModal) {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+}
+
+/* =========================================================
+   16. WARNING MODALS
+   ========================================================= */
+
+.warning-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.warning-modal-overlay.is-hidden {
+    display: none;
+}
+
+.warning-modal {
+    width: min(100%, 420px);
+    padding: 28px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.warning-modal-icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 14px;
+    color: #9a6700;
+    background: #fff3cd;
+    border-radius: 50%;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.warning-modal h3 {
+    margin: 0 0 10px;
+    color: #202124;
+    font-size: 20px;
+}
+
+.warning-modal p {
+    margin: 0;
+    color: #626262;
+    line-height: 1.6;
+}
+
+.warning-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.warning-modal-actions button {
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+}
+
+.warning-cancel-btn {
+    color: #333333;
+    background: #f1f3f5;
+}
+
+.warning-confirm-btn {
+    color: #ffffff;
+    background: #b42318;
+}
+
+/* =========================================================
+   17. GRADE LOCK MODAL
+   ========================================================= */
+
+.grade-lock-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.grade-lock-overlay.show {
+    display: flex;
+}
+
+.grade-lock-modal {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    animation: gradeModalIn 0.25s ease;
+}
+
+.grade-lock-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: #fef3c7;
+    color: #b45309;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 26px;
+}
+
+.grade-lock-modal h2 {
+    color: #183b29;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.grade-lock-modal p {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.grade-lock-notice {
+    display: flex;
+    gap: 10px;
+    text-align: left;
+    background: #f0fdf4;
+    color: #166534;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 20px 0;
+}
+
+.grade-lock-modal button {
+    width: 100%;
+    border: none;
+    border-radius: 9px;
+    padding: 13px;
+    background: #036f35;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.grade-lock-modal button:hover {
+    background: #025c2c;
+}
+
+@keyframes gradeModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =========================================================
+   18. RESPONSIVE DESIGN
+   ========================================================= */
+
+@media (max-width: 1200px) {
+    .gradebook-overview {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .policy-note {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-view {
+        padding: 14px;
+    }
+
+    .summary-school-header {
+        gap: 10px;
+    }
+
+    .summary-school-logo {
+        width: 52px;
+        height: 52px;
+    }
+
+    .summary-school-title {
+        padding-right: 0;
+    }
+
+    .summary-school-title h3 {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 760px) {
+    .gradebook-overview {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .gradebook-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .gradebook-toolbar,
+    .gradebook-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .gradebook-actions {
+        width: 100%;
+    }
+
+    .gradebook-actions .btn {
+        flex: 1;
+    }
+
+    .gradebook-tab {
+        padding: 10px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .assessment-modal-header,
+    .assessment-modal-body,
+    .assessment-modal-footer {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .assessment-setting-row {
+        grid-template-columns: 1fr 90px 35px;
+        gap: 8px;
+    }
+}
+
+/* =========================================================
+   19. ACCESSIBILITY — REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .gradebook-tab,
+    .gradebook-table tbody tr,
+    .score-input,
+    .btn {
+        transition: none !important;
+    }
+}

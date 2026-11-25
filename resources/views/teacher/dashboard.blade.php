@@ -14,9 +14,7 @@
 
     <section class="dashboard-container">
 
-
         {{-- WELCOME CARD --}}
-
         <div class="welcome-card">
 
             <div class="welcome-text">
@@ -37,7 +35,9 @@
 
                         <div>
                             <small>School Year</small>
-                            <strong>2026 - 2027</strong>
+                            <strong>
+                                {{ $schoolYear ?? 'No Active School Year' }}
+                            </strong>
                         </div>
                     </div>
 
@@ -47,8 +47,14 @@
                         <i class="fa-solid fa-book-open"></i>
 
                         <div>
-                            <small>Term</small>
-                            <strong>1st Term</strong>
+                            <small>Active Term</small>
+                            <strong>
+                                @if($term)
+                                    {{ $term == 1 ? '1st Term' : ($term == 2 ? '2nd Term' : '3rd Term') }}
+                                @else
+                                    No Active Term
+                                @endif
+                            </strong>
                         </div>
                     </div>
 
@@ -63,17 +69,11 @@
         </div>
 
 
-
         {{-- OVERVIEW --}}
-
         <div class="section-header">
-
             <h2>Overview</h2>
-
         </div>
 
-
-        {{-- STATISTICS --}}
         <div class="stats-grid">
 
             {{-- MY CLASSES --}}
@@ -84,15 +84,9 @@
                 </div>
 
                 <div class="stat-info">
-
-                    <span>My Classes</span>
-
-                    <h3>3</h3>
-
-                    <small>
-                        Classes assigned
-                    </small>
-
+                    <span>My Subjects</span>
+                    <h3>{{ $totalClasses }}</h3>
+                    <small>Assigned subjects</small>
                 </div>
 
                 <i class="fa-solid fa-chevron-right stat-arrow"></i>
@@ -108,15 +102,9 @@
                 </div>
 
                 <div class="stat-info">
-
                     <span>Total Students</span>
-
-                    <h3>90</h3>
-
-                    <small>
-                        Across all classes
-                    </small>
-
+                    <h3>{{ $totalStudents }}</h3>
+                    <small>Unique active students</small>
                 </div>
 
                 <i class="fa-solid fa-chevron-right stat-arrow"></i>
@@ -132,15 +120,9 @@
                 </div>
 
                 <div class="stat-info">
-
                     <span>Pending Grades</span>
-
-                    <h3>1</h3>
-
-                    <small>
-                        Class needs submission
-                    </small>
-
+                    <h3>{{ $pendingGrades }}</h3>
+                    <small>Incomplete student grades</small>
                 </div>
 
                 <i class="fa-solid fa-chevron-right stat-arrow"></i>
@@ -156,15 +138,9 @@
                 </div>
 
                 <div class="stat-info">
-
                     <span>Completed Grades</span>
-
-                    <h3>2</h3>
-
-                    <small>
-                        Classes completed
-                    </small>
-
+                    <h3>{{ $completedGrades }}</h3>
+                    <small>Complete student assessments</small>
                 </div>
 
                 <i class="fa-solid fa-chevron-right stat-arrow"></i>
@@ -174,9 +150,7 @@
         </div>
 
 
-
         {{-- MY CLASSES + QUICK ACTIONS --}}
-
         <div class="dashboard-grid">
 
             {{-- MY CLASSES --}}
@@ -192,111 +166,63 @@
 
                         <div>
                             <h2>My Classes</h2>
-                            <p>Classes currently assigned to you</p>
+                            <p>Subjects currently assigned to you</p>
                         </div>
 
                     </div>
-
-                    <button class="view-btn">
-                        View All
-                    </button>
 
                 </div>
 
 
                 <div class="class-list">
 
-                    {{-- CLASS 1 --}}
-                    <div class="class-item">
+                    @forelse($assignedClasses as $assignment)
 
-                        <div class="class-subject-icon math">
-                            <i class="fa-solid fa-calculator"></i>
-                        </div>
+                        <a href="{{ route('teacher.grade-management') }}" class="class-item">
 
-                        <div class="class-info">
-
-                            <h3>Mathematics</h3>
-
-                            <span>Grade 7 - A</span>
-
-                        </div>
-
-                        <div class="class-students">
-
-                            <i class="fa-solid fa-users"></i>
-
-                            <div>
-                                <strong>32</strong>
-                                <small>Students</small>
+                            <div class="class-subject-icon">
+                                <i class="fa-solid fa-book-open"></i>
                             </div>
 
-                        </div>
+                            <div class="class-info">
 
-                        <i class="fa-solid fa-chevron-right class-arrow"></i>
+                                <h3>
+                                    {{ $assignment->subjectDetails?->subject_name ?? $assignment->subject }}
+                                </h3>
 
-                    </div>
+                                <span>
+                                    Grade {{ $assignment->grade_level }}
+                                </span>
 
-
-                    {{-- CLASS 2 --}}
-                    <div class="class-item">
-
-                        <div class="class-subject-icon math">
-                            <i class="fa-solid fa-calculator"></i>
-                        </div>
-
-                        <div class="class-info">
-
-                            <h3>Mathematics</h3>
-
-                            <span>Grade 8 - A</span>
-
-                        </div>
-
-                        <div class="class-students">
-
-                            <i class="fa-solid fa-users"></i>
-
-                            <div>
-                                <strong>30</strong>
-                                <small>Students</small>
                             </div>
 
-                        </div>
+                            <div class="class-students">
 
-                        <i class="fa-solid fa-chevron-right class-arrow"></i>
+                                <i class="fa-solid fa-users"></i>
 
-                    </div>
+                                <div>
+                                    <strong>{{ $assignment->total_students }}</strong>
+                                    <small>Students</small>
+                                </div>
 
-
-                    {{-- CLASS 3 --}}
-                    <div class="class-item">
-
-                        <div class="class-subject-icon science">
-                            <i class="fa-solid fa-flask"></i>
-                        </div>
-
-                        <div class="class-info">
-
-                            <h3>Science</h3>
-
-                            <span>Grade 9 - A</span>
-
-                        </div>
-
-                        <div class="class-students">
-
-                            <i class="fa-solid fa-users"></i>
-
-                            <div>
-                                <strong>28</strong>
-                                <small>Students</small>
                             </div>
 
+                            <i class="fa-solid fa-chevron-right class-arrow"></i>
+
+                        </a>
+
+                    @empty
+
+                        <div class="empty-state">
+                            <i class="fa-solid fa-book-open"></i>
+                            <h3>No Assigned Classes</h3>
+                            <p>
+                                You currently have no subject assignments
+                                for the active school year.
+                            </p>
                         </div>
 
-                        <i class="fa-solid fa-chevron-right class-arrow"></i>
-
-                    </div>
+                    @endforelse
 
                 </div>
 
@@ -322,33 +248,22 @@
 
                 <div class="quick-actions">
 
-                    {{-- ENTERING GRADES --}}
-                    <button class="quick-action-btn">
+                    <a href="{{ route('teacher.grade-management') }}" class="quick-action-btn">
+
                         <i class="fa-solid fa-plus"></i>
                         <span>Enter Grades</span>
                         <i class="fa-solid fa-chevron-right"></i>
-                    </button>
 
-                    {{-- GRADE VIEWING --}}
-                    <button class="quick-action-btn">
+                    </a>
+
+
+                    <a href="{{ route('teacher.grade-review') }}" class="quick-action-btn">
+
                         <i class="fa-solid fa-file-lines"></i>
-                        <span>View Grades</span>
+                        <span>View Grade Records</span>
                         <i class="fa-solid fa-chevron-right"></i>
-                    </button>
 
-                    {{-- OVERALL STUDENTS --}}
-                    <button class="quick-action-btn">
-                        <i class="fa-solid fa-users"></i>
-                        <span>My Students</span>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-
-                    {{-- GRADE RECORDS FOR TEACHER --}}
-                    <button class="quick-action-btn">
-                        <i class="fa-solid fa-chart-column"></i>
-                        <span>Grade Records</span>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
+                    </a>
 
                 </div>
 
@@ -357,9 +272,7 @@
         </div>
 
 
-
-        {{-- GRADE SUBMISSION AND RECENT USER ACTIVITIES --}}
-
+        {{-- GRADE SUBMISSION + RECENT ACTIVITIES --}}
         <div class="dashboard-grid lower-grid">
 
             {{-- GRADE SUBMISSION --}}
@@ -375,14 +288,13 @@
 
                         <div>
                             <h2>Grade Submission</h2>
-                            <p>Check your grade submission status</p>
+                            <p>
+                                Submission progress for
+                                {{ $term ? 'Term ' . $term : 'the active term' }}
+                            </p>
                         </div>
 
                     </div>
-
-                    <button class="view-btn">
-                        View All
-                    </button>
 
                 </div>
 
@@ -401,80 +313,79 @@
 
                         <tbody>
 
-                            {{-- COMPLETED --}}
-                            <tr>
-                                <td>
-                                    <div class="class-table-name">
+                            @forelse($assignedClasses as $assignment)
 
-                                        <strong>Grade 7 - A</strong>
+                                @php
+                                    $total = $assignment->total_students;
+                                    $submitted = $assignment->submitted_students;
 
-                                        <span>Mathematics</span>
+                                    if ($total > 0 && $submitted >= $total) {
+                                        $submissionStatus = 'Completed';
+                                    } elseif ($submitted > 0) {
+                                        $submissionStatus = 'Partial';
+                                    } else {
+                                        $submissionStatus = 'Pending';
+                                    }
+                                @endphp
 
-                                    </div>
-                                </td>
+                                <tr>
 
-                                <td>
-                                    32 / 32
-                                </td>
+                                    <td>
+                                        <div class="class-table-name">
 
-                                <td>
-                                    <span class="status completed">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        Completed
-                                    </span>
-                                </td>
-                            </tr>
+                                            <strong>
+                                                Grade {{ $assignment->grade_level }}
+                                            </strong>
 
+                                            <span>
+                                                {{ $assignment->subjectDetails?->subject_name ?? $assignment->subject }}
+                                            </span>
 
-                            {{-- PENDING --}}
-                            <tr>
-                                <td>
-                                    <div class="class-table-name">
+                                        </div>
+                                    </td>
 
-                                        <strong>Grade 8 - B</strong>
+                                    <td>
+                                        {{ $submitted }} / {{ $total }}
+                                    </td>
 
-                                        <span>Mathematics</span>
+                                    <td>
 
-                                    </div>
-                                </td>
+                                        @if($submissionStatus === 'Completed')
 
-                                <td>
-                                    25 / 30
-                                </td>
+                                            <span class="status completed">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                Completed
+                                            </span>
 
-                                <td>
-                                    <span class="status pending">
-                                        <i class="fa-solid fa-clock"></i>
-                                        Pending
-                                    </span>
-                                </td>
-                            </tr>
+                                        @elseif($submissionStatus === 'Partial')
 
+                                            <span class="status pending">
+                                                <i class="fa-solid fa-clock"></i>
+                                                Partial
+                                            </span>
 
-                            {{-- COMPLETED --}}
-                            <tr>
-                                <td>
-                                    <div class="class-table-name">
+                                        @else
 
-                                        <strong>Grade 9 - A</strong>
+                                            <span class="status pending">
+                                                <i class="fa-solid fa-clock"></i>
+                                                Pending
+                                            </span>
 
-                                        <span>Science</span>
+                                        @endif
 
-                                    </div>
-                                </td>
+                                    </td>
 
-                                <td>
-                                    28 / 28
-                                </td>
+                                </tr>
 
-                                <td>
-                                    <span class="status completed">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        Completed
-                                    </span>
-                                </td>
+                            @empty
 
-                            </tr>
+                                <tr>
+                                    <td colspan="3" class="empty-table">
+                                        No grade submission records available.
+                                    </td>
+                                </tr>
+
+                            @endforelse
 
                         </tbody>
 
@@ -498,114 +409,69 @@
 
                         <div>
                             <h2>Recent Activities</h2>
-                            <p>Your latest activities in the system</p>
+                            <p>Your latest recorded activities</p>
                         </div>
 
                     </div>
 
-                    <button class="view-btn">
-                        View All
-                    </button>
-
                 </div>
+
 
                 <div class="activity-list">
 
-                    {{-- ACTIVITY 1 --}}
-                    <div class="activity-item">
+                    @forelse($recentActivities as $activity)
 
-                        <div class="activity-icon">
-                            <i class="fa-solid fa-pen"></i>
+                        <div class="activity-item">
+
+                            <div class="activity-icon">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+
+                            <div class="activity-info">
+
+                                <p>
+                                    <strong>
+                                        {{ ucwords(str_replace('_', ' ', $activity->action ?? 'Activity')) }}
+                                    </strong>
+
+                                    @if($activity->record_type)
+                                        {{ ' - ' . ucwords(str_replace('_', ' ', $activity->record_type)) }}
+                                    @endif
+
+                                    @if($activity->record_key)
+                                        <strong>{{ $activity->record_key }}</strong>
+                                    @endif
+                                </p>
+
+                                <span>
+                                    {{ $activity->created_at?->format('M d, Y - h:i A') ?? 'Date unavailable' }}
+                                </span>
+
+                            </div>
+
                         </div>
 
-                        <div class="activity-info">
+                    @empty
 
+                        <div class="empty-state">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <h3>No Recent Activities</h3>
                             <p>
-                                Updated grades for
-                                <strong>Grade 7 - A Mathematics</strong>
+                                Your recorded activities will appear here.
                             </p>
-
-                            <span>Today, 2:35 PM</span>
-
                         </div>
 
-                    </div>
-
-
-                    {{-- ACTIVITY 2 --}}
-                    <div class="activity-item">
-
-                        <div class="activity-icon">
-                            <i class="fa-solid fa-upload"></i>
-                        </div>
-
-                        <div class="activity-info">
-
-                            <p>
-                                Submitted grades for
-                                <strong>Grade 9 - A Science</strong>
-                            </p>
-
-                            <span>Today, 1:20 PM</span>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- ACTIVITY 3 --}}
-                    <div class="activity-item">
-
-                        <div class="activity-icon">
-                            <i class="fa-solid fa-eye"></i>
-                        </div>
-
-                        <div class="activity-info">
-
-                            <p>
-                                Viewed student records for
-                                <strong>Grade 8 - B</strong>
-                            </p>
-
-                            <span>Yesterday, 4:15 PM</span>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- ACTIVITY 4 --}}
-                    <div class="activity-item">
-
-                        <div class="activity-icon">
-                            <i class="fa-solid fa-file-import"></i>
-                        </div>
-
-                        <div class="activity-info">
-
-                            <p>
-                                Imported student records
-                            </p>
-
-                            <span>Yesterday, 10:32 AM</span>
-
-                        </div>
-
-                    </div>
+                    @endforelse
 
                 </div>
-
 
             </div>
 
         </div>
 
 
-
         {{-- ANNOUNCEMENTS --}}
-
-        <div class="content-card recent-activity-card">
-
+        <div class="content-card recent-activity-card announcements-card">
 
             <div class="card-header">
 
@@ -622,86 +488,48 @@
 
                 </div>
 
-                <button class="view-btn" id="viewAllAnnouncementsBtn">
-                    View All
-                </button>
-
             </div>
-
 
 
             <div class="announcement-list">
 
-                {{-- ANNOUNCEMENT 1 --}}
-                <div class="announcement-item">
+                @forelse($announcements as $announcement)
 
-                    <div class="announcement-icon">
+                    <div class="announcement-item">
+
+                        <div class="announcement-icon">
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </div>
+
+                        <div class="announcement-info">
+
+                            <h3>{{ $announcement->title }}</h3>
+
+                            <p>
+                                {{ $announcement->message }}
+                            </p>
+
+                            <span>
+                                {{ $announcement->created_at?->format('F d, Y') ?? 'Date unavailable' }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                @empty
+
+                    <div class="empty-state">
                         <i class="fa-solid fa-bullhorn"></i>
-                    </div>
-
-                    <div class="announcement-info">
-
-                        <h3>Grade Submission Deadline</h3>
-
+                        <h3>No Announcements</h3>
                         <p>
-                            Final grades must be submitted by
-                            October 10, 2026.
+                            There are currently no announcements for teachers.
                         </p>
-
-                        <span>September 25, 2026</span>
-
                     </div>
 
-                </div>
-
-
-                {{-- ANNOUNCEMENT 2 --}}
-                <div class="announcement-item">
-
-                    <div class="announcement-icon">
-                        <i class="fa-solid fa-calendar"></i>
-                    </div>
-
-                    <div class="announcement-info">
-
-                        <h3>Quarter 1 Grading Period</h3>
-
-                        <p>
-                            Quarter 1 grading is now open.
-                        </p>
-
-                        <span>September 20, 2026</span>
-
-                    </div>
-
-                </div>
-
-
-                {{-- ANNOUNCEMENT 3 --}}
-                <div class="announcement-item">
-
-                    <div class="announcement-icon">
-                        <i class="fa-solid fa-circle-info"></i>
-                    </div>
-
-                    <div class="announcement-info">
-
-                        <h3>System Maintenance</h3>
-
-                        <p>
-                            The grading system will undergo
-                            scheduled maintenance.
-                        </p>
-
-                        <span>September 18, 2026</span>
-
-                    </div>
-
-                </div>
+                @endforelse
 
             </div>
-
-
 
         </div>
 

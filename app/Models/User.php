@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;
@@ -18,6 +19,8 @@ class User extends Authenticatable
         'password',
         'role',
         'account_status',
+        'profile_photo_path',
+        'must_change_password',
     ];
 
     protected $hidden = [
@@ -30,6 +33,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
         ];
     }
 

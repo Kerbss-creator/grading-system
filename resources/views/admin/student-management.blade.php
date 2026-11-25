@@ -191,7 +191,7 @@
                                         title="Deactivate Student"
                                         onclick="deleteStudent({{ $student->id }})"
                                     >
-                                        <i class="fa-solid fa-user-slash"></i>
+                                        <i class="fa-solid fa-trash-can"></i>
                                     </button>
 
                                 @else
@@ -599,7 +599,7 @@
             </button>
 
             <button type="button" class="delete-confirm-btn" id="confirmDeleteStudent">
-                <i class="fa-solid fa-user-slash"></i>
+                <i class="fa-solid fa-trash-can"></i>
                 Deactivate
             </button>
 

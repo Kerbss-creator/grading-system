@@ -30,6 +30,7 @@ class GradeRecord extends Model
         'status',
         'submitted_at',
         'adviser_reviewed_at',
+        'adviser_return_reason',
         'admin_reviewed_at',
         'admin_return_reason',
     ];

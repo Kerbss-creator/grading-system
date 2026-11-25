@@ -115,14 +115,14 @@
 
                 <div class="adviser-submenu" id="academicRecordsSubmenu">
 
-                   <a href="{{ url('/adviser/academic-records') }}"
-                class="adviser-nav-link {{ request()->is('adviser/academic-records*') ? 'active' : '' }}">
+                    <a href="{{ url('/adviser/academic-records') }}"
+                        class="adviser-nav-link {{ request()->is('adviser/academic-records*') ? 'active' : '' }}">
 
-                <i class="fa-solid fa-clipboard-list"></i>
+                        <i class="fa-solid fa-clipboard-list"></i>
 
-                <span>Academic Records</span>
+                        <span>Academic Records</span>
 
-                </a>
+                    </a>
 
                     <a href="{{ url('/adviser/records?subject=mathematics') }}" class="adviser-sub-link">
                         <i class="fa-solid fa-calculator"></i>
@@ -167,6 +167,16 @@
                 </div>
 
             </div>
+
+            {{-- MY SUBJECTS --}}
+
+            <a href="{{ url('/adviser/subjects') }}"
+                class="adviser-nav-link {{ request()->is('adviser/subjects*') ? 'active' : '' }}">
+
+                <i class="fa-solid fa-book-open"></i>
+                <span>My Subjects</span>
+
+            </a>
 
             {{-- GRADE SUBMISSION HISTORY --}}
 
@@ -323,17 +333,17 @@
 
                         </div>
 
-                        
+
                         <div class="profile-info">
 
                             {{-- DYNAMIC NAME --}}
-                        <strong>
-                            {{ Auth::user()?->name ?? 'Adviser' }}
-                        </strong>
+                            <strong>
+                                {{ Auth::user()?->name ?? 'Adviser' }}
+                            </strong>
 
-                        <span>
-                            {{ ucfirst(Auth::user()?->role ?? 'adviser') }} Account
-                        </span>
+                            <span>
+                                {{ ucfirst(Auth::user()?->role ?? 'adviser') }} Account
+                            </span>
 
                         </div>
 
@@ -353,18 +363,18 @@
 
                             </div>
 
-                        <div class="profile-info">
+                            <div class="profile-info">
 
-                            {{-- DYNAMIC NAME --}}
-                            <strong>
-                                {{ Auth::user()?->name ?? 'Adviser' }}
-                            </strong>
+                                {{-- DYNAMIC NAME --}}
+                                <strong>
+                                    {{ Auth::user()?->name ?? 'Adviser' }}
+                                </strong>
 
-                            <span>
-                                {{ ucfirst(Auth::user()?->role ?? 'adviser') }} Account
-                            </span>
+                                <span>
+                                    {{ ucfirst(Auth::user()?->role ?? 'adviser') }} Account
+                                </span>
 
-                        </div>
+                            </div>
 
                         </div>
 

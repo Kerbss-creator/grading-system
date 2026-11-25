@@ -7,12 +7,16 @@ use App\Models\Faculty;
 use App\Models\Student;
 use App\Models\GradeRecord;
 use App\Models\GradeAssessmentScore;
+use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class GradeManagementController extends Controller
 {
+    /**
+     * Default assessment definitions.
+     */
     private function assessments(): array
     {
         return [
@@ -29,9 +33,16 @@ class GradeManagementController extends Controller
         ];
     }
 
-    private function updateComputedGrades(GradeRecord $record, string $subjectName): void
-    {
-        $scores = $record->assessmentScores()->get()->keyBy('assessment_code');
+    /**
+     * Calculate and save the student's computed grades.
+     */
+    private function updateComputedGrades(
+        GradeRecord $record,
+        string $subjectName
+    ): void {
+        $scores = $record->assessmentScores()
+            ->get()
+            ->keyBy('assessment_code');
 
         $groups = [
             'WW' => ['WW1', 'WW2', 'WW3', 'WW4'],
@@ -39,9 +50,10 @@ class GradeManagementController extends Controller
             'EX' => ['SA', 'SB', 'SC', 'TE'],
         ];
 
+        // TLE, MAPEH, and Computer use performance-subject weights.
         $isPerformanceSubject = in_array(
             strtolower(trim($subjectName)),
-            ['tle', 'mapeh', 'computer education'],
+            ['tle', 'mapeh', 'computer', 'computer education'],
             true
         );
 
@@ -94,6 +106,7 @@ class GradeManagementController extends Controller
 
             if ($group === 'WW') {
                 $computed['ww_ps'] = round($percentage, 2);
+
                 $computed['ww_ws'] = round(
                     $percentage * ($weights['WW'] / 100),
                     2
@@ -102,6 +115,7 @@ class GradeManagementController extends Controller
 
             if ($group === 'PT') {
                 $computed['pt_ps'] = round($percentage, 2);
+
                 $computed['pt_ws'] = round(
                     $percentage * ($weights['PT'] / 100),
                     2
@@ -125,8 +139,10 @@ class GradeManagementController extends Controller
                     $assessment = $scores->get($code);
 
                     $componentPercentage =
-                        ((float) $assessment->score /
-                            (float) $assessment->highest_possible_score) * 100;
+                        (
+                            (float) $assessment->score /
+                            (float) $assessment->highest_possible_score
+                        ) * 100;
 
                     $examPercentage +=
                         $componentPercentage * ($weight / 100);
@@ -139,7 +155,7 @@ class GradeManagementController extends Controller
             }
         }
 
-        // Initial Grade is computed only when all 10 assessments are complete.
+        // Initial Grade is calculated only when all assessments are complete.
         if (
             $groupComplete['WW'] &&
             $groupComplete['PT'] &&
@@ -153,31 +169,116 @@ class GradeManagementController extends Controller
             );
         }
 
-        // Compute Term Grade and Descriptor when all assessments are complete.
+        // Apply the DepEd transmutation table.
         if ($computed['initial_grade'] !== null) {
+            $termGrade = $this->transmuteGrade(
+                (float) $computed['initial_grade']
+            );
 
-            // Temporary: direct rounding only.
-            // Replace this with the approved DepEd transmutation lookup.
-            $termGrade = (int) round($computed['initial_grade']);
+            if ($termGrade !== null) {
+                $computed['term_grade'] = $termGrade;
 
-            $computed['term_grade'] = $termGrade;
-
-            if ($termGrade >= 90) {
-                $computed['descriptor'] = 'Advancing';
-            } elseif ($termGrade >= 80) {
-                $computed['descriptor'] = 'Benchmarking';
-            } elseif ($termGrade >= 75) {
-                $computed['descriptor'] = 'Connecting';
-            } elseif ($termGrade >= 65) {
-                $computed['descriptor'] = 'Developing';
-            } else {
-                $computed['descriptor'] = 'Emerging';
+                $computed['descriptor'] = $this->getGradeDescriptor(
+                    $termGrade
+                );
             }
         }
 
         $record->update($computed);
     }
 
+    /**
+     * Convert Initial Grade into the corresponding Term Grade.
+     */
+    private function transmuteGrade(float $initialGrade): ?int
+    {
+        if (!is_finite($initialGrade)) {
+            return null;
+        }
+
+        $ranges = [
+            [99.5, 100.0, 100],
+            [98.32, 99.49, 99],
+            [97.14, 98.31, 98],
+            [95.96, 97.13, 97],
+            [94.78, 95.95, 96],
+            [93.6, 94.77, 95],
+            [92.42, 93.59, 94],
+            [91.24, 92.41, 93],
+            [90.06, 91.23, 92],
+            [88.88, 90.05, 91],
+            [87.7, 88.87, 90],
+            [86.52, 87.69, 89],
+            [85.34, 86.51, 88],
+            [84.16, 85.33, 87],
+            [82.98, 84.15, 86],
+            [81.8, 82.97, 85],
+            [80.62, 81.79, 84],
+            [79.44, 80.61, 83],
+            [78.26, 79.43, 82],
+            [77.08, 78.25, 81],
+            [75.9, 77.07, 80],
+            [74.72, 75.89, 79],
+            [73.54, 74.71, 78],
+            [72.36, 73.53, 77],
+            [71.18, 72.35, 76],
+            [70.0, 71.17, 75],
+            [65.34, 69.99, 74],
+            [60.67, 65.33, 73],
+            [56.01, 60.66, 72],
+            [51.34, 56.0, 71],
+            [46.67, 51.33, 70],
+            [42.01, 46.66, 69],
+            [37.34, 42.0, 68],
+            [32.68, 37.33, 67],
+            [28.01, 32.67, 66],
+            [23.35, 28.0, 65],
+            [18.68, 23.34, 64],
+            [14.01, 18.67, 63],
+            [9.35, 14.0, 62],
+            [4.68, 9.34, 61],
+            [0.0, 4.67, 60],
+        ];
+
+        foreach ($ranges as [$minimum, $maximum, $grade]) {
+            if (
+                $initialGrade >= $minimum &&
+                $initialGrade <= $maximum
+            ) {
+                return $grade;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the descriptor based on the transmuted Term Grade.
+     */
+    private function getGradeDescriptor(int $termGrade): string
+    {
+        if ($termGrade >= 90) {
+            return 'Advancing';
+        }
+
+        if ($termGrade >= 80) {
+            return 'Benchmarking';
+        }
+
+        if ($termGrade >= 75) {
+            return 'Connecting';
+        }
+
+        if ($termGrade >= 65) {
+            return 'Developing';
+        }
+
+        return 'Emerging';
+    }
+
+    /**
+     * Get the authenticated faculty member.
+     */
     private function getFaculty(Request $request): Faculty
     {
         $faculty = Faculty::where('user_id', $request->user()->id)
@@ -189,6 +290,9 @@ class GradeManagementController extends Controller
         return $faculty;
     }
 
+    /**
+     * Get the teaching assignment belonging to the authenticated faculty.
+     */
     private function getAssignment(Request $request, Faculty $faculty)
     {
         return $faculty->teachingAssignments()
@@ -202,8 +306,6 @@ class GradeManagementController extends Controller
             ->firstOrFail();
     }
 
-
-
     /**
      * Display the teacher grade management page.
      */
@@ -211,24 +313,63 @@ class GradeManagementController extends Controller
     {
         $faculty = $this->getFaculty($request);
 
-        $assignment = $faculty->teachingAssignments()
+        // Get the active school year.
+        $activeSchoolYear = SchoolYear::active();
+
+        abort_unless(
+            $activeSchoolYear,
+            403,
+            'No active school year is configured.'
+        );
+
+        // Use the active school year as the default.
+        $schoolYearName = $request->query(
+            'school_year',
+            $activeSchoolYear->year_name
+        );
+
+        // Find the selected school year.
+        $schoolYearRecord = SchoolYear::where(
+            'year_name',
+            $schoolYearName
+        )->firstOrFail();
+
+        // Get all school years for the dropdown.
+        $schoolYears = SchoolYear::orderByDesc('year_name')->get();
+
+        // Get the original assignment selected by the teacher.
+        $selectedAssignment = $faculty->teachingAssignments()
             ->where('id', $request->query('assignment'))
             ->firstOrFail();
 
-        $schoolYear = $request->query('school_year', '2026-2027');
-        $term = (int) $request->query('term', 1);
+        // Find the matching assignment for the selected school year.
+        $assignment = $faculty->teachingAssignments()
+            ->where('subject', $selectedAssignment->subject)
+            ->where('grade_level', $selectedAssignment->grade_level)
+            ->where('school_year', $schoolYearRecord->year_name)
+            ->firstOrFail();
+
+        // Use the selected school's current term as the default.
+        $term = (int) $request->query(
+            'term',
+            $schoolYearRecord->current_term
+        );
 
         abort_unless(in_array($term, [1, 2, 3], true), 422);
 
-        $students = Student::where('grade_level', $assignment->grade_level)
-            ->where('school_year', $schoolYear)
+        // Get active students assigned to this grade level and school year.
+        $students = Student::where(
+            'grade_level',
+            $assignment->grade_level
+        )
+            ->where('school_year', $schoolYearRecord->year_name)
             ->where('status', 'active')
             ->orderBy('last_name')
             ->get();
 
         $gradeRecords = GradeRecord::with('assessmentScores')
             ->where('teaching_assignment_id', $assignment->id)
-            ->where('school_year', $schoolYear)
+            ->where('school_year', $schoolYearRecord->year_name)
             ->where('term', $term)
             ->whereIn('student_id', $students->pluck('id'))
             ->get()
@@ -274,6 +415,7 @@ class GradeManagementController extends Controller
             ?? strtoupper(substr($subjectName, 0, 3));
 
         $gradeNumber = preg_replace('/\D/', '', $assignment->grade_level);
+
         $subjectCode = $prefix . '-' . $gradeNumber;
 
         return view('teacher.grade-management', [
@@ -281,7 +423,8 @@ class GradeManagementController extends Controller
             'subjectName' => $subjectName,
             'subjectCode' => $subjectCode,
             'gradeLevel' => $assignment->grade_level,
-            'schoolYear' => $schoolYear,
+            'schoolYear' => $schoolYearRecord->year_name,
+            'schoolYears' => $schoolYears,
             'students' => $students,
             'selectedTerm' => $term,
         ]);
@@ -647,7 +790,6 @@ class GradeManagementController extends Controller
 
         DB::transaction(function () use ($validated, $definitions, $allowedStudents, $assignment, $schoolYear, $term) {
             foreach ($validated['scores'] as $studentId => $studentScores) {
-
                 if (!in_array((string) $studentId, $allowedStudents, true)) {
                     throw ValidationException::withMessages([
                         'scores' => 'Invalid student in grade submission.',
@@ -677,7 +819,6 @@ class GradeManagementController extends Controller
                 $record->save();
 
                 foreach ($definitions as $index => $definition) {
-
                     $scoreValue = $studentScores[$index] ?? null;
                     $maximum = $validated['max_scores'][$index] ?? null;
 
@@ -689,14 +830,12 @@ class GradeManagementController extends Controller
                     }
 
                     if ($scoreValue !== null && $scoreValue !== '') {
-
                         if ($scoreValue < 0 || $scoreValue > $maximum) {
                             throw ValidationException::withMessages([
                                 'scores' =>
                                     "Invalid score for {$definition['code']}.",
                             ]);
                         }
-
                     } else {
                         $scoreValue = null;
                     }

@@ -73,10 +73,10 @@
             ['group' => 'pt', 'label' => 'PT 2', 'max' => 100],
 
             // Summative Tests and Term Examination
-            ['group' => 'ex', 'label' => 'SA', 'max' => 20, 'weight' => 20],
-            ['group' => 'ex', 'label' => 'SB', 'max' => 20, 'weight' => 20],
-            ['group' => 'ex', 'label' => 'SC', 'max' => 20, 'weight' => 20],
-            ['group' => 'ex', 'label' => 'TE', 'max' => 40, 'weight' => 40],
+            ['group' => 'ex', 'label' => 'SA', 'max' => 25, 'weight' => 20],
+            ['group' => 'ex', 'label' => 'SB', 'max' => 25, 'weight' => 20],
+            ['group' => 'ex', 'label' => 'SC', 'max' => 25, 'weight' => 20],
+            ['group' => 'ex', 'label' => 'TE', 'max' => 50, 'weight' => 40],
         ];
 
         /*
@@ -113,7 +113,7 @@
         $assessmentColspan = 2 + 7 + 5 + 10 + 3;
     @endphp
 
-    <div class="gradebook-page" data-assignment-id="{{ $assignment->id }}"
+    <div class="gradebook-page" data-assignment-id="{{ $assignment->id }}" data-selected-term="{{ $selectedTerm }}"
         data-assessment-settings-url="{{ route('teacher.grade-management.assessment-settings') }}"
         data-save-url="{{ route('teacher.grade-management.save') }}"
         data-load-url="{{ route('teacher.grade-management.load') }}"
@@ -158,13 +158,14 @@
                     <label for="gradebookSchoolYear">School Year</label>
 
                     <select id="gradebookSchoolYear">
-                        <option value="2026-2027" @selected($gradebookYear === '2026-2027')>
-                            2026-2027
-                        </option>
-
-                        <option value="2027-2028" @selected($gradebookYear === '2027-2028')>
-                            2027-2028
-                        </option>
+                        @foreach ($schoolYears as $year)
+                            <option value="{{ $year->year_name }}" @selected($gradebookYear === $year->year_name)>
+                                {{ $year->year_name }}
+                                @if ($year->status === 'active')
+                                    (Current)
+                                @endif
+                            </option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -636,6 +637,7 @@
 
         </section>
 
+
         {{-- ========================================== --}}
         {{-- ASSESSMENT SETTINGS MODAL --}}
         {{-- ========================================== --}}
@@ -644,11 +646,18 @@
 
             <div class="assessment-modal" role="dialog" aria-modal="true" aria-labelledby="assessmentSettingsTitle">
 
+                {{-- Header --}}
                 <div class="assessment-modal-header">
 
-                    <div>
-                        <h3 id="assessmentSettingsTitle">Assessment Settings</h3>
-                        <p>Manage the maximum points for each assessment.</p>
+                    <div class="assessment-modal-heading">
+                        <div class="assessment-modal-icon">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+
+                        <div>
+                            <h3 id="assessmentSettingsTitle">Assessment Settings</h3>
+                            <p>Configure the maximum points for each assessment.</p>
+                        </div>
                     </div>
 
                     <button type="button" class="assessment-modal-close" id="closeAssessmentSettings"
@@ -658,56 +667,76 @@
 
                 </div>
 
+                {{-- Body --}}
                 <div class="assessment-modal-body">
 
-                    {{-- Subject-Based Grading Component Weights --}}
+                    {{-- Fixed Grading Weights --}}
                     <div class="assessment-weight-info">
 
-                        <h4>Grading Component Weights</h4>
+                        <div class="assessment-section-heading">
+                            <div>
+                                <h4>Grading Component Weights</h4>
+                                <p>These percentages are fixed by the grading policy.</p>
+                            </div>
+
+                            <span class="fixed-badge">
+                                <i class="fa-solid fa-lock"></i> Fixed
+                            </span>
+                        </div>
 
                         <div class="assessment-weight-list">
 
-                            <div>
-                                <span>Written / Oral Works</span>
+                            <div class="assessment-weight-card ww">
+                                <span class="weight-label">Written / Oral Works</span>
                                 <strong>{{ $gradingWeights['ww'] }}%</strong>
+                                <small>WW</small>
                             </div>
 
-                            <div>
-                                <span>Product / Performance Tasks</span>
+                            <div class="assessment-weight-card pt">
+                                <span class="weight-label">Performance Tasks</span>
                                 <strong>{{ $gradingWeights['pt'] }}%</strong>
+                                <small>PT</small>
                             </div>
 
-                            <div>
-                                <span>Summative Tests / Term Exam</span>
+                            <div class="assessment-weight-card ex">
+                                <span class="weight-label">Summative Tests / Term Exam</span>
                                 <strong>{{ $gradingWeights['ex'] }}%</strong>
+                                <small>EX</small>
                             </div>
 
                         </div>
 
-                        <p>
-                            Component weights are fixed and cannot be edited here.
-                        </p>
-
                     </div>
 
-                    {{-- Dynamic Assessment Maximum Point Fields --}}
+                    {{-- Assessment Maximum Points --}}
                     <div class="assessment-settings-fields">
 
-                        <h4>Assessment Maximum Points</h4>
+                        <div class="assessment-section-heading">
+                            <div>
+                                <h4>Assessment Maximum Points</h4>
+                                <p>Set the highest possible score for each activity.</p>
+                            </div>
+                        </div>
 
                         <div id="assessmentSettingsFields">
-                            {{-- JavaScript generates the assessment fields here. --}}
+                            {{-- JavaScript generates assessment fields here. --}}
                         </div>
 
                     </div>
 
-                    <p class="assessment-settings-note">
+                    {{-- Information Note --}}
+                    <div class="assessment-settings-note">
                         <i class="fa-solid fa-circle-info"></i>
-                        Changes will apply only to the currently selected term.
-                    </p>
+
+                        <p>
+                            Changes will apply only to the currently selected term.
+                            Existing student scores will be retained.
+                        </p>
+                    </div>
 
                 </div>
 
+                {{-- Footer --}}
                 <div class="assessment-modal-footer">
 
                     <button type="button" class="btn btn-light" id="cancelAssessmentSettings">
@@ -722,8 +751,8 @@
                 </div>
 
             </div>
-
         </div>
+
 
         {{-- ========================================== --}}
         {{-- CLEAR SCORES WARNING MODAL --}}
@@ -817,6 +846,25 @@
 
             <button type="button" id="closeGradeLockModal">
                 Okay, Got It
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Notification Modal -->
+    <div id="notificationModal" class="notification-modal-overlay is-hidden">
+        <div id="notificationModalContent" class="notification-modal success">
+            <div class="notification-modal-icon">
+                <i id="notificationModalIcon" class="fas fa-check"></i>
+            </div>
+
+            <h3 id="notificationModalTitle">Success!</h3>
+
+            <p id="notificationModalMessage">
+                Your changes have been saved successfully.
+            </p>
+
+            <button type="button" id="closeNotificationModal" class="notification-modal-button">
+                Okay
             </button>
         </div>
     </div>

@@ -82,10 +82,14 @@
                     </strong>
                 </div>
 
+                <div class="information-item">
+                    <span>School Year</span>
+                    <strong>{{ $schoolYear }}</strong>
+                </div>
+
             </div>
 
         </section>
-
 
         {{-- Class Assignments --}}
         <section class="details-card">
@@ -94,79 +98,128 @@
                 <div>
                     <h2>Class Assignments</h2>
                     <p>
-                        View the teacher and adviser assigned to each grade level.
+                        View the subject teacher and adviser assigned to each grade level.
                     </p>
                 </div>
             </div>
 
             <div class="class-assignment-list">
 
-                @foreach ($gradeAssignments as $assignment)
+                @foreach ($gradeAssignments as $gradeAssignment)
 
                     @php
-                        $teacher = $assignment['teacher'];
-
-                        $teacherName = $teacher
-                            ? trim(implode(' ', array_filter([
-                                $teacher->first_name,
-                                $teacher->middle_name,
-                                $teacher->last_name
-                            ])))
-                            : null;
+                        $adviserNames = $gradeAssignment['advisers']
+                            ->map(function ($adviser) {
+                                return trim(implode(' ', array_filter([
+                                    $adviser->first_name,
+                                    $adviser->middle_name,
+                                    $adviser->last_name
+                                ])));
+                            })
+                            ->implode(', ');
                     @endphp
 
-                    <div class="class-assignment" data-grade="{{ $assignment['grade_level'] }}">
+                    @if($gradeAssignment['assignments']->isNotEmpty())
 
-                        <div class="grade-icon">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        </div>
+                        @foreach($gradeAssignment['assignments'] as $teachingAssignment)
 
-                        <div class="grade-information">
+                            @php
+                                $teacher = $teachingAssignment->faculty;
 
-                            <h3>{{ $assignment['grade_level'] }}</h3>
+                                $teacherName = $teacher
+                                    ? trim(implode(' ', array_filter([
+                                        $teacher->first_name,
+                                        $teacher->middle_name,
+                                        $teacher->last_name
+                                    ])))
+                                    : null;
 
-                            <p>
-                                <strong>Subject Teacher:</strong>
-                                {{ $teacherName ?? 'Not Assigned' }}
-                            </p>
+                                $isMapeh = $subject->subject_code === 'MAPE'
+                                    || $teachingAssignment->subject === 'MAPEH';
 
-                            <p>
-                                <strong>Adviser:</strong>
+                                $componentName = $teachingAssignment->component ?? 'General';
+                            @endphp
 
-                                @if($assignment['advisers']->isNotEmpty())
+                            <div class="class-assignment" data-grade="{{ $gradeAssignment['grade_level'] }}"
+                                data-assignment-id="{{ $teachingAssignment->id }}" data-component="{{ $componentName }}">
 
-                                                    {{ $assignment['advisers']->map(function ($adviser) {
-                                        return trim(implode(' ', array_filter([
-                                            $adviser->first_name,
-                                            $adviser->middle_name,
-                                            $adviser->last_name
-                                        ])));
-                                    })->implode(', ') }}
+                                <div class="grade-icon">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
 
-                                @else
+                                <div class="grade-information">
+
+                                    <h3>{{ $gradeAssignment['grade_level'] }}</h3>
+
+                                    @if($isMapeh)
+                                        <p>
+                                            <strong>MAPEH Component:</strong>
+                                            {{ $componentName }}
+                                        </p>
+                                    @endif
+
+                                    <p>
+                                        <strong>Subject Teacher:</strong>
+                                        {{ $teacherName ?: 'Not Assigned' }}
+                                    </p>
+
+                                    <p>
+                                        <strong>Adviser:</strong>
+                                        {{ $adviserNames ?: 'Not Assigned' }}
+                                    </p>
+
+                                </div>
+
+                                <a href="{{ url('/admin/gradebook') }}?code={{ urlencode($subject->subject_code) }}&grade={{ urlencode(str_replace('Grade ', '', $gradeAssignment['grade_level'])) }}&school_year={{ urlencode($schoolYear) }}&assignment_id={{ $teachingAssignment->id }}"
+                                    class="assignment-label">
+
+                                    View Gradebook
+
+                                </a>
+
+                                <i class="fa-solid fa-chevron-right assignment-arrow"></i>
+
+                            </div>
+
+                        @endforeach
+
+                    @else
+
+                        <div class="class-assignment" data-grade="{{ $gradeAssignment['grade_level'] }}">
+
+                            <div class="grade-icon">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+
+                            <div class="grade-information">
+
+                                <h3>{{ $gradeAssignment['grade_level'] }}</h3>
+
+                                <p>
+                                    <strong>Subject Teacher:</strong>
                                     Not Assigned
-                                @endif
+                                </p>
 
-                            </p>
+                                <p>
+                                    <strong>Adviser:</strong>
+                                    {{ $adviserNames ?: 'Not Assigned' }}
+                                </p>
+
+                            </div>
+
+                            <span class="assignment-label">
+                                No Assignment
+                            </span>
 
                         </div>
 
-                        <a href="{{ url('/admin/gradebook') }}?code={{ urlencode($subject->subject_code) }}&grade={{ urlencode(str_replace('Grade ', '', $assignment['grade_level'])) }}&school_year={{ urlencode($schoolYear) }}"
-                            class="assignment-label">
-
-                            View Gradebook
-                        </a>
-
-                        <i class="fa-solid fa-chevron-right assignment-arrow"></i>
-
-                    </div>
+                    @endif
 
                 @endforeach
 
             </div>
 
         </section>
-
 
         {{-- Assigned Teachers --}}
         <section class="details-card assigned-teachers-section">
@@ -180,6 +233,7 @@
 
                 <span class="teacher-count">
                     <i class="fa-solid fa-users"></i>
+
                     <span id="assignedTeacherCount">
                         {{ $assignedTeacherCount }}
                         {{ $assignedTeacherCount === 1 ? 'Teacher' : 'Teachers' }}
@@ -190,14 +244,6 @@
 
             <div class="assigned-teacher-list" id="assignedTeacherList">
 
-                @php
-                    $assignedTeachers = $gradeAssignments
-                        ->pluck('teacher')
-                        ->filter()
-                        ->unique('id')
-                        ->values();
-                @endphp
-
                 @forelse ($assignedTeachers as $teacher)
 
                     @php
@@ -207,12 +253,34 @@
                             $teacher->last_name
                         ])));
 
-                        $teacherGrades = $gradeAssignments
-                            ->filter(
-                                fn($assignment) =>
-                                    $assignment['teacher']?->id === $teacher->id
-                            )
-                            ->pluck('grade_level')
+                        $teacherAssignments = $gradeAssignments
+                            ->flatMap(function ($grade) use ($teacher) {
+                                return $grade['assignments']
+                                    ->filter(function ($assignment) use ($teacher) {
+                                        return $assignment->faculty?->id === $teacher->id;
+                                    })
+                                    ->map(function ($assignment) use ($grade) {
+                                        return [
+                                            'grade_level' => $grade['grade_level'],
+                                            'component' => $assignment->component,
+                                        ];
+                                    });
+                            });
+
+                        $teacherGrades = $teacherAssignments
+                            ->map(function ($assignment) {
+                                $grade = $assignment['grade_level'];
+
+                                if (
+                                    $assignment['component'] &&
+                                    $assignment['component'] !== 'General'
+                                ) {
+                                    return $grade . ' - ' . $assignment['component'];
+                                }
+
+                                return $grade;
+                            })
+                            ->unique()
                             ->implode(', ');
                     @endphp
 
@@ -257,5 +325,5 @@
 @endsection
 
 @section('page-js')
-    <script src="{{ asset('js/admin/subject-details-admin.js') }}"></script>
+    <script src="{{ asset('js/admin/subject-details-admin.js') }}" defer></script>
 @endsection

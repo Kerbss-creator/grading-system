@@ -1,11 +1,12 @@
+/* =========================================
+   MAIN CONTENT
+========================================= */
+
 .main-content {
     margin-left: 75px;
-    width: calc(100% - 75px);
     min-height: 100vh;
     padding: 35px;
-    transition:
-        margin-left 0.3s ease,
-        width 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .sidebar:hover ~ .main-content {
@@ -661,7 +662,7 @@
     border-bottom: 1px solid var(--user-border);
 }
 
-.modal-header h3 {
+.modal-header h2 {
     margin: 0 0 6px;
     color: var(--user-text);
     font-size: 22px;
@@ -672,7 +673,7 @@
 .modal-header p {
     margin: 0;
     color: var(--user-muted);
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.6;
 }
 
@@ -1072,7 +1073,7 @@
 }
 
 /* =====================================================
-   VIEW USER DETAILS - FINAL TYPOGRAPHY OVERRIDE
+   VIEW USER DETAILS 
 ===================================================== */
 
 /* Modal size */
@@ -1103,6 +1104,12 @@
 /* Modal body */
 #viewUserModal .modal-body {
     padding: 30px 32px !important;
+}
+
+html.modal-open,
+body.modal-open {
+    overflow: hidden !important;
+    height: 100% !important;
 }
 
 /* Details grid */
@@ -1454,7 +1461,7 @@
 ===================================================== */
 
 #userModal {
-    overflow-y: auto;
+    overflow: hidden;
     align-items: center;
     justify-content: center;
 }

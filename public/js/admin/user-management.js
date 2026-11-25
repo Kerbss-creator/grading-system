@@ -158,6 +158,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         modal.classList.add("active");
         modal.style.display = "flex";
+
+        // Prevent background page scrolling.
+        document.documentElement.classList.add("modal-open");
+        document.body.classList.add("modal-open");
     }
 
     function hideModal(modal) {
@@ -165,6 +169,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         modal.classList.remove("active");
         modal.style.display = "none";
+
+        // Restore page scrolling only when no modal is open.
+        const activeModal = document.querySelector(".modal-overlay.active");
+
+        if (!activeModal) {
+            document.documentElement.classList.remove("modal-open");
+            document.body.classList.remove("modal-open");
+        }
     }
 
     function notify(message) {
@@ -250,57 +262,174 @@ document.addEventListener("DOMContentLoaded", function () {
 
         setSectionVisibility(teachingAssignmentSection, teacherSelected);
         setSectionVisibility(advisoryAssignmentSection, adviserSelected);
+
+        // Re-apply protection after section visibility changes.
+        applyAssignmentLocks();
     }
 
     // =====================================================
     // TEACHING ASSIGNMENTS
     // =====================================================
 
-    function createTeachingAssignmentRow() {
+    function getCurrentSchoolYear() {
+        return String(window.currentSchoolYear || "").trim();
+    }
+
+    function updateAssignmentComponentField(row) {
+        if (!row) return;
+
+        const subjectSelect = row.querySelector(".assignment-subject");
+        const componentGroup = row.querySelector(".assignment-component-group");
+        const componentSelect = row.querySelector(".assignment-component");
+
+        if (!subjectSelect || !componentGroup || !componentSelect) return;
+
+        const isMapeh = subjectSelect.value === "MAPEH";
+
+        componentGroup.hidden = !isMapeh;
+        componentSelect.disabled = !isMapeh;
+        componentSelect.required = isMapeh;
+
+        if (!isMapeh) {
+            componentSelect.value = "General";
+        }
+    }
+
+    function applyAssignmentLocks() {
+        if (!teachingAssignmentsContainer) return;
+
+        teachingAssignmentsContainer
+            .querySelectorAll(".teaching-assignment-row")
+            .forEach((row) => {
+                const hasGradeRecords = row.dataset.hasGradeRecords === "true";
+
+                const gradeSelect = row.querySelector(".assignment-grade");
+                const subjectSelect = row.querySelector(".assignment-subject");
+                const componentSelect = row.querySelector(
+                    ".assignment-component",
+                );
+                const removeButton = row.querySelector(
+                    ".btn-remove-assignment",
+                );
+
+                if (gradeSelect) gradeSelect.disabled = hasGradeRecords;
+                if (subjectSelect) subjectSelect.disabled = hasGradeRecords;
+
+                if (componentSelect) {
+                    componentSelect.disabled =
+                        hasGradeRecords || subjectSelect?.value !== "MAPEH";
+                }
+
+                if (removeButton) {
+                    removeButton.disabled = hasGradeRecords;
+                    removeButton.title = hasGradeRecords
+                        ? "This assignment cannot be removed because grade records already exist."
+                        : "Remove assignment";
+                }
+
+                row.classList.toggle("assignment-locked", hasGradeRecords);
+            });
+    }
+
+    function createTeachingAssignmentRow(assignment = {}) {
         const row = document.createElement("div");
         row.className = "teaching-assignment-row";
 
+        row.dataset.assignmentId = assignment.id || "";
+        row.dataset.schoolYear = assignment.school_year || "";
+        row.dataset.hasGradeRecords = assignment.has_grade_records
+            ? "true"
+            : "false";
+
         row.innerHTML = `
-            <div class="form-group">
-                <label>Grade Level <span class="required">*</span></label>
-                <select class="assignment-grade" required>
-                    <option value="">Select grade level</option>
-                    <option value="Grade 7">Grade 7</option>
-                    <option value="Grade 8">Grade 8</option>
-                    <option value="Grade 9">Grade 9</option>
-                    <option value="Grade 10">Grade 10</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label>
+                Grade Level <span class="required">*</span>
+            </label>
 
-            <div class="form-group">
-                <label>Subject <span class="required">*</span></label>
-                <select class="assignment-subject" required>
-                    <option value="">Select subject</option>
-                    <option value="Filipino">Filipino</option>
-                    <option value="English">English</option>
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Science">Science</option>
-                    <option value="Araling Panlipunan">Araling Panlipunan</option>
-                    <option value="TLE">TLE</option>
-                    <option value="Values Education">Values Education</option>
-                    <option value="MAPEH">MAPEH</option>
-                    <option value="Computer Education">Computer Education</option>
-                </select>
-            </div>
+            <select class="assignment-grade" required>
+                <option value="">Select grade level</option>
+                <option value="Grade 7">Grade 7</option>
+                <option value="Grade 8">Grade 8</option>
+                <option value="Grade 9">Grade 9</option>
+                <option value="Grade 10">Grade 10</option>
+            </select>
+        </div>
 
-            <button type="button" class="btn-remove-assignment" title="Remove assignment">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
+        <div class="form-group">
+            <label>
+                Subject <span class="required">*</span>
+            </label>
 
-        row.querySelector(".btn-remove-assignment").addEventListener(
-            "click",
-            function () {
-                row.remove();
-            },
-        );
+            <select class="assignment-subject" required>
+                <option value="">Select subject</option>
+                <option value="Filipino">Filipino</option>
+                <option value="English">English</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Science">Science</option>
+                <option value="Araling Panlipunan">Araling Panlipunan</option>
+                <option value="TLE">TLE</option>
+                <option value="Values Education">Values Education</option>
+                <option value="MAPEH">MAPEH</option>
+                <option value="Computer Education">Computer Education</option>
+            </select>
+        </div>
+
+        <div class="form-group assignment-component-group" hidden>
+            <label>
+                MAPEH Component <span class="required">*</span>
+            </label>
+
+            <select class="assignment-component">
+                <option value="">Select component</option>
+                <option value="Music and Arts">Music and Arts</option>
+                <option value="PE and Health">PE and Health</option>
+            </select>
+        </div>
+
+        <button
+            type="button"
+            class="btn-remove-assignment"
+            title="Remove assignment"
+        >
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+
+        const gradeSelect = row.querySelector(".assignment-grade");
+        const subjectSelect = row.querySelector(".assignment-subject");
+        const componentSelect = row.querySelector(".assignment-component");
+        const removeButton = row.querySelector(".btn-remove-assignment");
+
+        gradeSelect.value = assignment.grade_level || "";
+        subjectSelect.value = assignment.subject || "";
+
+        componentSelect.value =
+            assignment.component ||
+            (assignment.subject === "MAPEH" ? "" : "General");
+
+        subjectSelect.addEventListener("change", function () {
+            updateAssignmentComponentField(row);
+            applyAssignmentLocks();
+        });
+
+        removeButton.addEventListener("click", function () {
+            if (row.dataset.hasGradeRecords === "true") {
+                notify(
+                    "This assignment cannot be removed because grade records already exist.",
+                );
+                return;
+            }
+
+            row.remove();
+        });
 
         teachingAssignmentsContainer.appendChild(row);
+
+        updateAssignmentComponentField(row);
+        applyAssignmentLocks();
+
+        return row;
     }
 
     function getTeachingAssignments() {
@@ -308,10 +437,24 @@ document.addEventListener("DOMContentLoaded", function () {
             teachingAssignmentsContainer.querySelectorAll(
                 ".teaching-assignment-row",
             ),
-        ).map((row) => ({
-            grade_level: row.querySelector(".assignment-grade").value,
-            subject: row.querySelector(".assignment-subject").value,
-        }));
+        ).map((row) => {
+            const subject = row.querySelector(".assignment-subject").value;
+
+            const assignment = {
+                grade_level: row.querySelector(".assignment-grade").value,
+                subject: subject,
+                component:
+                    subject === "MAPEH"
+                        ? row.querySelector(".assignment-component").value
+                        : "General",
+            };
+
+            if (row.dataset.assignmentId) {
+                assignment.id = Number(row.dataset.assignmentId);
+            }
+
+            return assignment;
+        });
     }
 
     // =====================================================
@@ -406,26 +549,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
             updateFacultyResponsibilities();
 
-            // Restore existing teaching assignments.
+            // Restore active school year teaching assignments only.
             teachingAssignmentsContainer.innerHTML = "";
 
+            const currentSchoolYear = getCurrentSchoolYear();
+
             if (Array.isArray(user.assignments)) {
-                user.assignments.forEach((assignment) => {
-                    createTeachingAssignmentRow();
-
-                    const rows = teachingAssignmentsContainer.querySelectorAll(
-                        ".teaching-assignment-row",
-                    );
-
-                    const row = rows[rows.length - 1];
-
-                    row.querySelector(".assignment-grade").value =
-                        assignment.grade_level || "";
-
-                    row.querySelector(".assignment-subject").value =
-                        assignment.subject || "";
-                });
+                user.assignments
+                    .filter((assignment) => {
+                        return assignment.school_year === currentSchoolYear;
+                    })
+                    .forEach((assignment) => {
+                        createTeachingAssignmentRow(assignment);
+                    });
             }
+
+            applyAssignmentLocks();
 
             // Restore the latest advisory assignment.
             document.getElementById("advisoryGrade").value =
@@ -727,13 +866,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const details = [
             ["Full Name", user.name],
             ["Email Address", user.email],
-            ["Username", user.username || "—"],
             ["Role", roleLabel(role)],
             ["Account Status", statusLabel(user.status)],
-            ["Profile Type", user.profile_type || "—"],
             ["Profile ID", user.profile_identifier || "—"],
             ["Grade Level", user.grade_level || "—"],
-            ["Section", user.section || "—"],
             ["School Year", user.school_year || "—"],
         ];
 
@@ -1021,6 +1157,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (incompleteAssignment) {
                     return "Please complete all teaching assignments.";
+                }
+
+                const incompleteMapehComponent = payload.assignments.some(
+                    (assignment) =>
+                        assignment.subject === "MAPEH" &&
+                        !["Music and Arts", "PE and Health"].includes(
+                            assignment.component,
+                        ),
+                );
+
+                if (incompleteMapehComponent) {
+                    return "Please select a MAPEH component for every MAPEH assignment.";
                 }
             }
 

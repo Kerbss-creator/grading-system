@@ -3,16 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
 use App\Notifications\AnnouncementNotification;
+use App\Services\ActivityRecorder;
 
 class AnnouncementController extends Controller
 {
-
-    // DISPLAY ANNOUNCEMENT
+    // DISPLAY ANNOUNCEMENTS
     public function index()
     {
         $announcements = Announcement::latest()->get();
@@ -20,9 +18,24 @@ class AnnouncementController extends Controller
         return view('admin.announcement', compact('announcements'));
     }
 
-    public function destroy($id)
+    // DELETE ANNOUNCEMENT
+    public function destroy($id, ActivityRecorder $activityRecorder)
     {
         $announcement = Announcement::findOrFail($id);
+
+        $activityRecorder->record(
+            action: 'delete',
+            type: 'announcement',
+            key: (string) $announcement->id,
+            before: [
+                'title' => $announcement->title,
+                'message' => $announcement->message,
+                'audience' => $announcement->audience,
+            ],
+            details: [
+                'description' => 'Deleted an announcement.',
+            ]
+        );
 
         $announcement->delete();
 
@@ -33,8 +46,7 @@ class AnnouncementController extends Controller
     }
 
     // SAVE ANNOUNCEMENT
-
-    public function store(Request $request)
+    public function store(Request $request, ActivityRecorder $activityRecorder)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -58,8 +70,21 @@ class AnnouncementController extends Controller
             'created_by' => Auth::id(),
         ]);
 
-        // SEND NOTIFICATION TO ADMIN ACCOUNTS
-        // TEMPORARY TEST: Notify the currently logged-in user
+        // RECORD ANNOUNCEMENT ACTIVITY
+        $activityRecorder->record(
+            action: 'create',
+            type: 'announcement',
+            key: (string) $announcement->id,
+            after: [
+                'title' => $announcement->title,
+                'message' => $announcement->message,
+                'audience' => $announcement->audience,
+            ],
+            details: [
+                'description' => 'Published an announcement.',
+            ]
+        );
+
         // SEND NOTIFICATION TO THE CURRENTLY LOGGED-IN USER
         $user->notify(
             new AnnouncementNotification(
@@ -76,8 +101,11 @@ class AnnouncementController extends Controller
     }
 
     // UPDATE ANNOUNCEMENT
-    public function update(Request $request, $id)
-    {
+    public function update(
+        Request $request,
+        $id,
+        ActivityRecorder $activityRecorder
+    ) {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'message' => 'required|string',
@@ -86,11 +114,34 @@ class AnnouncementController extends Controller
 
         $announcement = Announcement::findOrFail($id);
 
+        // CAPTURE PREVIOUS VALUES
+        $before = [
+            'title' => $announcement->title,
+            'message' => $announcement->message,
+            'audience' => $announcement->audience,
+        ];
+
         $announcement->update([
             'title' => $validated['title'],
             'message' => $validated['message'],
             'audience' => $validated['audience'],
         ]);
+
+        // RECORD ANNOUNCEMENT UPDATE
+        $activityRecorder->record(
+            action: 'update',
+            type: 'announcement',
+            key: (string) $announcement->id,
+            before: $before,
+            after: [
+                'title' => $announcement->title,
+                'message' => $announcement->message,
+                'audience' => $announcement->audience,
+            ],
+            details: [
+                'description' => 'Updated an announcement.',
+            ]
+        );
 
         return response()->json([
             'success' => true,

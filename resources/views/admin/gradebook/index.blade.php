@@ -63,6 +63,14 @@
                     </strong>
                 </div>
 
+                {{-- MAPEH COMPONENT --}}
+                @if(strtoupper(trim($subject->subject_name)) === 'MAPEH')
+                    <div class="gradebook-info-item">
+                        <span class="info-label">MAPEH COMPONENT</span>
+                        <strong>{{ $assignment->component ?? 'Not Specified' }}</strong>
+                    </div>
+                @endif
+
                 <div class="gradebook-info-item">
                     <span class="info-label">ADVISER</span>
                     <strong>

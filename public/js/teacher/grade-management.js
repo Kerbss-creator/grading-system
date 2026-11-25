@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const tableTitle = document.getElementById("gradebookTableTitle");
     const termSelect = document.getElementById("gradebookTerm");
+    const schoolYearSelect = document.getElementById("gradebookSchoolYear");
 
     const resetButton = document.getElementById("resetGradebook");
     const clearButton = document.getElementById("clearScores");
@@ -34,6 +35,66 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const gradeLockModal = document.getElementById("gradeLockModal");
     const closeGradeLockModal = document.getElementById("closeGradeLockModal");
+
+    // ==========================================
+    // SUCCESS NOTIFICATION MODAL
+    // ==========================================
+
+    const notificationModal = document.getElementById("notificationModal");
+    const notificationModalContent = document.getElementById(
+        "notificationModalContent",
+    );
+    const notificationModalTitle = document.getElementById(
+        "notificationModalTitle",
+    );
+    const notificationModalMessage = document.getElementById(
+        "notificationModalMessage",
+    );
+    const notificationModalIcon = document.getElementById(
+        "notificationModalIcon",
+    );
+    const closeNotificationModal = document.getElementById(
+        "closeNotificationModal",
+    );
+
+    function showNotification(type, title, message) {
+        if (
+            !notificationModal ||
+            !notificationModalTitle ||
+            !notificationModalMessage
+        ) {
+            console.error("Notification modal elements are missing.");
+            return;
+        }
+
+        notificationModalTitle.textContent = title;
+        notificationModalMessage.textContent = message;
+
+        if (notificationModalContent) {
+            notificationModalContent.className = `notification-modal ${type}`;
+        }
+
+        if (notificationModalIcon) {
+            notificationModalIcon.className =
+                type === "success" ? "fas fa-check" : "fas fa-exclamation";
+        }
+
+        notificationModal.classList.remove("is-hidden");
+        notificationModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeNotification() {
+        notificationModal?.classList.add("is-hidden");
+        notificationModal?.setAttribute("aria-hidden", "true");
+    }
+
+    closeNotificationModal?.addEventListener("click", closeNotification);
+
+    notificationModal?.addEventListener("click", (event) => {
+        if (event.target === notificationModal) {
+            closeNotification();
+        }
+    });
 
     function closeGradeLock() {
         gradeLockModal?.classList.remove("show");
@@ -1018,7 +1079,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             closeWarningModal(clearScoresModal);
 
-            alert(result.message || "All student scores have been cleared.");
+            showNotification(
+                "success",
+                "Scores Cleared Successfully!",
+                result.message ||
+                    "All student scores for the selected term have been cleared.",
+            );
         } catch (error) {
             console.error("Clear scores error:", error);
             alert(error.message || "Unable to clear student scores.");
@@ -1103,9 +1169,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             closeWarningModal(resetGradebookModal);
 
-            alert(
+            showNotification(
+                "success",
+                "Gradebook Reset Successfully!",
                 result.message ||
-                    "Assessment maximum points restored successfully.",
+                    "Assessment maximum points have been restored to their default values. Existing student scores were retained.",
             );
         } catch (error) {
             console.error("Reset gradebook error:", error);
@@ -1227,7 +1295,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 unsavedNote.textContent = `Term ${activeTerm} scores saved successfully.`;
             }
 
-            alert(result.message || "Successfully saved grades!");
+            showNotification(
+                "success",
+                "Grades Saved Successfully!",
+                result.message ||
+                    "Grade scores and computed grades saved successfully.",
+            );
         } catch (error) {
             console.error("Grade saving error:", error);
 
@@ -1290,9 +1363,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function getAssessmentMaximum(index) {
         const firstLearnerValue = getAssessmentData(index);
 
-        return firstLearnerValue
+        const maximum = firstLearnerValue
             ? firstLearnerValue.max
             : getDefaultMaximum(index);
+
+        return Number(maximum);
     }
 
     function renderAssessmentSettings() {
@@ -1500,7 +1575,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 unsavedNote.textContent = `Term ${activeTerm} assessment settings saved successfully.`;
             }
 
-            alert(result.message || "Assessment settings saved successfully.");
+            showNotification(
+                "success",
+                "Assessment Settings Saved!",
+                result.message ||
+                    "Assessment maximum points saved successfully.",
+            );
         } catch (error) {
             console.error("Assessment settings error:", error);
 
@@ -1512,25 +1592,71 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
+    // SCHOOL YEAR SWITCHING
+    // ==========================================
+
+    schoolYearSelect?.addEventListener("change", function () {
+        const selectedSchoolYear = this.value;
+
+        if (!selectedSchoolYear) {
+            return;
+        }
+
+        const url = new URL(window.location.href);
+
+        // Keep the original assignment as reference.
+        url.searchParams.set("assignment", gradebook.dataset.assignmentId);
+
+        // Set the selected school year.
+        url.searchParams.set("school_year", selectedSchoolYear);
+
+        // Let the controller use the selected year's current term.
+        url.searchParams.delete("term");
+
+        // Reload the gradebook using the selected school year.
+        window.location.href = url.toString();
+    });
+
+    // ==========================================
     // INITIAL DISPLAY
     // ==========================================
 
     async function initializeGradebook() {
-        activeTerm = 1;
+        // Get the term selected by the database/controller.
+        const configuredTerm = Number(
+            gradebook.dataset.selectedTerm || termSelect?.value || 1,
+        );
+
+        activeTerm = [1, 2, 3].includes(configuredTerm) ? configuredTerm : 1;
 
         if (termSelect) {
-            termSelect.value = "1";
+            termSelect.value = String(activeTerm);
+        }
+
+        // Synchronize the active tab with the selected term.
+        tabs.forEach((tab, index) => {
+            const isActive =
+                tab.dataset.view === "term" &&
+                Number(tab.dataset.term) === activeTerm;
+
+            tab.classList.toggle("is-active", isActive);
+            tab.setAttribute("aria-selected", isActive ? "true" : "false");
+            tab.tabIndex = isActive ? 0 : -1;
+        });
+
+        if (tableTitle) {
+            tableTitle.textContent = `Term ${activeTerm} Scores`;
         }
 
         try {
             isLoadingTerm = true;
 
-            await loadTermFromDatabase(1);
+            await loadTermFromDatabase(activeTerm);
 
-            loadTermData(1);
+            loadTermData(activeTerm);
 
             if (unsavedNote) {
-                unsavedNote.textContent = "Saved grades loaded successfully.";
+                unsavedNote.textContent = `Term ${activeTerm} saved grades loaded successfully.`;
             }
         } catch (error) {
             console.error("Initial grade loading error:", error);
@@ -1538,7 +1664,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert(error.message || "Unable to load saved grades.");
 
             // Retain server-rendered scores if loading fails.
-            loadTermData(1);
+            loadTermData(activeTerm);
         } finally {
             isLoadingTerm = false;
         }

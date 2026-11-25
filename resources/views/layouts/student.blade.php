@@ -22,9 +22,9 @@
     <!-- STUDENT SIDEBAR CSS -->
     <link rel="stylesheet" href="{{ asset('css/student/student-sidebar.css') }}">
 
-    <!-- PAGE CSS -->
+    {{-- PAGE CSS --}}
     @yield('page-css')
-</head>
+    @stack('styles')
 
 <body>
 
@@ -61,6 +61,13 @@
                 class="student-nav-link {{ request()->is('student/grades*') ? 'active' : '' }}">
                 <i class="fa-solid fa-graduation-cap"></i>
                 <span>My Grades</span>
+            </a>
+
+            {{-- MY SUBJECTS --}}
+            <a href="{{ url('/student/subjects') }}"
+                class="student-nav-link {{ request()->is('student/subjects*') ? 'active' : '' }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>My Subjects</span>
             </a>
 
             <!-- SYSTEM -->

@@ -1,438 +1,410 @@
-/* MY GRADES PAGE */
+/* =========================================
+   STUDENT ACADEMIC PROGRESS REPORT
+========================================= */
 
-.grades-page {
+.academic-report-page {
     width: 100%;
-    max-width: 1600px;
+    max-width: 1500px;
     margin: 0 auto;
-    padding-bottom: 30px;
-    color: #24352c;
+    padding: 25px;
+    color: #26352c;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    box-sizing: border-box;
 }
 
-/* SUMMARY CARDS */
-
-.grades-summary {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-    margin-bottom: 28px;
+.academic-report-page *,
+.academic-report-page *::before,
+.academic-report-page *::after {
+    box-sizing: border-box;
 }
 
-.grade-summary-card {
+/* =========================================
+   REPORT TOOLBAR
+========================================= */
+
+.report-toolbar {
     display: flex;
     align-items: center;
-    gap: 17px;
-    min-width: 0;
-    padding: 24px;
-    background: #ffffff;
-    border: 1px solid #e8eee9;
-    border-radius: 15px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.025);
+    justify-content: flex-end;
+    margin-bottom: 20px;
 }
 
-.summary-icon {
+.report-filter {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.report-filter label {
+    color: #45564b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.report-filter select {
+    min-width: 125px;
+    padding: 9px 32px 9px 12px;
+    border: 1px solid #dce5df;
+    border-radius: 7px;
+    outline: none;
+    background-color: #fff;
+    color: #26352c;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.report-filter select:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.09);
+}
+
+/* =========================================
+   REPORT PAPER
+========================================= */
+
+.academic-report {
+    width: 100%;
+    max-width: 1250px;
+    min-height: 800px;
+    margin: 0 auto;
+    padding: 50px 55px;
+    background: #fff;
+    border: 1px solid #e5eae6;
+    border-radius: 5px;
+    box-shadow: 0 3px 15px rgba(30, 55, 40, 0.06);
+}
+
+/* =========================================
+   SCHOOL HEADER
+========================================= */
+
+.report-header {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    width: 54px;
-    height: 54px;
-    border-radius: 14px;
-    background: #e7f5ed;
-    color: #036f35;
-    font-size: 21px;
+    width: 100%;
+    margin: 0 auto 32px;
+    text-align: center;
 }
 
-.summary-info {
-    min-width: 0;
+.report-school-logo {
+    display: block;
+    width: 95px;
+    height: 95px;
+    object-fit: contain;
+    margin: 0 auto 12px;
 }
 
-.summary-info p {
-    margin: 0 0 7px;
-    color: #718078;
+.report-header h2 {
+    width: 100%;
+    margin: 0;
+    color: #173d29;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-align: center;
 }
 
-.summary-info h2 {
-    margin: 0 0 5px;
-    color: #036f35;
-    font-size: 21px;
+.report-header p {
+    width: 100%;
+    margin: 5px 0;
+    color: #536158;
+    font-size: 12px;
+    text-align: center;
+}
+
+.report-header h3 {
+    width: 100%;
+    margin: 20px 0 6px;
+    color: #26352c;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.report-header .report-period {
+    margin-top: 8px;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* =========================================
+   LEARNER INFORMATION
+========================================= */
+
+.learner-information {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+    padding: 16px 0;
+    border-top: 1px solid #aebbb2;
+    border-bottom: 1px solid #aebbb2;
+}
+
+.learner-info-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+    font-size: 12px;
+}
+
+.learner-info-item span {
+    flex-shrink: 0;
+    color: #536158;
+}
+
+.learner-info-item strong {
+    color: #26352c;
     font-weight: 700;
     overflow-wrap: anywhere;
 }
 
-.summary-info span {
-    color: #8a9790;
-    font-size: 11px;
+/* =========================================
+   PROGRESS TABLES
+========================================= */
+
+.report-tables {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 28px;
 }
 
-/* MAIN GRADES PANEL */
-
-.grades-panel {
-    overflow: hidden;
-    background: #ffffff;
-    border: 1px solid #e8eee9;
-    border-radius: 16px;
-    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.025);
+.report-table-section {
+    min-width: 0;
 }
 
-.grades-panel-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 25px 26px;
-    border-bottom: 1px solid #edf1ee;
-}
-
-.grades-panel-heading h2 {
-    margin: 0 0 7px;
-    color: #173c29;
-    font-size: 20px;
+.report-table-section h4 {
+    margin: 0 0 12px;
+    padding: 12px;
+    background: #edf4ef;
+    border: 1px solid #d4e2d8;
+    color: #17472c;
+    text-align: center;
+    font-size: 12px;
     font-weight: 700;
 }
 
-.grades-panel-heading p {
-    margin: 0;
-    color: #819087;
-    font-size: 13px;
-}
-
-.grades-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 13px;
-    border-radius: 20px;
-    background: #eaf7ef;
-    color: #036f35;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-/* FILTERS */
-
-.grades-filters {
-    display: flex;
-    align-items: end;
-    gap: 16px;
-    padding: 22px 26px;
-    border-bottom: 1px solid #edf1ee;
-}
-
-.grades-search {
-    position: relative;
-    flex: 1;
-    min-width: 180px;
-}
-
-.grades-search i {
-    position: absolute;
-    top: 50%;
-    left: 15px;
-    color: #87968d;
-    font-size: 14px;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
-
-.grades-search input,
-.filter-control select {
-    width: 100%;
-    height: 44px;
-    outline: none;
-    border: 1px solid #dfe8e2;
-    border-radius: 9px;
-    background: #ffffff;
-    color: #33473b;
-    font-family: inherit;
-    font-size: 12px;
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.grades-search input {
-    padding: 0 15px 0 41px;
-}
-
-.grades-search input::placeholder {
-    color: #9aa69f;
-}
-
-.filter-control {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    width: 165px;
-    flex-shrink: 0;
-}
-
-.filter-control label {
-    color: #526359;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.filter-control select {
-    padding: 0 12px;
-    cursor: pointer;
-}
-
-.grades-search input:focus,
-.filter-control select:focus {
-    border-color: #036f35;
-    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.08);
-}
-
-/* GRADES TABLE */
-
-.grades-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-}
-
-.grades-table {
+.scholastic-table,
+.behavioral-table {
     width: 100%;
     border-collapse: collapse;
-    text-align: left;
+    table-layout: fixed;
+    background: #fff;
 }
 
-.grades-table thead {
-    background: #f7faf8;
-}
-
-.grades-table th {
-    padding: 15px 26px;
-    color: #68796f;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.grades-table td {
-    padding: 16px 26px;
-    border-top: 1px solid #edf1ee;
-    color: #35483d;
-    font-size: 13px;
-    vertical-align: middle;
-}
-
-.grades-table tbody tr {
-    transition: background 0.2s ease;
-}
-
-.grades-table tbody tr:hover {
-    background: #fbfdfb;
-}
-
-.subject-cell {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    min-width: 180px;
-}
-
-.subject-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 42px;
-    height: 42px;
-    border-radius: 11px;
-    background: #e7f5ed;
-    color: #036f35;
-    font-size: 16px;
-}
-
-.subject-cell strong {
-    display: block;
-    margin-bottom: 5px;
-    color: #263b2e;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.subject-cell span {
-    display: block;
-    color: #94a097;
-    font-size: 11px;
-}
-
-.grades-table .grade-value {
-    color: #036f35;
-    font-size: 17px;
-    font-weight: 700;
-}
-
-.remarks-text {
-    color: #036f35;
+.scholastic-table th,
+.scholastic-table td,
+.behavioral-table th,
+.behavioral-table td {
+    border: 1px solid #aebbb2;
+    padding: 11px 12px;
+    color: #26352c;
     font-size: 12px;
-    font-weight: 600;
+    text-align: left;
+    overflow-wrap: break-word;
 }
 
-.grade-status {
-    display: inline-block;
-    padding: 6px 11px;
-    border-radius: 20px;
-    background: #eaf7ef;
-    color: #036f35;
-    font-size: 10px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-/* EMPTY STATE */
-
-.grades-empty-state {
-    padding: 50px 20px;
+.scholastic-table th,
+.behavioral-table th {
+    background: #f3f6f4;
+    color: #304b39;
+    font-size: 12px;
+    font-weight: 700;
     text-align: center;
 }
 
-.grades-empty-state[hidden] {
-    display: none !important;
+.scholastic-table th:first-child {
+    width: 72%;
 }
 
-.grades-empty-state > i {
-    margin-bottom: 15px;
-    color: #a7cbb5;
-    font-size: 34px;
+.scholastic-table th:last-child {
+    width: 28%;
 }
 
-.grades-empty-state h3 {
-    margin: 0 0 8px;
-    color: #294333;
-    font-size: 17px;
+.scholastic-table td:last-child {
+    text-align: center;
+    font-weight: 700;
 }
 
-.grades-empty-state p {
-    margin: 0;
-    color: #89968e;
+.behavioral-table th:first-child {
+    width: 72%;
+}
+
+.behavioral-table th:last-child {
+    width: 28%;
+}
+
+.behavioral-table tbody tr {
+    height: 43px;
+}
+
+.no-grade-data {
+    height: 65px;
+    color: #78857c !important;
+    text-align: center !important;
+    font-style: italic;
+    font-weight: 400 !important;
+}
+
+/* =========================================
+   SIGNATORIES
+========================================= */
+
+.report-signatories {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 50px;
+    margin-top: 50px;
+}
+
+.signatory {
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.signatory strong {
+    order: 1;
+    margin-bottom: 5px;
     font-size: 12px;
 }
 
-/* PANEL FOOTER */
+.signatory .signature-line {
+    order: 2;
+    width: 100%;
+    border-top: 1px solid #000;
+    margin-bottom: 5px;
+}
 
-.grades-panel-footer {
+.signatory span {
+    order: 3;
+    font-size: 12px;
+}
+
+/* =========================================
+   GRADE PUBLICATION NOTICE
+========================================= */
+
+.publication-notice {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    padding: 18px 26px;
-    border-top: 1px solid #edf1ee;
+    gap: 10px;
+    padding: 13px 16px;
+    margin-bottom: 20px;
+    background: #fff8e7;
+    border: 1px solid #f2dfad;
+    border-radius: 8px;
+    color: #80621d;
+    font-size: 12px;
+    font-weight: 500;
 }
 
-.grades-panel-footer p {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    color: #829087;
-    font-size: 11px;
+.publication-notice i {
+    font-size: 12px;
 }
 
-.grades-panel-footer p i {
-    color: #036f35;
-}
+/* =========================================
+   TABLET RESPONSIVENESS
+========================================= */
 
-.grades-panel-footer > span {
-    color: #66766c;
-    font-size: 11px;
-    white-space: nowrap;
-}
-
-/* RESPONSIVE DESIGN */
-
-@media (max-width: 1100px) {
-    .grades-summary {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .grades-summary .grade-summary-card:last-child {
-        grid-column: 1 / -1;
-    }
-
-    .grades-filters {
-        flex-wrap: wrap;
-    }
-
-    .grades-search {
-        flex-basis: 100%;
-    }
-
-    .filter-control {
-        flex: 1;
-    }
-}
-
-@media (max-width: 768px) {
-    .grades-page {
-        padding-bottom: 20px;
-    }
-
-    .grades-summary {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-
-    .grades-summary .grade-summary-card:last-child {
-        grid-column: auto;
-    }
-
-    .grade-summary-card {
+@media (max-width: 900px) {
+    .academic-report-page {
         padding: 18px;
     }
 
-    .grades-panel-heading {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 20px;
+    .academic-report {
+        padding: 30px 25px;
     }
 
-    .grades-filters {
+    .report-tables {
         gap: 14px;
-        padding: 18px 20px;
     }
 
-    .grades-search {
-        flex-basis: 100%;
-    }
-
-    .filter-control {
-        width: auto;
-        min-width: 0;
-    }
-
-    .grades-table {
-        min-width: 650px;
-    }
-
-    .grades-table th,
-    .grades-table td {
-        padding: 14px 16px;
-    }
-
-    .grades-panel-footer {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 16px 20px;
+    .report-signatories {
+        gap: 35px;
     }
 }
 
-@media (max-width: 420px) {
-    .grades-status {
-        font-size: 11px;
+/* =========================================
+   MOBILE RESPONSIVENESS
+========================================= */
+
+@media (max-width: 650px) {
+    .academic-report-page {
+        padding: 12px;
     }
 
-    .filter-control label {
-        font-size: 10px;
+    .report-toolbar {
+        justify-content: flex-start;
     }
 
-    .filter-control select {
-        font-size: 11px;
-        padding: 0 8px;
+    .report-filter {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .report-filter label {
+        align-self: end;
+    }
+
+    .report-filter select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .academic-report {
+        padding: 25px 16px;
+    }
+
+    .report-header h2,
+    .report-header h3,
+    .report-header p,
+    .report-header .report-period {
+        font-size: 12px;
+    }
+
+    .learner-information {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .report-tables {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .scholastic-table th,
+    .scholastic-table td,
+    .behavioral-table th,
+    .behavioral-table td {
+        font-size: 12px;
+        padding: 8px 6px;
+    }
+
+    .report-signatories {
+        gap: 20px;
+        margin-top: 50px;
+        padding: 0;
+    }
+
+    .signatory {
+        width: 50%;
+    }
+
+    .signatory strong,
+    .signatory span {
+        font-size: 12px;
     }
 }

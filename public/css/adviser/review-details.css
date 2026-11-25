@@ -322,7 +322,6 @@
     color: #2b3d30;
     font-size: 11px;
     font-weight: 700;
-    
 }
 
 .student-id {
@@ -559,5 +558,171 @@
     .review-action-buttons {
         align-items: stretch;
         flex-direction: column;
+    }
+}
+
+/* =========================================
+   RETURN GRADE MODAL
+========================================= */
+
+.return-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(18, 35, 24, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+.return-modal-overlay.active {
+    display: flex;
+}
+
+.return-modal {
+    width: 100%;
+    max-width: 460px;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+    animation: returnModalShow 0.2s ease;
+}
+
+@keyframes returnModalShow {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.return-modal-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    background: #fff0ed;
+    color: #c44735;
+    font-size: 20px;
+}
+
+.return-modal h3 {
+    margin: 0 0 7px;
+    color: #26392d;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.return-modal-description {
+    margin: 0 0 19px;
+    color: #879189;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.return-modal label {
+    display: block;
+    margin-bottom: 8px;
+    color: #405448;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.return-modal textarea {
+    width: 100%;
+    min-height: 125px;
+    padding: 12px;
+    resize: vertical;
+    border: 1px solid #dce5de;
+    border-radius: 9px;
+    outline: none;
+    font-family: inherit;
+    font-size: 11px;
+    color: #34483a;
+    transition: 0.2s ease;
+}
+
+.return-modal textarea:focus {
+    border-color: #036f35;
+    box-shadow: 0 0 0 3px rgba(3, 111, 53, 0.08);
+}
+
+.return-modal-counter {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+    color: #929c94;
+    font-size: 10px;
+}
+
+.return-modal-error {
+    display: none;
+    margin-top: 7px;
+    color: #c44735;
+    font-size: 10px;
+}
+
+.return-modal-error.show {
+    display: block;
+}
+
+.return-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 22px;
+}
+
+.return-modal-actions button {
+    min-height: 39px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.return-modal-cancel {
+    background: #f0f3f0;
+    color: #647067;
+}
+
+.return-modal-confirm {
+    background: #c44735;
+    color: #ffffff;
+}
+
+.return-modal-confirm:hover {
+    background: #a93627;
+}
+
+.return-modal-cancel:hover {
+    background: #e3e9e4;
+}
+
+@media (max-width: 480px) {
+    .return-modal {
+        padding: 20px;
+    }
+
+    .return-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .return-modal-actions button {
+        width: 100%;
     }
 }

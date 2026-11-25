@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Subject;
 use App\Models\TeachingAssignment;
 use App\Models\AdvisoryAssignment;
+use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
@@ -30,8 +32,11 @@ class SubjectController extends Controller
             ->where('subject_code', $request->query('code'))
             ->firstOrFail();
 
-        // Default school year
-        $schoolYear = $request->query('school_year', '2026-2027');
+        // Use selected school year or the active school year.
+        $schoolYear = $request->query(
+            'school_year',
+            SchoolYear::active()?->year_name ?? '2026-2027'
+        );
 
         $gradeLevels = [
             'Grade 7',
@@ -40,45 +45,70 @@ class SubjectController extends Controller
             'Grade 10',
         ];
 
-        // Get subject teachers assigned to this subject
+        // Get all assignments for this subject and school year.
+        // Do not keyBy grade_level because MAPEH has two components.
         $teachingAssignments = TeachingAssignment::with('faculty')
             ->where('subject', $subject->subject_name)
             ->whereIn('grade_level', $gradeLevels)
+            ->where('school_year', $schoolYear)
+            ->orderBy('grade_level')
+            ->orderBy('component')
             ->get()
-            ->keyBy('grade_level');
+            ->groupBy('grade_level');
 
-        // Get advisers assigned to each grade level
-        // Include legacy assignments with NULL school_year.
+        // Get advisers assigned to the selected school year.
         $advisoryAssignments = AdvisoryAssignment::with('faculty')
             ->whereIn('grade_level', $gradeLevels)
             ->where(function ($query) use ($schoolYear) {
                 $query->where('school_year', $schoolYear)
                     ->orWhereNull('school_year');
             })
+            ->orderByRaw(
+                'CASE WHEN school_year IS NULL THEN 1 ELSE 0 END'
+            )
             ->get()
             ->groupBy('grade_level');
 
-        // Prepare Grade 7–10 assignments
+        // Prepare Grade 7–10 assignments.
         $gradeAssignments = collect($gradeLevels)
             ->map(function ($gradeLevel) use ($teachingAssignments, $advisoryAssignments) {
+                $assignments = $teachingAssignments
+                    ->get($gradeLevel, collect())
+                    ->filter(function ($assignment) {
+                        return $assignment->faculty !== null;
+                    })
+                    ->values();
+
+                $advisers = $advisoryAssignments
+                    ->get($gradeLevel, collect())
+                    ->filter(function ($assignment) {
+                        return $assignment->faculty !== null;
+                    })
+                    ->unique('faculty_id')
+                    ->values();
+
                 return [
                     'grade_level' => $gradeLevel,
 
-                    'teacher' => $teachingAssignments
-                        ->get($gradeLevel)?->faculty,
+                    // All component assignments for this grade.
+                    'assignments' => $assignments,
 
-                    'advisers' => $advisoryAssignments
-                        ->get($gradeLevel, collect())
-                        ->pluck('faculty')
-                        ->filter()
+                    // Backward-compatible property for existing Blade.
+                    // For MAPEH, use assignments instead of this property.
+                    'teacher' => $assignments->first()?->faculty,
+
+                    // Adviser assigned to this grade level.
+                    'advisers' => $advisers->pluck('faculty')
                         ->unique('id')
                         ->values(),
                 ];
             });
 
-        // Get unique assigned teachers
+        // Get unique assigned teachers across all grade levels/components.
         $assignedTeachers = $gradeAssignments
-            ->pluck('teacher')
+            ->flatMap(function ($grade) {
+                return $grade['assignments']->pluck('faculty');
+            })
             ->filter()
             ->unique('id')
             ->values();

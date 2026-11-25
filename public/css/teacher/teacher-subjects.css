@@ -4,10 +4,15 @@
 ========================================== */
 
 .subjects-container {
+    .subjects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 25px 30px;
     width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    color: #202922;
+    box-sizing: border-box;
+}
+
 }
 
 /* SCHOOL YEAR AND TERM FILTERS */

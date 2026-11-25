@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Subject extends Model
 {
@@ -13,9 +14,17 @@ class Subject extends Model
         'status',
     ];
 
-    
-    public function gradeLevels()
+    public function gradeLevels(): HasMany
     {
         return $this->hasMany(GradeLevelSubject::class);
+    }
+
+    public function teachingAssignments(): HasMany
+    {
+        return $this->hasMany(
+            TeachingAssignment::class,
+            'subject',
+            'subject_name'
+        );
     }
 }

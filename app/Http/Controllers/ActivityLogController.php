@@ -20,11 +20,11 @@ use Illuminate\Validation\ValidationException;
 class ActivityLogController extends Controller
 {
     /**
-     * Display activity logs.
+     * Apply System Owner visibility restrictions to activity logs.
      */
-    public function index(Request $request)
+    private function visibleLogsQuery(Request $request)
     {
-        $query = ActivityLog::query()->latest('id');
+        $query = ActivityLog::query();
 
         if (!SystemOwner::is($request->user())) {
             $owner = User::withTrashed()
@@ -46,16 +46,69 @@ class ActivityLogController extends Controller
                                 ->orWhere('record_key', '!=', (string) $owner->id);
                         });
                     } else {
-                        $q->whereRaw('1=1');
+                        $q->whereRaw('1 = 1');
                     }
                 });
         }
 
-        if (in_array(
-            $request->query('type'),
-            ['students', 'faculty', 'admins', 'users'],
-            true
-        )) {
+        return $query;
+    }
+
+    /**
+     * Display activity logs.
+     */
+    public function index(Request $request)
+    {
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'type' => ['nullable', 'string', 'max:50'],
+            'action' => ['nullable', 'string', 'max:40'],
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
+
+        $baseQuery = $this->visibleLogsQuery($request);
+
+        $totalActivities = (clone $baseQuery)->count();
+
+        $activeUsers = (clone $baseQuery)
+            ->whereNotNull('actor_id')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->distinct()
+            ->count('actor_id');
+
+        $todayLogs = (clone $baseQuery)
+            ->whereDate('created_at', today())
+            ->count();
+
+        $availableTypes = (clone $baseQuery)
+            ->whereNotNull('record_type')
+            ->distinct()
+            ->orderBy('record_type')
+            ->pluck('record_type');
+
+        $availableActions = (clone $baseQuery)
+            ->whereNotNull('action')
+            ->distinct()
+            ->orderBy('action')
+            ->pluck('action');
+
+        $query = clone $baseQuery;
+
+        if ($request->filled('search')) {
+            $search = $request->query('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('actor_name', 'like', "%{$search}%")
+                    ->orWhere('actor_email', 'like', "%{$search}%")
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhere('record_type', 'like', "%{$search}%")
+                    ->orWhere('record_key', 'like', "%{$search}%")
+                    ->orWhere('details', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('type')) {
             $query->where('record_type', $request->query('type'));
         }
 
@@ -63,8 +116,81 @@ class ActivityLogController extends Controller
             $query->where('action', $request->query('action'));
         }
 
-        return view('admin.activity-log', [
-            'logs' => $query->paginate(30)->withQueryString(),
+        if ($request->filled('from')) {
+            $query->whereDate('created_at', '>=', $request->query('from'));
+        }
+
+        if ($request->filled('to')) {
+            $query->whereDate('created_at', '<=', $request->query('to'));
+        }
+
+        $logs = $query
+            ->latest('id')
+            ->paginate(30)
+            ->withQueryString();
+
+        /*
+         * Add display-only aliases for the Blade.
+         * Role is not stored historically in activity_logs,
+         * so we intentionally do not invent a role value.
+         */
+        $logs->getCollection()->transform(function (ActivityLog $log) {
+            $log->user_name = $log->actor_name;
+            $log->user_role = $log->actor_role
+                ? ucwords(str_replace('_', ' ', $log->actor_role))
+                : 'Not recorded';
+            $log->module = ucwords(
+                str_replace('_', ' ', $log->record_type ?? 'Unknown')
+            );
+            $log->description = data_get(
+                $log->details,
+                'description',
+                $log->action . ' - ' . ($log->record_type ?? 'record')
+            );
+
+            return $log;
+        });
+
+        return view('admin.audit-log', [
+            'logs' => $logs,
+            'totalActivities' => $totalActivities,
+            'activeUsers' => $activeUsers,
+            'todayLogs' => $todayLogs,
+            'availableTypes' => $availableTypes,
+            'availableActions' => $availableActions,
+            'filters' => $request->only([
+                'search',
+                'type',
+                'action',
+                'from',
+                'to',
+            ]),
+        ]);
+    }
+
+    /**
+     * Return the details of one visible audit log as JSON.
+     */
+    public function show(Request $request, ActivityLog $log)
+    {
+        $log = $this->visibleLogsQuery($request)
+            ->whereKey($log->id)
+            ->firstOrFail();
+
+        return response()->json([
+            'id' => $log->id,
+            'actor_id' => $log->actor_id,
+            'actor_name' => $log->actor_name,
+            'actor_email' => $log->actor_email,
+            'actor_role' => $log->actor_role,
+            'action' => $log->action,
+            'record_type' => $log->record_type,
+            'record_key' => $log->record_key,
+            'before' => $log->before,
+            'after' => $log->after,
+            'details' => $log->details,
+            'ip_address' => $log->ip_address,
+            'created_at' => $log->created_at?->format('M d, Y h:i A'),
         ]);
     }
 
@@ -117,6 +243,7 @@ class ActivityLogController extends Controller
      * Restore a deleted record or unlinked login account.
      */
     public function restore(
+        Request $request,
         string $type,
         int $id,
         PersonRecordService $records,
@@ -129,6 +256,12 @@ class ActivityLogController extends Controller
             404
         );
 
+        $tab = $request->input('tab', $type);
+
+        if (!in_array($tab, ['students', 'faculty', 'admins', 'users'], true)) {
+            $tab = $type;
+        }
+
         // Restore an unlinked login account.
         if ($type === 'users') {
             DB::transaction(function () use ($id, $audit) {
@@ -139,6 +272,7 @@ class ActivityLogController extends Controller
                         'adviser',
                         'teacher_adviser',
                     ])
+                    ->lockForUpdate()
                     ->findOrFail($id);
 
                 $hasStudentRecord = Student::withTrashed()
@@ -155,6 +289,13 @@ class ActivityLogController extends Controller
                     ]);
                 }
 
+                $before = $account->only([
+                    'name',
+                    'email',
+                    'role',
+                    'account_status',
+                ]);
+
                 $account->restore();
 
                 $audit->record(
@@ -162,40 +303,41 @@ class ActivityLogController extends Controller
                     'users',
                     (string) $id,
                     null,
-                    $account->only(['name', 'email', 'role'])
+                    $before
                 );
             });
 
-            return back()->with(
-                'success',
-                'Unlinked login account restored.'
-            );
+            return redirect()
+                ->route('admin.recycle-bin', ['tab' => $tab])
+                ->with('success', 'Unlinked login account restored.');
         }
 
         // Restore an administrator account.
         if ($type === 'admins') {
-            $account = User::withTrashed()->findOrFail($id);
+            $account = User::withTrashed()
+                ->where('role', 'admin')
+                ->findOrFail($id);
 
             abort_if(SystemOwner::is($account), 404);
 
             $admins->restore($id);
+            $snapshots->refresh('admins');
         } else {
-            // Restore a student or faculty record and its linked account.
+            // PersonRecordService handles linked account restoration and audit logging.
             $records->restore($type, $id);
+            $snapshots->refresh($type);
         }
 
-        $snapshots->refresh($type);
-
-        return back()->with(
-            'success',
-            'Record and its login account restored.'
-        );
+        return redirect()
+            ->route('admin.recycle-bin', ['tab' => $tab])
+            ->with('success', 'Record and its login account restored.');
     }
 
     /**
      * Permanently delete one record from the Recycle Bin.
      */
     public function forceDelete(
+        Request $request,
         string $type,
         int $id,
         ActivityRecorder $audit,
@@ -208,14 +350,19 @@ class ActivityLogController extends Controller
 
         $this->permanentlyDeleteRecord($type, $id, $audit);
 
-        if (in_array($type, ['students', 'faculty'], true)) {
+        if (in_array($type, ['students', 'faculty', 'admins'], true)) {
             $snapshots->refresh($type);
         }
 
-        return back()->with(
-            'success',
-            'Record permanently deleted.'
-        );
+        $tab = $request->input('tab', $type);
+
+        if (!in_array($tab, ['students', 'faculty', 'admins', 'users'], true)) {
+            $tab = $type;
+        }
+
+        return redirect()
+            ->route('admin.recycle-bin', ['tab' => $tab])
+            ->with('success', 'Record permanently deleted.');
     }
 
     /**
@@ -262,22 +409,29 @@ class ActivityLogController extends Controller
 
         if (
             $deletedCount > 0 &&
-            in_array($type, ['students', 'faculty'], true)
+            in_array($type, ['students', 'faculty', 'admins'], true)
         ) {
             $snapshots->refresh($type);
         }
 
-        $response = back();
+        $tab = $request->input('tab', $type);
+
+        if (!in_array($tab, ['students', 'faculty', 'admins', 'users'], true)) {
+            $tab = $type;
+        }
+
+        $response = redirect()
+            ->route('admin.recycle-bin', ['tab' => $tab]);
 
         if ($deletedCount > 0) {
-            $response = $response->with(
+            $response->with(
                 'success',
                 "{$deletedCount} record(s) permanently deleted."
             );
         }
 
         if (count($skipped) > 0) {
-            $response = $response->with(
+            $response->with(
                 'warning',
                 'Some records were skipped: ' . implode(' | ', $skipped)
             );
@@ -402,7 +556,10 @@ class ActivityLogController extends Controller
                         'teacher_adviser',
                     ];
 
-                    if (!$account || !in_array($account->role, $validRoles, true)) {
+                    if (
+                        !$account ||
+                        !in_array($account->role, $validRoles, true)
+                    ) {
                         throw ValidationException::withMessages([
                             'record' => 'The linked Faculty login account is missing or has an invalid role. Deletion was stopped to protect account data.',
                         ]);
@@ -542,7 +699,6 @@ class ActivityLogController extends Controller
                 abort(404);
             }
 
-            // Keep an audit entry for every successful permanent deletion.
             $audit->record(
                 'force_delete',
                 $type,

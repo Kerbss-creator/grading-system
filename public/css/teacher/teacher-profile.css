@@ -588,3 +588,164 @@
         width: 100%;
     }
 }
+
+/* ==========================================
+   TEACHER PROFILE PICTURE
+========================================== */
+
+.profile-avatar-wrapper {
+    position: relative;
+    width: 112px;
+    height: 112px;
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+    width: 112px;
+    height: 112px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #ffffff;
+    background: #036f35;
+    border: 4px solid #e6f2e9;
+    border-radius: 50%;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-photo-upload-btn {
+    position: absolute;
+    right: 1px;
+    bottom: 2px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    background: #036f35;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.profile-photo-upload-btn:hover {
+    background: #025a2b;
+    transform: scale(1.08);
+}
+
+/* ==========================================
+   PROFILE PHOTO MODAL
+========================================== */
+
+.photo-modal {
+    max-width: 440px;
+}
+
+.photo-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 20px 20px;
+}
+
+.photo-preview-wrapper {
+    width: 155px;
+    height: 155px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #f1f6f2;
+    border: 4px solid #e2eee5;
+    border-radius: 50%;
+}
+
+.photo-preview-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.photo-preview-wrapper #teacherPhotoPlaceholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #9aafa0;
+    font-size: 55px;
+}
+
+.photo-preview-wrapper img.is-hidden,
+.photo-preview-wrapper #teacherPhotoPlaceholder.is-hidden {
+    display: none;
+}
+
+.photo-upload-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 20px;
+    padding: 11px 20px;
+    color: #036f35;
+    background: #edf6ef;
+    border: 1px solid #d9eadd;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.photo-upload-label:hover {
+    background: #e1f0e4;
+    border-color: #b9d8c0;
+}
+
+.photo-upload-label i {
+    font-size: 14px;
+}
+
+.photo-upload-hint {
+    margin: 12px 0 0;
+    color: #89948d;
+    font-size: 11px;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .profile-avatar-wrapper,
+    .profile-avatar {
+        width: 95px;
+        height: 95px;
+    }
+
+    .profile-avatar {
+        font-size: 29px;
+    }
+
+    .profile-photo-upload-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .photo-preview-wrapper {
+        width: 135px;
+        height: 135px;
+    }
+}

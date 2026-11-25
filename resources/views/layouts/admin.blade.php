@@ -103,10 +103,7 @@
                         <i class="fa-solid fa-users-gear"></i>
                         <span>User Management</span>
                     </a>
-                    <a href="/admin/admins" class="dropdown-link {{ request()->is('admin/admins*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-user-shield"></i>
-                        <span>Admin</span>
-                    </a>
+
                     <a href="/admin/faculty-management"
                         class="dropdown-link {{ request()->is('admin/faculty-management*') ? 'active' : '' }}">
                         <i class="fa-solid fa-user-tie"></i>
@@ -141,6 +138,13 @@
                 <span>Grade Approval</span>
             </a>
 
+            {{-- GRADE PUBLICATION --}}
+            <a href="{{ route('admin.grade-publications.index') }}"
+                class="nav-link {{ request()->is('admin/grade-publications*') ? 'active' : '' }}">
+                <i class="fa-solid fa-globe"></i>
+                <span>Grade Publication</span>
+            </a>
+
             <p class="nav-title">SYSTEM</p>
 
             {{-- MY PROFILE --}}
@@ -155,8 +159,10 @@
                 <span>Announcements</span>
             </a>
 
+
             {{-- AUDIT LOGS --}}
-            <a href="/admin/auditlogs" class="nav-link {{ request()->is('admin/auditlogs*') ? 'active' : '' }}">
+            <a href="{{ route('admin.activity-log') }}"
+                class="nav-link {{ request()->is('admin/activity-log*') ? 'active' : '' }}">
                 <i class="fa-solid fa-bars-progress"></i>
                 <span>Audit Logs</span>
             </a>
@@ -238,70 +244,70 @@
 
                             @forelse (($notifications ?? collect()) as $notification)
 
-                            <div class="notification-item {{ $notification->read_at ? '' : 'unread' }}"
-                                data-notification-id="{{ $notification->id }}">
+                                                    <div class="notification-item {{ $notification->read_at ? '' : 'unread' }}"
+                                                        data-notification-id="{{ $notification->id }}">
 
-                                <div class="notification-item-icon">
-                                    <i class="fa-solid fa-bullhorn"></i>
-                                </div>
+                                                        <div class="notification-item-icon">
+                                                            <i class="fa-solid fa-bullhorn"></i>
+                                                        </div>
 
-                                <div class="notification-item-info">
+                                                        <div class="notification-item-info">
 
-                                    <h4>
-                                        {{ $notification->data['title'] ?? 'New Announcement' }}
-                                    </h4>
+                                                            <h4>
+                                                                {{ $notification->data['title'] ?? 'New Announcement' }}
+                                                            </h4>
 
-                                    <p>
-                                        {{ $notification->data['message'] ?? 'Admin posted a new announcement.' }}
-                                    </p>
+                                                            <p>
+                                                                {{ $notification->data['message'] ?? 'Admin posted a new announcement.' }}
+                                                            </p>
 
-                                    <span class="notification-time">
-                                        {{ $notification->created_at
+                                                            <span class="notification-time">
+                                                                {{ $notification->created_at
                                 ->timezone(config('app.timezone'))
                                 ->diffForHumans() }}
-                                    </span>
+                                                            </span>
 
-                                    {{-- Notification actions --}}
-                                    <div class="notification-actions">
+                                                            {{-- Notification actions --}}
+                                                            <div class="notification-actions">
 
-                                        @if (!$notification->read_at)
-                                        <button type="button" class="notification-action mark-read-btn"
-                                            data-id="{{ $notification->id }}">
-                                            <i class="fa-solid fa-check"></i>
-                                            Mark as Read
-                                        </button>
-                                        @else
-                                        <span class="notification-read-label">
-                                            <i class="fa-solid fa-check-double"></i>
-                                            Read
-                                        </span>
-                                        @endif
+                                                                @if (!$notification->read_at)
+                                                                    <button type="button" class="notification-action mark-read-btn"
+                                                                        data-id="{{ $notification->id }}">
+                                                                        <i class="fa-solid fa-check"></i>
+                                                                        Mark as Read
+                                                                    </button>
+                                                                @else
+                                                                    <span class="notification-read-label">
+                                                                        <i class="fa-solid fa-check-double"></i>
+                                                                        Read
+                                                                    </span>
+                                                                @endif
 
-                                        <button type="button" class="notification-action delete-notification-btn"
-                                            data-id="{{ $notification->id }}">
-                                            <i class="fa-regular fa-trash-can"></i>
-                                            Delete
-                                        </button>
+                                                                <button type="button" class="notification-action delete-notification-btn"
+                                                                    data-id="{{ $notification->id }}">
+                                                                    <i class="fa-regular fa-trash-can"></i>
+                                                                    Delete
+                                                                </button>
 
-                                    </div>
+                                                            </div>
 
-                                </div>
+                                                        </div>
 
-                            </div>
+                                                    </div>
 
                             @empty
 
-                            <div class="empty-notification" id="emptyNotification">
+                                <div class="empty-notification" id="emptyNotification">
 
-                                <div class="empty-notification-icon">
-                                    <i class="fa-regular fa-bell-slash"></i>
+                                    <div class="empty-notification-icon">
+                                        <i class="fa-regular fa-bell-slash"></i>
+                                    </div>
+
+                                    <h4>No notifications yet</h4>
+
+                                    <p>You don't have any notifications at the moment.</p>
+
                                 </div>
-
-                                <h4>No notifications yet</h4>
-
-                                <p>You don't have any notifications at the moment.</p>
-
-                            </div>
 
                             @endforelse
 
@@ -311,17 +317,23 @@
 
                 </div>
 
+
                 {{-- ADMIN PROFILE --}}
                 <div class="profile-wrapper">
 
                     <button class="profile" id="profileBtn" type="button">
 
                         <div class="profile-icon">
-                            <i class="fa-solid fa-user"></i>
+                            @if (auth()->user()->profile_photo_path)
+                                <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}"
+                                    alt="Admin Profile Photo">
+                            @else
+                                <i class="fa-solid fa-user"></i>
+                            @endif
                         </div>
 
                         <div class="profile-info">
-                            <strong>Administrator</strong>
+                            <strong>{{ auth()->user()->name }}</strong>
                             <span>Admin</span>
                         </div>
 
@@ -335,11 +347,16 @@
                         <div class="profile-menu-header">
 
                             <div class="profile-menu-icon">
-                                <i class="fa-solid fa-user"></i>
+                                @if (auth()->user()->profile_photo_path)
+                                    <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}"
+                                        alt="Admin Profile Photo">
+                                @else
+                                    <i class="fa-solid fa-user"></i>
+                                @endif
                             </div>
 
                             <div>
-                                <strong>Administrator</strong>
+                                <strong>{{ auth()->user()->name }}</strong>
                                 <span>Admin Account</span>
                             </div>
 
@@ -368,6 +385,8 @@
                     </div>
 
                 </div>
+
+
 
             </div>
 

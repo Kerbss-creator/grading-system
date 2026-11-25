@@ -1,4 +1,13 @@
 /* =========================
+   DASHBOARD CONTAINER
+========================= */
+
+.dashboard-container {
+    width: 100%;
+    min-width: 0;
+}
+
+/* =========================
    WELCOME CARD
 ========================= */
 
@@ -8,10 +17,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 25px;
     border-radius: 15px;
-    background: #036f35;
-    color: white;
+    background: linear-gradient(115deg, #14532d 0%, #15803d 55%, #65a765 100%);
+    color: #fff;
     overflow: hidden;
+}
+
+.welcome-text {
+    flex: 1;
+    min-width: 0;
 }
 
 .welcome-text span {
@@ -36,11 +51,10 @@
     opacity: 0.82;
 }
 
-/* WELCOME DETAILS */
-
 .welcome-details {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 20px;
 }
 
@@ -58,7 +72,7 @@
 .welcome-detail small {
     display: block;
     margin-bottom: 2px;
-    font-size: 9px;
+    font-size: 12px;
     opacity: 0.65;
 }
 
@@ -75,6 +89,7 @@
 }
 
 .welcome-icon {
+    flex: 0 0 120px;
     width: 120px;
     height: 120px;
     margin-right: 30px;
@@ -82,11 +97,12 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
+    background: #fff;
     overflow: hidden;
 }
 
 .welcome-icon img {
+    display: block;
     width: 85%;
     height: 85%;
     object-fit: contain;
@@ -151,7 +167,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 11px;
-    font-size: 18px;
+    font-size: 15px;
 }
 
 .stat-icon.student {
@@ -178,31 +194,31 @@
     min-width: 0;
 }
 
-.stat-info span {
+.stats-grid .stat-info span {
     display: block;
     margin-bottom: 2px;
-    color: #888;
-    font-size: 10px;
+    color: #888888;
+    font-size: 12px !important;
 }
 
-.stat-info h3 {
+.stats-grid .stat-info h3 {
     margin: 0;
     color: #155624;
-    font-size: 23px;
+    font-size: 21px;
     font-weight: 600;
 }
 
-.stat-info small {
+.stats-grid .stat-info small {
     display: block;
     margin-top: 2px;
-    color: #999;
-    font-size: 9px;
+    color: #999999;
+    font-size: 10px;
 }
 
 .stat-arrow {
     margin-left: auto;
-    color: #bbb;
-    font-size: 10px;
+    color: #bbbbbb;
+    font-size: 12px;
 }
 
 /* =========================
@@ -225,6 +241,7 @@
 ========================= */
 
 .content-card {
+    min-width: 0;
     overflow: hidden;
     border: 1px solid #eeeeee;
     border-radius: 14px;
@@ -239,6 +256,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     padding: 18px 20px;
     border-bottom: 1px solid #eeeeee;
 }
@@ -247,9 +265,11 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
 }
 
 .card-title-icon {
+    flex-shrink: 0;
     width: 34px;
     height: 34px;
     display: flex;
@@ -264,17 +284,18 @@
 .card-header h2 {
     margin: 0;
     color: #036f35;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
 }
 
 .card-header p {
-    margin-top: 2px;
+    margin-top: 3px;
     color: #999;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .view-btn {
+    flex-shrink: 0;
     border: none;
     background: none;
     color: #036f35;
@@ -287,7 +308,10 @@
     text-decoration: underline;
 }
 
-/* MY CLASSES */
+/* =========================
+   MY CLASSES
+========================= */
+
 .class-list {
     padding: 5px 15px;
 }
@@ -298,6 +322,13 @@
     gap: 13px;
     padding: 13px 5px;
     border-bottom: 1px solid #eeeeee;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s ease;
+}
+
+.class-item:hover {
+    background: #f8fcf9;
 }
 
 .class-item:last-child {
@@ -305,6 +336,7 @@
 }
 
 .class-subject-icon {
+    flex-shrink: 0;
     min-width: 40px;
     width: 40px;
     height: 40px;
@@ -312,20 +344,14 @@
     align-items: center;
     justify-content: center;
     border-radius: 9px;
+    background: #036f35;
     color: white;
     font-size: 15px;
 }
 
-.class-subject-icon.math {
-    background: #036f35;
-}
-
-.class-subject-icon.science {
-    background: #036f35;
-}
-
 .class-info {
     flex: 1;
+    min-width: 0;
 }
 
 .class-info h3 {
@@ -369,7 +395,9 @@
     font-size: 9px;
 }
 
-/*QUICK ACTIONS*/
+/* =========================
+   QUICK ACTIONS
+========================= */
 
 .quick-actions {
     padding: 15px;
@@ -391,6 +419,7 @@
     font-size: 11px;
     font-weight: 500;
     text-align: left;
+    text-decoration: none;
     cursor: pointer;
     transition: 0.2s ease;
 }
@@ -415,6 +444,7 @@
 
 .quick-action-btn:hover {
     background: #0d5c2d;
+    color: white;
     transform: translateX(2px);
 }
 
@@ -423,27 +453,29 @@
 ========================= */
 
 .table-container {
+    width: 100%;
     overflow-x: auto;
 }
 
-table {
+.table-container table {
     width: 100%;
     border-collapse: collapse;
 }
 
-thead {
+.table-container thead {
     background: #f8f9fa;
 }
 
-th {
+.table-container th {
     padding: 11px 20px;
     color: #777;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 600;
     text-align: left;
+    white-space: nowrap;
 }
 
-td {
+.table-container td {
     padding: 12px 20px;
     border-top: 1px solid #f1f1f1;
     color: #555;
@@ -461,7 +493,13 @@ td {
     display: block;
     margin-top: 2px;
     color: #999;
-    font-size: 9px;
+    font-size: 12px;
+}
+
+.empty-table {
+    padding: 25px 15px !important;
+    color: #999 !important;
+    text-align: center;
 }
 
 /* =========================
@@ -490,68 +528,8 @@ td {
 }
 
 /* =========================
-   ANNOUNCEMENTS
+   RECENT ACTIVITIES
 ========================= */
-
-.announcement-list {
-    padding: 5px 20px 10px;
-}
-
-.announcement-item {
-    display: flex;
-    gap: 11px;
-    padding: 13px 0;
-    border-bottom: 1px solid #eeeeee;
-}
-
-.announcement-item:last-child {
-    border-bottom: none;
-}
-
-.announcement-icon {
-    min-width: 34px;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 9px;
-    background: #e7f5ec;
-    color: #036f35;
-    font-size: 12px;
-}
-
-.announcement-info {
-    min-width: 0;
-}
-
-.announcement-info h3 {
-    margin-bottom: 3px;
-    color: #333;
-    font-size: 10px;
-    font-weight: 600;
-}
-
-.announcement-info p {
-    color: #888;
-    font-size: 9px;
-    line-height: 1.5;
-}
-
-.announcement-info span {
-    display: block;
-    margin-top: 5px;
-    color: #aaa;
-    font-size: 8px;
-}
-
-/* =========================
-   RECENT ACTIVITY
-========================= */
-
-.recent-activity-card {
-    margin-top: 20px;
-}
 
 .activity-list {
     padding: 5px 20px 10px;
@@ -570,7 +548,7 @@ td {
 }
 
 .activity-icon {
-    min-width: 32px;
+    flex-shrink: 0;
     width: 32px;
     height: 32px;
     display: flex;
@@ -584,6 +562,7 @@ td {
 
 .activity-info {
     flex: 1;
+    min-width: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -593,6 +572,7 @@ td {
 .activity-info p {
     color: #666;
     font-size: 10px;
+    line-height: 1.5;
 }
 
 .activity-info p strong {
@@ -604,6 +584,101 @@ td {
     color: #999;
     font-size: 8px;
     white-space: nowrap;
+}
+
+/* =========================
+   ANNOUNCEMENTS
+========================= */
+
+.announcement-list {
+    padding: 5px 20px 10px;
+}
+
+.announcement-item {
+    display: flex;
+    gap: 11px;
+    padding: 13px 0;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.announcement-item:last-child {
+    border-bottom: none;
+}
+
+.announcements-card {
+    margin-top: 20px !important;
+}
+
+.announcement-icon {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #e7f5ec;
+    color: #036f35;
+    font-size: 12px;
+}
+
+.announcement-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.announcement-info h3 {
+    margin-bottom: 3px;
+    color: #333;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.announcement-info p {
+    color: #888;
+    font-size: 10px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.announcement-info span {
+    display: block;
+    margin-top: 5px;
+    color: #aaa;
+    font-size: 8px;
+}
+
+/* =========================
+   EMPTY STATES
+========================= */
+
+.empty-state {
+    padding: 30px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.empty-state > i {
+    margin-bottom: 12px;
+    color: #a7cbb4;
+    font-size: 27px;
+}
+
+.empty-state h3 {
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.empty-state p {
+    max-width: 270px;
+    color: #999;
+    font-size: 10px;
+    line-height: 1.6;
 }
 
 /* =========================
@@ -759,5 +834,61 @@ td {
 
     .class-arrow {
         margin-left: auto;
+    }
+}
+/* =========================
+   TEXT SIZE ADJUSTMENT
+   Minimum text size: 12px
+========================= */
+
+.welcome-text span,
+.welcome-text p,
+.welcome-detail small,
+.welcome-detail strong,
+.section-header span,
+.stats-grid .stat-info span,
+.stats-grid .stat-info small,
+.class-info h3,
+.class-info span,
+.class-students strong,
+.class-students small,
+.quick-action-btn,
+.view-btn,
+.table-container th,
+.table-container td,
+.class-table-name strong,
+.class-table-name span,
+.status,
+.activity-info p,
+.activity-info span,
+.announcement-info h3,
+.announcement-info p,
+.announcement-info span,
+.empty-state h3,
+.empty-state p {
+    font-size: 12px !important;
+}
+
+/* Keep headings visually emphasized */
+.welcome-text h2 {
+    font-size: 25px;
+}
+
+.section-header h2 {
+    font-size: 18px;
+}
+
+.card-header h2 {
+    font-size: 16px;
+}
+
+/* Mobile heading adjustments */
+@media (max-width: 600px) {
+    .welcome-text h2 {
+        font-size: 20px;
+    }
+
+    .card-header h2 {
+        font-size: 14px;
     }
 }

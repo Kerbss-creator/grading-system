@@ -1,708 +1,852 @@
 @extends('layouts.admin')
 
 @section('title', 'Settings')
-
 @section('header', 'Settings')
-
-@section('header-description', 'Configure system preferences, account details, and administrative settings.')
+@section('header-description', 'Manage school year, grading standards, notifications, and database backup.')
 
 @section('page-css')
-
-  <link rel="stylesheet" href="{{ asset('css/admin/settings-admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/settings-admin.css') }}">
 @endsection
 
 @section('content')
 
-  <!-- SETTINGS CONTAINER -->
+    <section class="settings-container">
 
-  <section class="settings-container">
+        {{-- SETTINGS SIDEBAR --}}
+        <div class="settings-sidebar">
 
+            <button type="button" class="settings-tab active" data-section="general">
+                <i class="fa-solid fa-sliders"></i>
+                <span>General Settings</span>
+            </button>
 
-    <!-- SETTINGS SIDEBAR -->
+            <button type="button" class="settings-tab" data-section="grades">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Grade Settings</span>
+            </button>
 
-    <div class="settings-sidebar">
+            <button type="button" class="settings-tab" data-section="notifications">
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifications</span>
+            </button>
 
-      <button class="settings-tab active" data-section="general">
-        <i class="fa-solid fa-sliders"></i>
-        <span>General Settings</span>
-      </button>
-
-      <button class="settings-tab" data-section="grades">
-        <i class="fa-solid fa-graduation-cap"></i>
-        <span>Grade Settings</span>
-      </button>
-
-      <button class="settings-tab" data-section="account">
-        <i class="fa-solid fa-user-gear"></i>
-        <span>Account Settings</span>
-      </button>
-
-      <button class="settings-tab" data-section="notifications">
-        <i class="fa-solid fa-bell"></i>
-        <span>Notifications</span>
-      </button>
-
-      <button class="settings-tab" data-section="data">
-        <i class="fa-solid fa-database"></i>
-        <span>Data Management</span>
-      </button>
-
-    </div>
-
-    <!-- SETTINGS CONTENT -->
-
-    <div class="settings-content">
-
-      <!-- GENERAL SETTINGS -->
-
-      <div class="settings-section active" id="general">
-
-        <div class="settings-section-header">
-
-          <div>
-            <h2>General Settings</h2>
-            <p>Manage basic information about the grading system.</p>
-          </div>
+            <button type="button" class="settings-tab" data-section="backup">
+                <i class="fa-solid fa-database"></i>
+                <span>Database Backup</span>
+            </button>
 
         </div>
 
-        <div class="settings-form">
+        <div class="settings-content">
 
-          <div class="form-group">
+            {{-- SESSION MESSAGES --}}
+            @if(session('success'))
+                <div class="settings-alert success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    {{ session('success') }}
+                </div>
+            @endif
 
-            <label for="schoolName">
-              School Name
-            </label>
+            @if(session('error'))
+                <div class="settings-alert error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ session('error') }}
+                </div>
+            @endif
 
-            <input type="text" id="schoolName" value="Forbes Academy">
+            @if($errors->any())
+                <div class="settings-alert error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div>
+                        <strong>Please check the following:</strong>
+                        <ul>
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
 
-          </div>
 
-          <div class="form-row">
+            {{-- GENERAL SETTINGS --}}
+            <div class="settings-section active" id="general">
 
-            <div class="form-group">
+                <div class="settings-section-header">
+                    <div>
+                        <h2>General Settings</h2>
+                        <p>Manage the school's information and academic year.</p>
+                    </div>
+                </div>
 
-              <label for="schoolYear">
-                School Year
-              </label>
+                {{-- SCHOOL INFORMATION --}}
+                <div class="settings-subsection">
+                    <h3>School Information</h3>
+                    <p class="settings-description">
+                        Official school information used throughout the grading system.
+                    </p>
 
-              <select id="schoolYear">
+                    <div class="settings-form">
 
-                <option>2025 - 2026</option>
+                        <div class="form-group">
+                            <label>School Name</label>
+                            <input type="text" value="Forbes Academy" readonly>
+                            <small>This is the registered school name and cannot be changed here.</small>
+                        </div>
 
-                <option selected>
-                  2026 - 2027
-                </option>
+                        <div class="form-row">
 
-                <option>2027 - 2028</option>
+                            <div class="form-group">
+                                <label>School Level</label>
+                                <input type="text" value="Junior High School" readonly>
+                            </div>
 
-                <option>2028 - 2029</option>
+                            <div class="form-group">
+                                <label>Grade Levels</label>
+                                <input type="text" value="Grades 7–10" readonly>
+                            </div>
 
-                <option>2030 - 2031</option>
+                        </div>
 
-              </select>
+                    </div>
+                </div>
 
-            </div>
 
-            <div class="form-group">
+                {{-- SCHOOL YEAR MANAGEMENT --}}
+                <div class="settings-subsection">
 
-              <label for="semester">
-                Current Semester
-              </label>
+                    <div class="settings-subsection-heading">
+                        <div>
+                            <h3>School Year Management</h3>
+                            <p class="settings-description">
+                                Create and manage academic years for the grading system.
+                            </p>
+                        </div>
 
-              <select id="semester">
+                        <button type="button" class="save-settings" id="openAddYearModal">
+                            <i class="fa-solid fa-plus"></i>
+                            Add School Year
+                        </button>
+                    </div>
 
-                <option selected>
-                  First Semester
-                </option>
 
-                <option>
-                  Second Semester
-                </option>
+                    {{-- ACTIVE SCHOOL YEAR --}}
+                    <div class="active-school-year-card">
 
-                <option>
-                  Third Semester
-                </option>
+                        <div class="active-year-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
 
-              </select>
+                        <div class="active-year-details">
+                            <span class="active-year-label">Currently Active School Year</span>
 
-            </div>
+                            @if($activeSchoolYear)
+                                <h3>{{ $activeSchoolYear->year_name }}</h3>
+                                <p>
+                                    Current Term:
+                                    <strong>{{ $activeSchoolYear->current_term_label }}</strong>
+                                </p>
+                            @else
+                                <h3>No Active School Year</h3>
+                                <p>Please activate a school year to continue.</p>
+                            @endif
+                        </div>
 
-          </div>
+                        @if($activeSchoolYear)
+                            <span class="year-status active">Active</span>
+                        @else
+                            <span class="year-status archived">No Active Year</span>
+                        @endif
+                    </div>
 
-          <div class="form-group">
 
-            <label>
-              System Status
-            </label>
+                    {{-- SCHOOL YEAR END DATE WARNING --}}
+                    @if($activeSchoolYear && $activeSchoolYear->end_date)
+                        @if(today()->lessThanOrEqualTo($activeSchoolYear->end_date))
+                            <div class="school-year-date-warning">
+                                <i class="fa-solid fa-calendar-clock"></i>
+                                <div>
+                                    <strong>School Year End Date Not Reached</strong>
+                                    <p>
+                                        The active school year is scheduled to end on
+                                        {{ $activeSchoolYear->end_date->format('F d, Y') }}.
+                                        School year activation for the next academic year is not
+                                        yet allowed. You may continue managing grades and records.
+                                    </p>
+                                </div>
+                            </div>
+                        @else
+                            <div class="school-year-date-notice">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <div>
+                                    <strong>School Year End Date Reached</strong>
+                                    <p>
+                                        The scheduled end date was
+                                        {{ $activeSchoolYear->end_date->format('F d, Y') }}.
+                                        The administrator may now consider activating the next
+                                        school year, subject to pending grade submission checks
+                                        and successful database backup.
+                                    </p>
+                                </div>
+                            </div>
+                        @endif
+                    @endif
 
-            <div class="status-box">
 
-              <div class="status-indicator">
 
-                <span></span>
+                    {{-- CURRENT TERM --}}
+                    @if($activeSchoolYear)
 
-                <div>
+                        <div class="term-management-card">
 
-                  <strong>
-                    System Active
-                  </strong>
+                            <div>
+                                <h4>Current Term</h4>
+                                <p>
+                                    Select the term currently being used for grading
+                                    under {{ $activeSchoolYear->year_name }}.
+                                </p>
+                            </div>
 
-                  <p>
-                    The grading system is currently operational.
-                  </p>
+                            <form action="{{ route('admin.settings.school-years.term', $activeSchoolYear) }}" method="POST"
+                                class="term-update-form">
+                                @csrf
+                                @method('PATCH')
+
+                                <select name="current_term" required>
+                                    <option value="1" {{ $activeSchoolYear->current_term == 1 ? 'selected' : '' }}>
+                                        Term 1
+                                    </option>
+                                    <option value="2" {{ $activeSchoolYear->current_term == 2 ? 'selected' : '' }}>
+                                        Term 2
+                                    </option>
+                                    <option value="3" {{ $activeSchoolYear->current_term == 3 ? 'selected' : '' }}>
+                                        Term 3
+                                    </option>
+                                </select>
+
+                                <button type="submit" class="save-settings">
+                                    <i class="fa-solid fa-check"></i>
+                                    Update Term
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    @endif
+
+
+                    {{-- SCHOOL YEAR LIST --}}
+                    <div class="school-year-list-container">
+
+                        <h4>School Year Records</h4>
+
+                        <div class="school-year-list">
+
+                            @forelse($schoolYears as $schoolYear)
+
+                                <div class="school-year-row">
+
+                                    <div class="school-year-info">
+
+                                        <strong>{{ $schoolYear->year_name }}</strong>
+
+                                        <span>
+                                            @if($schoolYear->start_date)
+                                                {{ $schoolYear->start_date->format('M d, Y') }}
+                                            @else
+                                                Start date not set
+                                            @endif
+
+                                            <span class="date-separator">—</span>
+
+                                            @if($schoolYear->end_date)
+                                                {{ $schoolYear->end_date->format('M d, Y') }}
+                                            @else
+                                                End date not set
+                                            @endif
+                                        </span>
+
+                                    </div>
+
+                                    <div class="school-year-actions">
+
+                                        <span class="year-status {{ $schoolYear->status }}">
+                                            {{ ucfirst($schoolYear->status) }}
+                                        </span>
+
+                                        @if(in_array($schoolYear->status, ['active', 'upcoming']))
+                                            <button type="button" class="edit-year-btn" data-id="{{ $schoolYear->id }}"
+                                                data-year="{{ $schoolYear->year_name }}"
+                                                data-start="{{ $schoolYear->start_date?->format('Y-m-d') }}"
+                                                data-end="{{ $schoolYear->end_date?->format('Y-m-d') }}">
+                                                <i class="fa-solid fa-pen"></i>
+                                                Edit
+                                            </button>
+
+                                        @endif
+
+                                        @if($schoolYear->status === 'upcoming')
+
+                                            <form action="{{ route('admin.settings.school-years.activate', $schoolYear) }}"
+                                                method="POST" class="activate-year-form">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button type="submit" class="activate-year-btn">
+                                                    Activate
+                                                </button>
+                                            </form>
+
+                                        @elseif($schoolYear->status === 'active')
+
+                                            <span class="current-year-label">
+                                                <i class="fa-solid fa-check-circle"></i>
+                                                Current
+                                            </span>
+
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            @empty
+
+                                <div class="empty-school-years">
+                                    <i class="fa-solid fa-calendar-xmark"></i>
+                                    <p>No school year records found.</p>
+                                </div>
+
+                            @endforelse
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-              </div>
+
+                {{-- SYSTEM STATUS --}}
+                <div class="settings-subsection">
+
+                    <h3>System Status</h3>
+
+                    <div class="status-box">
+                        <div class="status-indicator">
+                            <span></span>
+                            <div>
+                                <strong>System Active</strong>
+                                <p>The grading system is currently operational.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
 
             </div>
 
-          </div>
+
+            {{-- GRADE SETTINGS --}}
+            <div class="settings-section" id="grades">
+
+                <div class="settings-section-header">
+                    <div>
+                        <h2>Grade Settings</h2>
+                        <p>Official grading standards currently implemented in the system.</p>
+                    </div>
+                </div>
+
+                <div class="settings-subsection">
+
+                    <h3>Grading Standards</h3>
+
+                    <div class="settings-form">
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+                                <label>Passing Grade</label>
+                                <input type="number" value="75" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Maximum Grade</label>
+                                <input type="number" value="100" readonly>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-subsection">
+
+                    <h3>Grade Descriptors</h3>
+
+                    <p class="settings-description">
+                        The following descriptors are used to describe student academic performance.
+                    </p>
+
+                    <div class="grade-remarks">
+
+                        <div class="remark-row">
+                            <div>
+                                <strong>90-100</strong>
+                                <span>Namumukod-tangi</span>
+                            </div>
+                            <span class="remark-badge passed">Advancing</span>
+                        </div>
+
+                        <div class="remark-row">
+                            <div>
+                                <strong>80-89</strong>
+                                <span>Napamamalas</span>
+                            </div>
+                            <span class="remark-badge passed">Benchmarking</span>
+                        </div>
+
+                        <div class="remark-row">
+                            <div>
+                                <strong>75-79</strong>
+                                <span>Natutungo</span>
+                            </div>
+                            <span class="remark-badge passed">Connecting</span>
+                        </div>
+
+                        <div class="remark-row">
+                            <div>
+                                <strong>65-74</strong>
+                                <span>Napauunlad</span>
+                            </div>
+                            <span class="remark-badge failed">Developing</span>
+                        </div>
+
+                        <div class="remark-row">
+                            <div>
+                                <strong>0-64</strong>
+                                <span>Emerging</span>
+                            </div>
+                            <span class="remark-badge failed">Emerging</span>
+                        </div>
+
+                    </div>
+
+                    <div class="settings-information">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <p>
+                            These grading standards are read-only to maintain consistency
+                            across student records and grade computations.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="settings-subsection">
+
+                    <h3>Passing and Failing Remarks</h3>
+
+                    <div class="remark-row">
+                        <div>
+                            <strong>75–100</strong>
+                            <span>Passing range</span>
+                        </div>
+                        <span class="remark-badge passed">Passed</span>
+                    </div>
+
+                    <div class="remark-row">
+                        <div>
+                            <strong>Below 75</strong>
+                            <span>Failing range</span>
+                        </div>
+                        <span class="remark-badge failed">Failed</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- NOTIFICATIONS --}}
+            <div class="settings-section" id="notifications">
+
+                <div class="settings-section-header">
+                    <div>
+                        <h2>Notifications</h2>
+                        <p>Information about system notifications.</p>
+                    </div>
+                </div>
+
+                <div class="settings-information">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <p>
+                        The system uses in-app notifications for important academic
+                        activities. Notification preferences are not yet configurable
+                        from this page.
+                    </p>
+                </div>
+
+                <div class="notification-settings">
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            <div>
+                                <strong>Announcement Notifications</strong>
+                                <p>Announcements posted by the administrator.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fa-solid fa-file-circle-check"></i>
+                            <div>
+                                <strong>Grade Submission Notifications</strong>
+                                <p>Updates regarding submitted grades and reviews.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <div>
+                                <strong>System Notifications</strong>
+                                <p>Important system-related announcements and updates.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
+            {{-- DATABASE BACKUP --}}
+            <div class="settings-section" id="backup">
+
+                <div class="settings-section-header">
+                    <div>
+                        <h2>Database Backup</h2>
+                        <p>Protect the system's academic and administrative records.</p>
+                    </div>
+                </div>
+
+                <div class="data-management">
+
+                    {{-- CREATE BACKUP --}}
+                    <div class="data-card">
+
+                        <div class="data-icon">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+
+                        <div class="data-info">
+                            <h3>Create Database Backup</h3>
+                            <p>
+                                Generate a downloadable backup of the system database,
+                                including academic records and related data.
+                            </p>
+                            <span class="backup-note">
+                                A new SQL backup file will be saved in the system's backup directory.
+                            </span>
+                        </div>
+
+                        <form action="{{ route('admin.settings.backups.store') }}" method="POST" id="createBackupForm">
+                            @csrf
+
+                            <button type="submit" class="save-settings" id="createBackupBtn">
+                                <i class="fa-solid fa-download"></i>
+                                Create Backup
+                            </button>
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {{-- BACKUP HISTORY --}}
+                <div class="backup-history-container" id="backupHistoryContainer"
+                    data-index-url="{{ route('admin.settings.backups.index') }}"
+                    data-download-url="{{ route('admin.settings.backups.download', ['filename' => '__BACKUP_FILENAME__']) }}"
+                    data-restore-url="{{ route('admin.settings.backups.restore', ['filename' => '__BACKUP_FILENAME__']) }}">
+
+                    <div class="backup-history-header">
+                        <div>
+                            <h3>Backup History</h3>
+                            <p>View and manage previously created database backups.</p>
+                        </div>
+
+                        <button type="button" class="backup-refresh-btn" id="refreshBackupHistory">
+                            <i class="fa-solid fa-rotate"></i>
+                            Refresh
+                        </button>
+                    </div>
+
+                    <div class="backup-table-wrapper">
+                        <table class="backup-table">
+                            <thead>
+                                <tr>
+                                    <th>Backup File</th>
+                                    <th>File Size</th>
+                                    <th>Date Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="backupHistoryBody">
+                                <tr>
+                                    <td colspan="4" class="backup-loading">
+                                        <i class="fa-solid fa-spinner fa-spin"></i>
+                                        Loading backup history...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <div class="settings-information">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <p>
+                        Restoring a backup replaces the current database contents with
+                        the contents of the selected backup. A separate pre-restore
+                        backup will automatically be created before restoration.
+                        Always keep an additional copy of important backup files.
+                    </p>
+                </div>
+
+            </div>
+
 
         </div>
 
-      </div>
+    </section>
 
-      <!-- GRADE SETTINGS -->
 
-      <div class="settings-section" id="grades">
+    {{-- ADD SCHOOL YEAR MODAL --}}
+    <div class="settings-modal" id="addYearModal">
 
-        <div class="settings-section-header">
+        <div class="settings-modal-box">
 
-          <div>
+            <div class="settings-modal-header">
+                <h2>Add School Year</h2>
 
-            <h2>Grade Settings</h2>
+                <button type="button" class="close-modal" data-close="addYearModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
             <p>
-              Configure grading rules used by the system.
+                Create a new academic year. Newly created school years will be marked as Upcoming.
             </p>
 
-          </div>
+            <form action="{{ route('admin.settings.school-years.store') }}" method="POST" id="addYearForm">
+                @csrf
+
+                <div class="form-group">
+                    <label for="year_name">School Year Name <span>*</span></label>
+                    <input type="text" id="year_name" name="year_name" placeholder="Example: 2027-2028"
+                        value="{{ old('year_name') }}" pattern="[0-9]{4}-[0-9]{4}" required>
+                    <small>Use the format YYYY-YYYY.</small>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" id="start_date" name="start_date" value="{{ old('start_date') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="end_date">End Date</label>
+                        <input type="date" id="end_date" name="end_date" value="{{ old('end_date') }}">
+                    </div>
+
+                </div>
+
+                <div class="settings-information">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <p>
+                        Start Date and End Date are optional. You can add them when
+                        the official school calendar is available.
+                    </p>
+                </div>
+
+                <div class="modal-actions">
+
+                    <button type="button" class="cancel-btn close-modal" data-close="addYearModal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-plus"></i>
+                        Add School Year
+                    </button>
+
+                </div>
+
+            </form>
 
         </div>
-
-        <div class="settings-form">
-
-          <div class="form-row">
-
-            <div class="form-group">
-
-              <label for="passingGrade">
-                Passing Grade
-              </label>
-
-              <input type="number" id="passingGrade" value="75" min="0" max="100">
-
-              <small>
-                Students with grades below this value are considered failed.
-              </small>
-
-            </div>
-
-            <div class="form-group">
-
-              <label for="maximumGrade">
-                Maximum Grade
-              </label>
-
-              <input type="number" id="maximumGrade" value="100" min="1" max="100">
-
-            </div>
-
-          </div>
-
-          <div class="grade-remarks">
-
-            <h3>
-              Grade Remarks
-            </h3>
-
-            <div class="remark-row">
-
-              <div>
-
-                <strong>
-                  75 - 100
-                </strong>
-
-                <span>
-                  Passing
-                </span>
-
-              </div>
-
-              <span class="remark-badge passed">
-                Passed
-              </span>
-
-            </div>
-
-            <div class="remark-row">
-
-              <div>
-
-                <strong>
-                  Below 75
-                </strong>
-
-                <span>
-                  Failing
-                </span>
-
-              </div>
-
-              <span class="remark-badge failed">
-                Failed
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- ACCOUNT SETTINGS -->
-
-      <div class="settings-section" id="account">
-
-        <div class="settings-section-header">
-
-          <div>
-
-            <h2>
-              Account Settings
-            </h2>
-
-            <p>
-              Manage your administrator account information.
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="settings-form">
-
-          <div class="form-group">
-
-            <label for="adminName">
-              Administrator Name
-            </label>
-
-            <input type="text" id="adminName" value="Administrator">
-
-          </div>
-
-          <div class="form-group">
-
-            <label for="adminEmail">
-              Email Address
-            </label>
-
-            <input type="email" id="adminEmail" value="admin@forbesacademy.edu">
-
-          </div>
-
-          <div class="password-section">
-
-            <div>
-
-              <strong>
-                Password
-              </strong>
-
-              <p>
-                Change your administrator account password.
-              </p>
-
-            </div>
-
-            <button class="secondary-btn" id="changePasswordBtn" type="button">
-
-              <i class="fa-solid fa-key"></i>
-
-              Change Password
-
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- NOTIFICATION SETTINGS -->
-
-      <div class="settings-section" id="notifications">
-
-        <div class="settings-section-header">
-
-          <div>
-
-            <h2>
-              Notification Settings
-            </h2>
-
-            <p>
-              Control which system notifications are enabled.
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="notification-settings">
-
-          <div class="setting-item">
-
-            <div class="setting-info">
-
-              <strong>
-                Announcement Notifications
-              </strong>
-
-              <p>
-                Receive notifications when announcements are created.
-              </p>
-
-            </div>
-
-            <label class="switch">
-
-              <input type="checkbox" checked>
-
-              <span class="slider"></span>
-
-            </label>
-
-          </div>
-
-          <div class="setting-item">
-
-            <div class="setting-info">
-
-              <strong>
-                Grade Approval Notifications
-              </strong>
-
-              <p>
-                Receive notifications when teachers submit grades.
-              </p>
-
-            </div>
-
-            <label class="switch">
-
-              <input type="checkbox" checked>
-
-              <span class="slider"></span>
-
-            </label>
-
-          </div>
-
-          <div class="setting-item">
-
-            <div class="setting-info">
-
-              <strong>
-                System Notifications
-              </strong>
-
-              <p>
-                Receive important system-related notifications.
-              </p>
-
-            </div>
-
-            <label class="switch">
-
-              <input type="checkbox" checked>
-
-              <span class="slider"></span>
-
-            </label>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- DATA MANAGEMENT -->
-
-      <div class="settings-section" id="data">
-
-        <div class="settings-section-header">
-
-          <div>
-
-            <h2>
-              Data Management
-            </h2>
-
-            <p>
-              Manage academic records and system data.
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="data-management">
-
-          <!-- EXPORT -->
-
-          <div class="data-card">
-
-            <div class="data-icon">
-
-              <i class="fa-solid fa-file-excel"></i>
-
-            </div>
-
-            <div class="data-info">
-
-              <h3>
-                Export Records
-              </h3>
-
-              <p>
-                Export student academic records to an Excel file.
-              </p>
-
-            </div>
-
-            <button class="secondary-btn" type="button">
-
-              <i class="fa-solid fa-download"></i>
-
-              Export
-
-            </button>
-
-          </div>
-
-          <!-- IMPORT -->
-
-          <div class="data-card">
-
-            <div class="data-icon">
-
-              <i class="fa-solid fa-file-import"></i>
-
-            </div>
-
-            <div class="data-info">
-
-              <h3>
-                Import Records
-              </h3>
-
-              <p>
-                Import academic records using an Excel file.
-              </p>
-
-            </div>
-
-            <button class="secondary-btn" type="button">
-
-              <i class="fa-solid fa-upload"></i>
-
-              Import
-
-            </button>
-
-          </div>
-
-          <!-- BACKUP -->
-
-          <div class="data-card">
-
-            <div class="data-icon">
-
-              <i class="fa-solid fa-database"></i>
-
-            </div>
-
-            <div class="data-info">
-
-              <h3>
-                Backup Database
-              </h3>
-
-              <p>
-                Create a backup of the current system data.
-              </p>
-
-            </div>
-
-            <button class="secondary-btn" id="backupBtn" type="button">
-
-              <i class="fa-solid fa-cloud-arrow-down"></i>
-
-              Backup
-
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- SETTINGS FOOTER -->
-
-      <div class="settings-footer">
-
-        <button class="cancel-settings" id="cancelSettings" type="button">
-          Cancel
-        </button>
-
-        <button class="save-settings" id="saveSettings" type="button">
-
-          <i class="fa-solid fa-check"></i>
-
-          Save Changes
-
-        </button>
-
-      </div>
 
     </div>
 
-  </section>
+    {{-- EDIT SCHOOL YEAR MODAL --}}
+    <div class="settings-modal" id="editYearModal">
 
-  <!-- CHANGE PASSWORD MODAL -->
+        <div class="settings-modal-box">
 
-  <div class="settings-modal" id="passwordModal">
+            <div class="settings-modal-header">
+                <h2>Edit School Year</h2>
 
-    <div class="settings-modal-box">
+                <button type="button" class="close-modal" data-close="editYearModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-      <div class="settings-modal-header">
+            <p>
+                Changes to the dates will apply to this school year only.
+                Completed school years cannot be edited.
+            </p>
 
-        <div>
+            <form action="{{ route('admin.settings.school-years.update', '__YEAR_ID__') }}"
+                data-url-template="{{ route('admin.settings.school-years.update', '__YEAR_ID__') }}" method="POST"
+                id="editYearForm">
+                @csrf
+                @method('PATCH')
 
-          <h2>
-            Change Password
-          </h2>
+                <div class="form-group">
+                    <label for="edit_year_name">
+                        School Year Name <span>*</span>
+                    </label>
 
-          <p>
-            Update your administrator account password.
-          </p>
+                    <input type="text" id="edit_year_name" name="year_name" readonly>
+
+                    <small>School year name cannot be changed after creation.</small>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="edit_start_date">
+                            Start Date <span>*</span>
+                        </label>
+
+                        <input type="date" id="edit_start_date" name="start_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_end_date">
+                            End Date <span>*</span>
+                        </label>
+
+                        <input type="date" id="edit_end_date" name="end_date" required>
+                    </div>
+
+                </div>
+
+                <div class="settings-information">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <p>
+                        Only upcoming school year dates can be edited.
+                        Existing academic records will not be modified.
+                    </p>
+                </div>
+
+                <div class="modal-actions">
+
+                    <button type="button" class="cancel-btn close-modal" data-close="editYearModal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="save-btn">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
 
         </div>
-
-        <button class="close-modal" data-close="passwordModal" type="button">
-
-          <i class="fa-solid fa-xmark"></i>
-
-        </button>
-
-      </div>
-
-      <div class="modal-form">
-
-        <div class="form-group">
-
-          <label for="currentPassword">
-            Current Password
-          </label>
-
-          <input type="password" id="currentPassword" placeholder="Enter current password">
-
-        </div>
-
-        <div class="form-group">
-
-          <label for="newPassword">
-            New Password
-          </label>
-
-          <input type="password" id="newPassword" placeholder="Enter new password">
-
-        </div>
-
-        <div class="form-group">
-
-          <label for="confirmPassword">
-            Confirm New Password
-          </label>
-
-          <input type="password" id="confirmPassword" placeholder="Confirm new password">
-
-        </div>
-
-      </div>
-
-      <div class="modal-actions">
-
-        <button class="cancel-btn close-modal" data-close="passwordModal" type="button">
-          Cancel
-        </button>
-
-        <button class="save-btn" id="updatePasswordBtn" type="button">
-
-          <i class="fa-solid fa-check"></i>
-
-          Update Password
-
-        </button>
-
-      </div>
 
     </div>
 
-  </div>
 
-  <!-- BACKUP MODAL -->
+    {{-- RESTORE DATABASE CONFIRMATION MODAL --}}
+    <div class="settings-modal" id="restoreBackupModal">
 
-  <div class="settings-modal" id="backupModal">
+        <div class="settings-modal-box">
 
-    <div class="settings-modal-box small-modal">
+            <div class="settings-modal-header">
+                <h2>Restore Database Backup</h2>
 
-      <div class="backup-icon">
+                <button type="button" class="close-modal" data-close="restoreBackupModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-        <i class="fa-solid fa-database"></i>
+            <div class="restore-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
 
-      </div>
+                <div>
+                    <strong>Warning: This action will replace current database data.</strong>
+                    <p>
+                        The selected backup will be restored to the current database.
+                        Recent records that are not included in that backup may be lost.
+                    </p>
+                </div>
+            </div>
 
-      <h2>
-        Create Database Backup?
-      </h2>
+            <div class="restore-selected-file">
+                <span>Selected backup file</span>
+                <strong id="restoreBackupFilename">No backup selected</strong>
+            </div>
 
-      <p>
-        A backup copy of the current academic records and system data
-        will be created.
-      </p>
+            <div class="settings-information">
+                <i class="fa-solid fa-shield-halved"></i>
+                <p>
+                    The system will automatically create a separate backup
+                    of the current database before proceeding.
+                </p>
+            </div>
 
-      <div class="modal-actions">
+            <form method="POST" id="restoreBackupForm"
+                data-url-template="{{ route('admin.settings.backups.restore', ['filename' => '__BACKUP_FILENAME__']) }}">
 
-        <button class="cancel-btn close-modal" data-close="backupModal" type="button">
-          Cancel
-        </button>
+                @csrf
 
-        <button class="save-btn" id="confirmBackupBtn" type="button">
+                <div class="modal-actions">
 
-          <i class="fa-solid fa-download"></i>
+                    <button type="button" class="cancel-btn close-modal" data-close="restoreBackupModal">
+                        Cancel
+                    </button>
 
-          Create Backup
+                    <button type="submit" class="restore-confirm-btn" id="confirmRestoreBtn">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Restore Database
+                    </button>
 
-        </button>
+                </div>
 
-      </div>
+            </form>
+
+        </div>
 
     </div>
 
-  </div>
+
 
 @endsection
 
 @section('page-js')
-
-  <script src="{{ asset('js/admin/settings-admin.js') }}"></script>
-
+    <script src="{{ asset('js/admin/settings-admin.js') }}"></script>
 @endsection

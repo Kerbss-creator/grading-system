@@ -1,49 +1,49 @@
 {{-- EXTENDS TEACHER LAYOUT --}}
 @extends('layouts.teacher')
 
-{{-- PAGE TITLE --}}
 @section('title', 'My Profile')
-
-{{-- PAGE HEADER --}}
 @section('header', 'My Profile')
-
-{{-- PAGE HEADER DESCRIPTION --}}
 @section('header-description', 'View and manage your personal and account information.')
 
-{{-- PAGE CSS --}}
 @section('page-css')
     <link rel="stylesheet" href="{{ asset('css/teacher/teacher-profile.css') }}">
 @endsection
 
-{{-- PAGE CONTENT --}}
 @section('content')
 
     @php
-        // Get the currently authenticated user.
-        $profileUser = auth()->user();
-
-        // Use actual database information whenever available.
+        // Information provided by TeacherProfileController.
+        $profileUser = $user;
         $profileName = $profileUser->name ?? 'Name not available';
         $profileEmail = $profileUser->email ?? 'Email not provided';
-        $teacherId = $profileUser->teacher_id ?? null;
-        $contactNumber = $profileUser->contact_number ?? null;
 
-        // account role from the database.
+        // Actual Teacher ID comes from the linked Faculty record.
+        $teacherId = $faculty->faculty_id ?? null;
+        $displayTeacherId = $teacherId ?: 'Not assigned';
+
+        // Account information.
         $accountRole = $profileUser->role ?? 'Teacher';
+        $accountStatus = $profileUser->account_status ?? 'Not available';
 
-        // Generate initials from the user's actual name.
+        // Generate initials from the user's name.
         $initials = collect(explode(' ', trim($profileName)))
             ->filter()
             ->take(2)
             ->map(fn($part) => strtoupper(substr($part, 0, 1)))
             ->implode('');
 
-        // Display a fallback when a field has no value.
-        $displayTeacherId = $teacherId ?: 'Not assigned';
-        $displayContact = $contactNumber ?: 'Not provided';
+        // Teaching information.
+        $assignedClassCount = $assignedClasses->count();
+        $subjectCount = $subjects->count();
 
-        // Account status is optional until its database column is confirmed.
-        $accountStatus = $profileUser->status ?? null;
+        // Display unique assigned grade levels and subjects.
+        $displayClasses = $assignedClassCount
+            ? $assignedClasses->map(fn($grade) => 'Grade ' . $grade)->implode(', ')
+            : 'No assigned classes';
+
+        $displaySubjects = $subjectCount
+            ? $subjects->implode(', ')
+            : 'No assigned subjects';
     @endphp
 
     <div class="teacher-profile-container">
@@ -51,8 +51,24 @@
         {{-- PROFILE HEADER --}}
         <section class="profile-header-card">
 
-            <div class="profile-avatar" aria-label="Profile initials">
-                <span>{{ $initials ?: 'T' }}</span>
+            <div class="profile-avatar-wrapper">
+
+                <div class="profile-avatar" id="teacherProfileAvatar">
+
+                    @if (!empty($profileUser->profile_photo_path))
+                        <img src="{{ asset('storage/' . $profileUser->profile_photo_path) }}" alt="Teacher Profile Picture"
+                            id="teacherProfileImage">
+                    @else
+                        <span id="teacherProfileInitials">{{ $initials ?: 'T' }}</span>
+                    @endif
+
+                </div>
+
+                <button type="button" class="profile-photo-upload-btn" id="openTeacherPhotoModal"
+                    aria-label="Change profile picture">
+                    <i class="fa-solid fa-camera"></i>
+                </button>
+
             </div>
 
             <div class="profile-header-info">
@@ -61,7 +77,7 @@
 
                 <span class="profile-status">
                     <i class="fa-solid fa-circle" aria-hidden="true"></i>
-                    {{ $accountStatus ?: 'Status not available' }}
+                    {{ ucfirst($accountStatus) }}
                 </span>
             </div>
 
@@ -118,18 +134,13 @@
                     </div>
 
                     <div class="profile-info-item">
-                        <span class="info-label">Contact Number</span>
-                        <span class="info-value">{{ $displayContact }}</span>
-                    </div>
-
-                    <div class="profile-info-item">
                         <span class="info-label">Department</span>
                         <span class="info-value">Junior High School</span>
                     </div>
 
                     <div class="profile-info-item">
                         <span class="info-label">Position</span>
-                        <span class="info-value">Teacher</span>
+                        <span class="info-value">{{ ucfirst($faculty->role ?? $accountRole) }}</span>
                     </div>
 
                 </div>
@@ -185,9 +196,7 @@
 
                         <div class="list-item-content">
                             <span class="info-label">Account Status</span>
-                            <span class="info-value">
-                                {{ $accountStatus ?: 'Not available' }}
-                            </span>
+                            <span class="info-value">{{ ucfirst($accountStatus) }}</span>
                         </div>
                     </div>
 
@@ -218,17 +227,19 @@
             <div class="teaching-info-grid">
 
                 <div class="teaching-info-item">
-                    <span class="teaching-number">—</span>
+                    <span class="teaching-number">{{ $assignedClassCount }}</span>
                     <span class="teaching-label">Assigned Classes</span>
+                    <small>{{ $displayClasses }}</small>
                 </div>
 
                 <div class="teaching-info-item">
-                    <span class="teaching-number">—</span>
+                    <span class="teaching-number">{{ $subjectCount }}</span>
                     <span class="teaching-label">Subjects</span>
+                    <small>{{ $displaySubjects }}</small>
                 </div>
 
                 <div class="teaching-info-item">
-                    <span class="teaching-number">—</span>
+                    <span class="teaching-number">{{ $studentCount }}</span>
                     <span class="teaching-label">Students</span>
                 </div>
 
@@ -239,10 +250,70 @@
 
             </div>
 
+        </section>
 
-            <p class="teaching-data-note">
-                KAIPUHAN INI KI BACKEND
-            </p>
+    </div>
+
+    {{-- PROFILE PHOTO MODAL --}}
+    <div class="profile-modal-overlay" id="teacherPhotoModal" aria-hidden="true">
+
+        <section class="profile-modal photo-modal" role="dialog" aria-modal="true" aria-labelledby="teacherPhotoTitle">
+
+            <div class="modal-header">
+                <div>
+                    <h3 id="teacherPhotoTitle">Profile Picture</h3>
+                    <p>Upload a photo for your teacher account.</p>
+                </div>
+
+                <button type="button" class="modal-close" id="closeTeacherPhotoModal"
+                    aria-label="Close profile picture modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="teacherPhotoForm" action="{{ route('teacher.profile.photo.update') }}" method="POST"
+                enctype="multipart/form-data">
+                @csrf
+
+                <div class="photo-upload-content">
+
+                    <div class="photo-preview-wrapper">
+                        <img src="{{ !empty($profileUser->profile_photo_path)
+        ? asset('storage/' . $profileUser->profile_photo_path)
+        : '' }}" alt="Profile Picture Preview" id="teacherPhotoPreview"
+                            class="{{ empty($profileUser->profile_photo_path) ? 'is-hidden' : '' }}">
+
+                        <div id="teacherPhotoPlaceholder"
+                            class="{{ !empty($profileUser->profile_photo_path) ? 'is-hidden' : '' }}">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                    </div>
+
+                    <label for="teacherPhotoInput" class="photo-upload-label">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        Choose Photo
+                    </label>
+
+                    <input type="file" id="teacherPhotoInput" name="profile_photo" accept=".jpg,.jpeg,.png,.webp" hidden>
+
+                    <p class="photo-upload-hint">
+                        JPG, JPEG, PNG, or WEBP. Maximum file size: 2 MB.
+                    </p>
+
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn cancel" id="cancelTeacherPhoto">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="modal-btn save" id="saveTeacherPhoto">
+                        <i class="fa-solid fa-check"></i>
+                        Save Picture
+                    </button>
+                </div>
+
+            </form>
 
         </section>
 
@@ -264,7 +335,6 @@
                 </button>
             </div>
 
-            {{-- UI FORM: Laravel submission route will be added separately. --}}
             <form id="editProfileForm">
 
                 <div class="modal-form-grid">
@@ -282,14 +352,8 @@
 
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" value="{{ $profileUser->email ?? '' }}" maxlength="255"
+                        <input type="email" id="email" name="email" value="{{ $profileEmail }}" maxlength="255"
                             autocomplete="email" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="contact">Contact Number</label>
-                        <input type="tel" id="contact" name="contact_number" value="{{ $contactNumber ?? '' }}"
-                            maxlength="30" autocomplete="tel" placeholder="Enter contact number">
                     </div>
 
                 </div>
@@ -301,7 +365,6 @@
                 </p>
 
                 <div class="modal-actions">
-
                     <button type="button" class="modal-btn cancel" id="cancelEditProfile">
                         Cancel
                     </button>
@@ -310,7 +373,6 @@
                         <i class="fa-solid fa-check" aria-hidden="true"></i>
                         Save Changes
                     </button>
-
                 </div>
 
             </form>
@@ -337,7 +399,6 @@
 
             </div>
 
-            {{-- UI FORM: Secure password update will use a Laravel controller. --}}
             <form id="changePasswordForm">
 
                 <div class="form-group">
@@ -391,7 +452,6 @@
                 </div>
 
                 <div class="modal-actions">
-
                     <button type="button" class="modal-btn cancel" id="cancelChangePassword">
                         Cancel
                     </button>
@@ -400,7 +460,6 @@
                         <i class="fa-solid fa-key" aria-hidden="true"></i>
                         Update Password
                     </button>
-
                 </div>
 
             </form>
@@ -414,7 +473,6 @@
 
 @endsection
 
-{{-- PAGE JAVASCRIPT --}}
 @section('page-js')
     <script src="{{ asset('js/teacher/teacher-profile.js') }}"></script>
-@endsection\
+@endsection

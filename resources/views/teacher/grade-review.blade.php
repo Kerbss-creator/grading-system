@@ -11,159 +11,242 @@
 @section('page-css')
     <style>
         .review-page {
+            width: 100%;
+            min-width: 0;
             padding: 5px 0 30px;
         }
 
+        /* BACK BUTTON */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            background: #fff;
+            color: #036f35;
+            border: 1px solid #dce5de;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: .2s ease;
+        }
+
+        .back-button:hover {
+            background: #036f35;
+            color: #fff;
+            border-color: #036f35;
+            transform: translateX(-3px);
+        }
+
+        /* HEADING */
         .review-heading {
             background: #fff;
             padding: 24px;
             border-radius: 14px;
             border-left: 5px solid #036f35;
-            margin-bottom: 22px;
+            margin-bottom: 20px;
             box-shadow: 0 3px 12px rgba(0, 0, 0, .04);
         }
 
         .review-heading h2 {
-            margin: 0 0 8px;
+            margin: 0 0 9px;
             color: #183b29;
-            font-size: 21px;
+            font-size: 20px;
+            font-weight: 700;
         }
 
         .review-heading p {
-            margin: 4px 0;
+            margin: 5px 0;
             color: #68756d;
-            font-size: 13px;
+            font-size: 12px;
         }
 
+        .review-heading strong {
+            color: #315b40;
+        }
+
+        /* SUMMARY CARDS */
         .review-summary {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 16px;
             margin-bottom: 22px;
         }
 
         .review-stat {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             background: #fff;
-            padding: 20px;
+            padding: 19px;
             border-radius: 13px;
             box-shadow: 0 3px 12px rgba(0, 0, 0, .04);
+            min-width: 0;
         }
 
-        .review-stat span {
+        .review-stat-icon {
+            width: 43px;
+            height: 43px;
+            min-width: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            background: #e8f5ec;
+            color: #036f35;
+            font-size: 17px;
+        }
+
+        .review-stat-info span {
             display: block;
             color: #778078;
-            font-size: 13px;
-            margin-bottom: 8px;
+            font-size: 12px;
+            margin-bottom: 5px;
         }
 
-        .review-stat strong {
-            color: #036f35;
-            font-size: 27px;
+        .review-stat-info strong {
+            display: block;
+            color: #183b29;
+            font-size: 23px;
+            font-weight: 700;
         }
 
-        .review-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
-        }
-
-        .review-tab {
-            border: 1px solid #dce5de;
-            background: #fff;
-            color: #536158;
-            padding: 11px 20px;
-            border-radius: 9px;
-            font-family: inherit;
-            font-weight: 600;
-            cursor: pointer;
-            transition: .2s;
-        }
-
-        .review-tab:hover,
-        .review-tab.active {
-            background: #036f35;
-            color: #fff;
-            border-color: #036f35;
-        }
-
-        .review-panel {
-            display: none;
+        /* MAIN CONTENT CARD */
+        .review-card {
             background: #fff;
             padding: 22px;
             border-radius: 14px;
             box-shadow: 0 3px 12px rgba(0, 0, 0, .04);
         }
 
-        .review-panel.active {
-            display: block;
-        }
-
-        .review-panel-header {
+        .review-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
             flex-wrap: wrap;
+            gap: 12px;
             margin-bottom: 18px;
         }
 
-        .review-panel-header h3 {
+        .review-card-header h3 {
             margin: 0;
             color: #183b29;
-            font-size: 17px;
+            font-size: 16px;
+            font-weight: 700;
         }
 
+        .student-count {
+            color: #68756d;
+            background: #f2f7f3;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* TABLE */
         .review-table-wrapper {
             width: 100%;
             overflow-x: auto;
+            border: 1px solid #edf0ed;
+            border-radius: 10px;
         }
 
         .review-table {
             width: 100%;
-            border-collapse: collapse;
             min-width: 850px;
+            border-collapse: collapse;
         }
 
         .review-table th {
             background: #f2f7f3;
             color: #315b40;
-            padding: 13px 12px;
+            padding: 14px 15px;
             text-align: left;
             font-size: 12px;
+            font-weight: 700;
             white-space: nowrap;
+            border-bottom: 1px solid #e2eae3;
         }
 
         .review-table td {
-            padding: 13px 12px;
+            padding: 15px;
             border-bottom: 1px solid #edf0ed;
             color: #46534a;
-            font-size: 13px;
+            font-size: 12px;
             vertical-align: middle;
         }
 
-        .review-table tbody tr:hover {
+        .review-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .review-table tbody tr.student-row:hover {
             background: #f9fcfa;
         }
 
         .student-name {
-            font-weight: 600;
+            display: block;
             color: #243c2c;
+            font-weight: 700;
+            font-size: 12px;
+            min-width: 150px;
         }
 
         .student-id {
             display: block;
-            font-size: 11px;
             color: #879188;
-            margin-top: 3px;
+            font-size: 11px;
+            margin-top: 4px;
         }
 
+        /* TERM CELL */
+        .term-grade {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 7px;
+        }
+
+        .grade-value {
+            color: #183b29;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .no-grade {
+            color: #9aa39c;
+            font-size: 13px;
+        }
+
+        /* DESCRIPTOR */
+        .descriptor-badge {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .descriptor-passing {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .descriptor-failing {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* STATUS */
         .status-pill {
             display: inline-block;
-            padding: 5px 10px;
+            padding: 5px 9px;
             border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: capitalize;
             background: #f0f2f0;
             color: #647067;
@@ -171,7 +254,7 @@
 
         .status-pill.submitted,
         .status-pill.approved,
-        .status-pill.forwarded {
+        .status-pill.forwarded-to-admin {
             background: #e5f5eb;
             color: #08743a;
         }
@@ -187,117 +270,192 @@
             color: #947019;
         }
 
+        /* DETAILS BUTTON */
+        .details-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #dce9df;
+            background: #f5faf6;
+            color: #036f35;
+            padding: 7px 10px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: .2s;
+            white-space: nowrap;
+        }
+
+        .details-toggle:hover {
+            background: #036f35;
+            color: #fff;
+            border-color: #036f35;
+        }
+
+        /* ASSESSMENT DETAILS */
         .details-row td {
             background: #f8fbf8;
+            padding: 18px !important;
+        }
+
+        .details-container {
+            border: 1px solid #e2eae3;
+            background: #fff;
+            border-radius: 10px;
             padding: 16px;
         }
 
-        .assessment-list {
+        .details-heading {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
             flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .details-heading strong {
+            color: #315b40;
+            font-size: 13px;
+        }
+
+        .assessment-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
             gap: 10px;
         }
 
         .assessment-item {
             border: 1px solid #e2eae3;
-            background: #fff;
-            padding: 10px 13px;
+            background: #fafffb;
+            padding: 11px;
             border-radius: 8px;
-            min-width: 110px;
         }
 
         .assessment-item strong {
             display: block;
             color: #315b40;
-            font-size: 12px;
-            margin-bottom: 5px;
+            font-size: 11px;
+            margin-bottom: 6px;
         }
 
         .assessment-item span {
-            font-size: 13px;
+            font-size: 12px;
             color: #56635a;
-        }
-
-        .details-toggle {
-            border: 0;
-            background: transparent;
-            color: #036f35;
             font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
         }
 
+        .empty-assessments {
+            color: #849087;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        /* RETURN FEEDBACK */
+        .return-feedback-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .return-feedback {
+            padding: 13px 15px;
+            border-radius: 9px;
+            border-left: 4px solid;
+        }
+
+        .return-feedback.adviser-feedback {
+            background: #fff8e9;
+            border-color: #d99a24;
+        }
+
+        .return-feedback.admin-feedback {
+            background: #fff0ed;
+            border-color: #c44735;
+        }
+
+        .return-feedback strong {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 12px;
+            color: #34483a;
+        }
+
+        .return-feedback p {
+            margin: 0;
+            color: #5e6a61;
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        /* EMPTY STATE */
         .empty-state {
-            padding: 35px 15px;
+            padding: 45px 15px;
             text-align: center;
             color: #849087;
-            font-size: 13px;
-        }
-
-        .pending-final {
-            color: #a27a16;
-            font-weight: 600;
-        }
-
-        .summary-note {
-            color: #7b867e;
             font-size: 12px;
-            margin-top: 12px;
         }
 
-        @media (max-width: 768px) {
+        .empty-state i {
+            display: block;
+            font-size: 30px;
+            color: #b7c9bb;
+            margin-bottom: 12px;
+        }
+
+        /* FOOTNOTE */
+        .review-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            color: #7b867e;
+            font-size: 11px;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        .review-note i {
+            color: #036f35;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 1100px) {
+            .review-summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .review-summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
             .review-page {
-                padding: 18px 14px;
+                padding: 5px 0 25px;
+            }
+
+            .review-heading {
+                padding: 18px;
             }
 
             .review-summary {
                 grid-template-columns: 1fr;
+                gap: 11px;
             }
 
-            .review-panel {
+            .review-stat {
                 padding: 15px;
             }
-        }
 
-        .back-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            padding: 11px 17px;
-            margin-bottom: 18px;
-            background: #fff;
-            color: #036f35;
-            border: 1px solid #dce5de;
-            border-radius: 9px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            transition: .2s ease;
-        }
-
-        .back-button:hover {
-            background: #036f35;
-            color: #fff;
-            border-color: #036f35;
-            transform: translateX(-3px);
-        }
-
-        .descriptor-badge {
-            display: inline-block;
-            padding: 5px 11px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .descriptor-passing {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .descriptor-failing {
-            background: #fee2e2;
-            color: #dc2626;
+            .review-card {
+                padding: 15px;
+            }
         }
     </style>
 @endsection
@@ -305,13 +463,13 @@
 @section('content')
     <div class="review-page">
 
-
-
+        {{-- BACK BUTTON --}}
         <a href="{{ route('teacher.grade-submission') }}" class="back-button">
             <i class="fa-solid fa-arrow-left"></i>
             Back to Grade Submission
         </a>
 
+        {{-- ASSIGNMENT HEADER --}}
         <div class="review-heading">
             <h2>
                 Grade {{ $assignment->grade_level }} -
@@ -324,214 +482,141 @@
             </p>
 
             <p>
-                Review the individual academic records of your assigned students.
+                Review the academic records and assessment results of your assigned students.
             </p>
         </div>
 
         @php
             $totalStudents = $students->count();
+
             $submittedCount = 0;
-            $incompleteCount = 0;
+            $returnedCount = 0;
+            $pendingCount = 0;
+
+            $submittedStatuses = [
+                'submitted',
+                'forwarded_to_admin',
+                'approved',
+            ];
 
             foreach ($students as $student) {
-                $record = $student->gradeRecords->firstWhere('term', $selectedTerm);
+                foreach ($terms as $term) {
+                    $record = $student->gradeRecords->firstWhere('term', $term);
 
-                if ($record && $record->status !== 'draft') {
-                    $submittedCount++;
-                } else {
-                    $incompleteCount++;
+                    if (!$record) {
+                        $pendingCount++;
+                        continue;
+                    }
+
+                    if (in_array($record->status, $submittedStatuses, true)) {
+                        $submittedCount++;
+                    } elseif ($record->status === 'returned') {
+                        $returnedCount++;
+                    } else {
+                        $pendingCount++;
+                    }
                 }
             }
         @endphp
 
+        {{-- SUMMARY CARDS --}}
         <div class="review-summary">
-            <div class="review-stat">
-                <span>Total Students</span>
-                <strong>{{ $totalStudents }}</strong>
-            </div>
 
             <div class="review-stat">
-                <span>Records Submitted - Selected Term</span>
-                <strong>{{ $submittedCount }}</strong>
-            </div>
-
-            <div class="review-stat">
-                <span>Pending / Draft Records</span>
-                <strong>{{ $incompleteCount }}</strong>
-            </div>
-        </div>
-
-        <div class="review-tabs">
-            @foreach ($terms as $term)
-                <button type="button" class="review-tab {{ $selectedTerm === $term ? 'active' : '' }}"
-                    data-tab="term-{{ $term }}">
-                    Term {{ $term }}
-                </button>
-            @endforeach
-
-            <button type="button" class="review-tab" data-tab="summary">
-
-                Summary
-            </button>
-        </div>
-
-        {{-- TERM 1, 2 AND 3 --}}
-        @foreach ($terms as $term)
-            <section class="review-panel {{ $selectedTerm === $term ? 'active' : '' }}" id="term-{{ $term }}">
-                <div class="review-panel-header">
-                    <h3>Term {{ $term }} - Student Grades</h3>
-                    <span>{{ $totalStudents }} Students</span>
+                <div class="review-stat-icon">
+                    <i class="fa-solid fa-users"></i>
                 </div>
 
-                @if ($students->isEmpty())
-                    <div class="empty-state">
-                        No active students found for this assignment and school year.
-                    </div>
-                @else
-                    <div class="review-table-wrapper">
-                        <table class="review-table">
-                            <thead>
-                                <tr>
-                                    <th>Student</th>
-                                    <th>WW PS</th>
-                                    <th>PT PS</th>
-                                    <th>EX PS</th>
-                                    <th>Initial Grade</th>
-                                    <th>Term Grade</th>
-                                    <th>Descriptor</th>
-                                    <th>Status</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
+                <div class="review-stat-info">
+                    <span>Total Students</span>
+                    <strong>{{ $totalStudents }}</strong>
+                </div>
+            </div>
 
-                            <tbody>
-                                @foreach ($students as $student)
-                                    @php
-                                        $record = $student->gradeRecords->firstWhere('term', $term);
-                                    @endphp
+            <div class="review-stat">
+                <div class="review-stat-icon">
+                    <i class="fa-solid fa-file-circle-check"></i>
+                </div>
 
-                                    <tr>
-                                        <td>
-                                            <span class="student-name">
-                                                {{ $student->last_name }},
-                                                {{ $student->first_name }}
-                                                {{ $student->middle_name }}
-                                            </span>
+                <div class="review-stat-info">
+                    <span>Submitted / Under Review</span>
+                    <strong>{{ $submittedCount }}</strong>
+                </div>
+            </div>
 
-                                            <span class="student-id">
-                                                {{ $student->student_id }}
-                                            </span>
-                                        </td>
+            <div class="review-stat">
+                <div class="review-stat-icon">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
 
-                                        <td>{{ $record?->ww_ps ?? '—' }}</td>
-                                        <td>{{ $record?->pt_ps ?? '—' }}</td>
-                                        <td>{{ $record?->ex_ps ?? '—' }}</td>
-                                        <td>{{ $record?->initial_grade ?? '—' }}</td>
-                                        <td>{{ $record?->term_grade ?? '—' }}</td>
-                                        <td>
-                                            @if($record?->descriptor)
-                                            <span class="descriptor-badge
-                                            {{ in_array($record->descriptor, ['Advancing', 'Benchmarking', 'Connecting'])
-                                            ? 'descriptor-passing'
-                                            : 'descriptor-failing' }}">
-                                            {{ $record->descriptor }}
-                                            </span>
-                                            @else
-    
-                                            @endif
-                                        </td>
+                <div class="review-stat-info">
+                    <span>Returned Records</span>
+                    <strong>{{ $returnedCount }}</strong>
+                </div>
+            </div>
 
-                                        <td>
-                                            @if ($record)
-                                                <span class="status-pill {{ $record->status }}">
-                                                    {{ ucfirst($record->status) }}
-                                                </span>
-                                            @else
-                                                <span class="status-pill">
-                                                    No Record
-                                                </span>
-                                            @endif
-                                        </td>
+            <div class="review-stat">
+                <div class="review-stat-icon">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
 
-                                        <td>
-                                            @if ($record)
-                                                <button type="button" class="details-toggle"
-                                                    data-details="details-{{ $term }}-{{ $student->id }}">
-                                                    View Details
-                                                </button>
-                                            @else
-                                                —
-                                            @endif
-                                        </td>
-                                    </tr>
+                <div class="review-stat-info">
+                    <span>Pending / Draft Records</span>
+                    <strong>{{ $pendingCount }}</strong>
+                </div>
+            </div>
 
-                                    @if ($record)
-                                        <tr class="details-row" id="details-{{ $term }}-{{ $student->id }}" hidden>
-                                            <td colspan="9">
-                                                <strong>Assessment Breakdown</strong>
+        </div>
 
-                                                <div class="assessment-list" style="margin-top: 12px;">
-                                                    @forelse ($record->assessmentScores as $assessment)
-                                                        <div class="assessment-item">
-                                                            <strong>
-                                                                {{ $assessment->assessment_code }}
-                                                                ({{ $assessment->assessment_group }})
-                                                            </strong>
+        {{-- STUDENT GRADES TABLE --}}
+        <div class="review-card">
 
-                                                            <span>
-                                                                {{ $assessment->score ?? '—' }}
-                                                                /
-                                                                {{ $assessment->highest_possible_score }}
-                                                            </span>
-                                                        </div>
-                                                    @empty
-                                                        <p>No assessment scores available.</p>
-                                                    @endforelse
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </section>
-        @endforeach
+            <div class="review-card-header">
+                <h3>
+                    <i class="fa-solid fa-table-list"></i>
+                    Student Academic Records
+                </h3>
 
-        {{-- SUMMARY --}}
-        <section class="review-panel" id="summary">
-            <div class="review-panel-header">
-                <h3>Academic Records Summary</h3>
-                <span>Terms 1–3</span>
+                <span class="student-count">
+                    {{ $totalStudents }} Students
+                </span>
             </div>
 
             @if ($students->isEmpty())
+
                 <div class="empty-state">
-                    No student records available.
+                    <i class="fa-solid fa-folder-open"></i>
+                    No active students found for this assignment and school year.
                 </div>
+
             @else
+
                 <div class="review-table-wrapper">
                     <table class="review-table">
+
                         <thead>
                             <tr>
                                 <th>Student</th>
                                 <th>Term 1</th>
                                 <th>Term 2</th>
                                 <th>Term 3</th>
-                                <th>Final Grade</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             @foreach ($students as $student)
+
                                 @php
-                                    $term1 = $student->gradeRecords->firstWhere('term', 1);
-                                    $term2 = $student->gradeRecords->firstWhere('term', 2);
-                                    $term3 = $student->gradeRecords->firstWhere('term', 3);
+                                    $studentTerms = [];
+
+                                    foreach ($terms as $term) {
+                                        $studentTerms[$term] = $student->gradeRecords->firstWhere('term', $term);
+                                    }
                                 @endphp
 
-                                <tr>
+                                {{-- STUDENT ROW --}}
+                                <tr class="student-row">
+
                                     <td>
                                         <span class="student-name">
                                             {{ $student->last_name }},
@@ -544,27 +629,161 @@
                                         </span>
                                     </td>
 
-                                    <td>{{ $term1?->term_grade ?? '—' }}</td>
-                                    <td>{{ $term2?->term_grade ?? '—' }}</td>
-                                    <td>{{ $term3?->term_grade ?? '—' }}</td>
+                                    @foreach ($terms as $term)
+                                        @php
+                                            $record = $studentTerms[$term];
+                                        @endphp
 
-                                    <td>
-                                        <span class="pending-final">
-                                            Pending
-                                        </span>
-                                    </td>
+                                        <td>
+                                            <div class="term-grade">
+
+                                                @if ($record)
+
+                                                    <span class="grade-value">
+                                                        {{ $record->term_grade ?? '—' }}
+                                                    </span>
+
+                                                    @if ($record->descriptor)
+                                                                <span class="descriptor-badge
+                                                                                            {{ in_array($record->descriptor, ['Advancing', 'Benchmarking', 'Connecting'])
+                                                        ? 'descriptor-passing'
+                                                        : 'descriptor-failing' }}">
+                                                                    {{ $record->descriptor }}
+                                                                </span>
+                                                    @endif
+
+                                                    <span class="status-pill {{ str_replace('_', '-', $record->status) }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $record->status)) }}
+                                                    </span>
+
+                                                    <button type="button" class="details-toggle"
+                                                        data-details="details-{{ $student->id }}-{{ $term }}">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                        View Details
+                                                    </button>
+
+                                                @else
+
+                                                    <span class="no-grade">—</span>
+
+                                                    <span class="status-pill">
+                                                        No Record
+                                                    </span>
+
+                                                @endif
+
+                                            </div>
+                                        </td>
+                                    @endforeach
+
                                 </tr>
+
+                                {{-- ASSESSMENT DETAILS PER TERM --}}
+                                @foreach ($terms as $term)
+
+                                    @php
+                                        $record = $studentTerms[$term];
+                                    @endphp
+
+                                    @if ($record)
+                                        <tr class="details-row" id="details-{{ $student->id }}-{{ $term }}" hidden>
+                                            <td colspan="4">
+
+                                                <div class="details-container">
+
+                                                    <div class="details-heading">
+                                                        <strong>
+                                                            <i class="fa-solid fa-clipboard-list"></i>
+                                                            {{ $student->last_name }}, {{ $student->first_name }}
+                                                            - Term {{ $term }} Assessment Breakdown
+                                                        </strong>
+                                                    </div>
+
+                                                    {{-- RETURN FEEDBACK --}}
+                                                    @if($record->adviser_return_reason || $record->admin_return_reason)
+
+                                                        <div class="return-feedback-list">
+
+                                                            @if($record->adviser_return_reason)
+                                                                <div class="return-feedback adviser-feedback">
+                                                                    <strong>
+                                                                        <i class="fa-solid fa-user-tie"></i>
+                                                                        Adviser Feedback
+                                                                    </strong>
+
+                                                                    <p>{{ $record->adviser_return_reason }}</p>
+                                                                </div>
+                                                            @endif
+
+                                                            @if($record->admin_return_reason)
+                                                                <div class="return-feedback admin-feedback">
+                                                                    <strong>
+                                                                        <i class="fa-solid fa-user-shield"></i>
+                                                                        Administrator Feedback
+                                                                    </strong>
+
+                                                                    <p>{{ $record->admin_return_reason }}</p>
+                                                                </div>
+                                                            @endif
+
+                                                        </div>
+
+                                                    @endif
+
+                                                    <div class="assessment-list">
+
+                                                        @forelse ($record->assessmentScores as $assessment)
+
+                                                            <div class="assessment-item">
+                                                                <strong>
+                                                                    {{ $assessment->assessment_code }}
+                                                                    ({{ $assessment->assessment_group }})
+                                                                </strong>
+
+                                                                <span>
+                                                                    {{ $assessment->score ?? '—' }}
+                                                                    /
+                                                                    {{ $assessment->highest_possible_score }}
+                                                                </span>
+                                                            </div>
+
+                                                        @empty
+
+                                                            <p class="empty-assessments">
+                                                                No assessment scores available.
+                                                            </p>
+
+                                                        @endforelse
+
+                                                    </div>
+
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                    @endif
+
+                                @endforeach
+
                             @endforeach
                         </tbody>
+
                     </table>
                 </div>
 
-                <p class="summary-note">
-                    Final Grade computation will be implemented after the official
-                    school grading policy is confirmed.
-                </p>
+                <div class="review-note">
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <span>
+                        Final Grade is not displayed because the official school policy
+                        for computing the overall academic grade has not yet been finalized.
+                        Individual term grades and assessment records are shown as stored.
+                    </span>
+                </div>
+
             @endif
-        </section>
+
+        </div>
 
     </div>
 @endsection
@@ -573,39 +792,25 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            // Switch between term tabs and summary
-            const tabs = document.querySelectorAll('.review-tab');
-            const panels = document.querySelectorAll('.review-panel');
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function () {
-                    const target = this.dataset.tab;
-
-                    tabs.forEach(item => item.classList.remove('active'));
-                    panels.forEach(panel => panel.classList.remove('active'));
-
-                    this.classList.add('active');
-
-                    const selectedPanel = document.getElementById(target);
-
-                    if (selectedPanel) {
-                        selectedPanel.classList.add('active');
-                    }
-                });
-            });
-
-            // Show and hide assessment breakdown
             document.querySelectorAll('.details-toggle').forEach(button => {
+
                 button.addEventListener('click', function () {
-                    const target = document.getElementById(this.dataset.details);
+
+                    const targetId = this.dataset.details;
+                    const target = document.getElementById(targetId);
 
                     if (!target) return;
 
                     const isHidden = target.hidden;
 
                     target.hidden = !isHidden;
-                    this.textContent = isHidden ? 'Hide Details' : 'View Details';
+
+                    this.innerHTML = isHidden
+                        ? '<i class="fa-solid fa-eye-slash"></i> Hide Details'
+                        : '<i class="fa-solid fa-eye"></i> View Details';
+
                 });
+
             });
 
         });

@@ -79,9 +79,28 @@ document.addEventListener("DOMContentLoaded", () => {
     let facultyRecords = Array.isArray(window.facultyData)
         ? window.facultyData.map((record) => ({
               ...record,
+
               assignments: Array.isArray(record.assignments)
-                  ? record.assignments
+                  ? record.assignments.map((assignment) => ({
+                        ...assignment,
+
+                        // Preserve the database assignment ID.
+                        id: assignment.id || null,
+
+                        // Normalize Laravel snake_case and JS camelCase.
+                        grade: assignment.grade || assignment.grade_level || "",
+
+                        subject: assignment.subject || "",
+
+                        component: assignment.component || "General",
+
+                        schoolYear:
+                            assignment.schoolYear ||
+                            assignment.school_year ||
+                            "",
+                    }))
                   : [],
+
               status:
                   String(record.status).toLowerCase() === "active"
                       ? "Active"
@@ -142,20 +161,44 @@ document.addEventListener("DOMContentLoaded", () => {
         return "No Role";
     }
 
+    function getCurrentAssignments(record) {
+        const activeYear = String(window.currentSchoolYear || "");
+
+        return record.assignments.filter((assignment) => {
+            const assignmentYear = String(
+                assignment.schoolYear || assignment.school_year || "",
+            );
+
+            return assignmentYear === activeYear;
+        });
+    }
+
     function assignmentSummary(record) {
         const parts = [];
+        const currentAssignments = getCurrentAssignments(record);
 
-        if (record.assignments.length > 0) {
-            parts.push(`${record.assignments.length} subject assignment(s)`);
+        if (currentAssignments.length > 0) {
+            const mapehCount = currentAssignments.filter(
+                (assignment) => assignment.subject === "MAPEH",
+            ).length;
+
+            const generalCount = currentAssignments.length - mapehCount;
+
+            if (generalCount > 0) {
+                parts.push(`${generalCount} subject assignment(s)`);
+            }
+
+            if (mapehCount > 0) {
+                parts.push(`${mapehCount} MAPEH component assignment(s)`);
+            }
         }
 
         if (record.adviser && record.advisoryGrade) {
             parts.push(`Adviser: ${record.advisoryGrade}`);
         }
 
-        return parts.length ? parts.join(" · ") : "No assignments";
+        return parts.length ? parts.join(" · ") : "No current assignments";
     }
-
     // ==========================================
     // MODAL FUNCTIONS
     // ==========================================
@@ -388,7 +431,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const matchesSubject =
                 !selectedSubject ||
-                record.assignments.some(
+                getCurrentAssignments(record).some(
                     (assignment) => assignment.subject === selectedSubject,
                 );
 
@@ -731,56 +774,92 @@ document.addEventListener("DOMContentLoaded", () => {
         const row = document.createElement("div");
         row.className = "faculty-assignment-row";
 
+        row.dataset.assignmentId = assignment.id || "";
+        row.dataset.schoolYear =
+            assignment.schoolYear ||
+            assignment.school_year ||
+            window.currentSchoolYear ||
+            "";
+
         row.innerHTML = `
-            <div class="faculty-form-group">
-                <label>Grade Level *</label>
+        <div class="faculty-form-group">
+            <label>Grade Level *</label>
 
-                <select class="assignment-grade" required>
-                    <option value="">Select Grade</option>
+            <select class="assignment-grade">
+                <option value="">Select Grade</option>
+                ${grades
+                    .map(
+                        (grade) => `
+                    <option value="${escapeHTML(grade)}">
+                        ${escapeHTML(grade)}
+                    </option>
+                `,
+                    )
+                    .join("")}
+            </select>
+        </div>
 
-                    ${grades
-                        .map(
-                            (grade) => `
-                                <option value="${escapeHTML(grade)}">
-                                    ${escapeHTML(grade)}
-                                </option>
-                            `,
-                        )
-                        .join("")}
-                </select>
-            </div>
+        <div class="faculty-form-group">
+            <label>Subject *</label>
 
-            <div class="faculty-form-group">
-                <label>Subject *</label>
+            <select class="assignment-subject">
+                <option value="">Select Subject</option>
+                ${subjects
+                    .map(
+                        (subject) => `
+                    <option value="${escapeHTML(subject)}">
+                        ${escapeHTML(subject)}
+                    </option>
+                `,
+                    )
+                    .join("")}
+            </select>
+        </div>
 
-                <select class="assignment-subject" required>
-                    <option value="">Select Subject</option>
+        <div class="faculty-form-group assignment-component-group" hidden>
+            <label>MAPEH Component *</label>
 
-                    ${subjects
-                        .map(
-                            (subject) => `
-                                <option value="${escapeHTML(subject)}">
-                                    ${escapeHTML(subject)}
-                                </option>
-                            `,
-                        )
-                        .join("")}
-                </select>
-            </div>
+            <select class="assignment-component">
+            <option value="">Select Component</option>
+            <option value="General">General</option>
+            <option value="Music and Arts">Music and Arts</option>
+            <option value="PE and Health">PE and Health</option>
+</select>
+        </div>
 
-            <button
-                type="button"
-                class="faculty-remove-row-btn"
-                title="Remove assignment"
-                aria-label="Remove assignment">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        `;
+        <button
+            type="button"
+            class="faculty-remove-row-btn"
+            title="Remove assignment"
+            aria-label="Remove assignment">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    `;
 
-        row.querySelector(".assignment-grade").value = assignment.grade || "";
+        const gradeSelect = row.querySelector(".assignment-grade");
+        const subjectSelect = row.querySelector(".assignment-subject");
+        const componentSelect = row.querySelector(".assignment-component");
+        const componentGroup = row.querySelector(".assignment-component-group");
 
-        row.querySelector(".assignment-subject").value =
-            assignment.subject || "";
+        gradeSelect.value = assignment.grade || assignment.grade_level || "";
+        subjectSelect.value = assignment.subject || "";
+
+        // Never automatically select a MAPEH component.
+        componentSelect.value = assignment.component || "";
+
+        function updateComponentVisibility() {
+            const isTeacher = Boolean(teacherCheckbox?.checked);
+            const isMapeh = subjectSelect.value === "MAPEH";
+
+            componentGroup.hidden = !isMapeh;
+            componentSelect.required = isTeacher && isMapeh;
+
+            if (!isMapeh) {
+                componentSelect.value = "";
+            }
+        }
+
+        subjectSelect.addEventListener("change", updateComponentVisibility);
 
         row.querySelector(".faculty-remove-row-btn").addEventListener(
             "click",
@@ -792,6 +871,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         assignmentsList.appendChild(row);
 
+        updateComponentVisibility();
         updateResponsibilityFields();
     }
 
@@ -807,9 +887,40 @@ document.addEventListener("DOMContentLoaded", () => {
             advisorySection.hidden = !isAdviser;
         }
 
-        assignmentsList?.querySelectorAll("select").forEach((select) => {
-            select.required = isTeacher;
-        });
+        assignmentsList
+            ?.querySelectorAll(".faculty-assignment-row")
+            .forEach((row) => {
+                const gradeSelect = row.querySelector(".assignment-grade");
+                const subjectSelect = row.querySelector(".assignment-subject");
+                const componentSelect = row.querySelector(
+                    ".assignment-component",
+                );
+                const componentGroup = row.querySelector(
+                    ".assignment-component-group",
+                );
+
+                const isMapeh = subjectSelect?.value === "MAPEH";
+
+                if (gradeSelect) {
+                    gradeSelect.required = isTeacher;
+                }
+
+                if (subjectSelect) {
+                    subjectSelect.required = isTeacher;
+                }
+
+                if (componentGroup) {
+                    componentGroup.hidden = !isMapeh;
+                }
+
+                if (componentSelect) {
+                    componentSelect.required = isTeacher && isMapeh;
+
+                    if (!isMapeh) {
+                        componentSelect.value = "";
+                    }
+                }
+            });
 
         const advisoryGrade = document.getElementById("advisoryGrade");
 
@@ -823,10 +934,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return [
             ...assignmentsList.querySelectorAll(".faculty-assignment-row"),
-        ].map((row) => ({
-            grade: row.querySelector(".assignment-grade").value,
-            subject: row.querySelector(".assignment-subject").value,
-        }));
+        ].map((row) => {
+            const subject = row.querySelector(".assignment-subject").value;
+
+            return {
+                id: row.dataset.assignmentId || null,
+                grade: row.querySelector(".assignment-grade").value,
+                subject,
+
+                component:
+                    subject === "MAPEH"
+                        ? row.querySelector(".assignment-component").value
+                        : "General",
+
+                schoolYear:
+                    row.dataset.schoolYear || window.currentSchoolYear || "",
+            };
+        });
     }
 
     function validateAssignments(assignments) {
@@ -842,14 +966,18 @@ document.addEventListener("DOMContentLoaded", () => {
             return false;
         }
 
-        if (
-            assignments.some(
-                (assignment) => !assignment.grade || !assignment.subject,
-            )
-        ) {
+        const incomplete = assignments.some(
+            (assignment) =>
+                !assignment.grade ||
+                !assignment.subject ||
+                !assignment.schoolYear ||
+                (assignment.subject === "MAPEH" && !assignment.component),
+        );
+
+        if (incomplete) {
             showFacultyAlert(
                 "Incomplete Assignment",
-                "Please complete every teaching assignment.",
+                "Please complete the grade level, subject, school year, and MAPEH component where applicable.",
                 "warning",
             );
 
@@ -857,15 +985,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const uniqueAssignments = new Set(
-            assignments.map(
-                (assignment) => `${assignment.grade}|${assignment.subject}`,
+            assignments.map((assignment) =>
+                [
+                    assignment.grade,
+                    assignment.subject,
+                    assignment.component,
+                    assignment.schoolYear,
+                ].join("|"),
             ),
         );
 
         if (uniqueAssignments.size !== assignments.length) {
             showFacultyAlert(
                 "Duplicate Assignment",
-                "Duplicate Grade Level and Subject assignments are not allowed.",
+                "Duplicate Grade Level, Subject, Component, and School Year assignments are not allowed.",
                 "warning",
             );
 
@@ -887,6 +1020,22 @@ document.addEventListener("DOMContentLoaded", () => {
         editingRecordId = null;
 
         assignmentsList.innerHTML = "";
+
+        // Default status for newly created faculty.
+        const facultyStatus = document.getElementById("facultyStatus");
+
+        if (facultyStatus) {
+            facultyStatus.value = "active";
+        }
+
+        // Clear initial password fields when opening Add Faculty.
+        const password = document.getElementById("facultyPassword");
+        const passwordConfirmation = document.getElementById(
+            "facultyPasswordConfirmation",
+        );
+
+        if (password) password.value = "";
+        if (passwordConfirmation) passwordConfirmation.value = "";
 
         document.getElementById("facultyFormTitle").textContent = "Add Faculty";
 
@@ -919,7 +1068,6 @@ document.addEventListener("DOMContentLoaded", () => {
         editingRecordId = record.id;
 
         document.getElementById("facultyId").value = record.facultyId || "";
-
         document.getElementById("facultyEmail").value = record.email || "";
 
         document.getElementById("facultyFirstName").value =
@@ -938,8 +1086,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         assignmentsList.innerHTML = "";
 
-        if (record.assignments.length > 0) {
-            record.assignments.forEach(createAssignmentRow);
+        // Only current school-year assignments are editable.
+        // Historical assignments remain in the database untouched.
+        const currentAssignments = getCurrentAssignments(record);
+
+        if (currentAssignments.length > 0) {
+            currentAssignments.forEach(createAssignmentRow);
         } else if (record.teacher) {
             createAssignmentRow();
         }
@@ -951,7 +1103,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "Edit Faculty";
 
         document.getElementById("facultyFormDescription").textContent =
-            "Update the faculty information and assignments.";
+            "Update the faculty information and current school-year assignments.";
 
         document.getElementById("saveFacultyText").textContent = "Save Changes";
 
@@ -972,11 +1124,17 @@ document.addEventListener("DOMContentLoaded", () => {
             ? record.assignments
                   .map(
                       (assignment) => `
-                        <div class="faculty-detail-assignment">
-                            <strong>${escapeHTML(assignment.grade)}</strong>
-                            <span>${escapeHTML(assignment.subject)}</span>
-                        </div>
-                    `,
+        <div class="faculty-detail-assignment">
+            <strong>${escapeHTML(assignment.grade)}</strong>
+            <span>${escapeHTML(assignment.subject)}</span>
+            ${
+                assignment.subject === "MAPEH"
+                    ? `<span>${escapeHTML(assignment.component || "Component not specified")}</span>`
+                    : ""
+            }
+            <small>SY ${escapeHTML(assignment.schoolYear || "")}</small>
+        </div>
+    `,
                   )
                   .join("")
             : '<p class="faculty-help-text">No teaching assignments.</p>';
@@ -1084,12 +1242,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     .value.toLowerCase(),
                 teacher: teacherCheckbox.checked,
                 adviser: adviserCheckbox.checked,
+
                 assignments: teacherCheckbox.checked
                     ? assignments.map((assignment) => ({
+                          id: assignment.id,
                           grade_level: assignment.grade,
                           subject: assignment.subject,
+                          component: assignment.component,
+                          school_year: assignment.schoolYear,
                       }))
                     : [],
+
                 advisory_grade: adviserCheckbox.checked ? advisoryGrade : "",
                 school_year: window.currentSchoolYear || "",
             };

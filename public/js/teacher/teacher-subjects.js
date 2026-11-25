@@ -1,42 +1,46 @@
 document.addEventListener("DOMContentLoaded", () => {
     const schoolYearSelect = document.getElementById("schoolYearSelect");
     const termSelect = document.getElementById("termSelect");
-    const subjectLinks = document.querySelectorAll(".subject-card-link");
 
     /**
-     * Update every subject card URL based on the selected filters.
+     * Reload the Teacher My Subjects page
+     * using the selected filters.
      */
-    function updateSubjectLinks() {
-        const schoolYear = schoolYearSelect?.value || "2026-2027";
-        const term = termSelect?.value || "1st-term";
+    function updateSubjectFilters(changedFilter) {
+        const schoolYear = schoolYearSelect?.value;
+        const term = termSelect?.value;
 
-        subjectLinks.forEach((link) => {
-            const assignmentId = link.dataset.assignmentId;
+        if (!schoolYear) {
+            return;
+        }
 
-            if (!assignmentId) {
-                return;
-            }
+        const targetUrl = new URL(window.location.href);
 
-            const targetUrl = new URL(
-                "/teacher/grade-management",
-                window.location.origin,
-            );
+        // Apply the selected school year.
+        targetUrl.searchParams.set("school_year", schoolYear);
 
-            targetUrl.searchParams.set("assignment", assignmentId);
-            targetUrl.searchParams.set("school_year", schoolYear);
+        if (changedFilter === "school_year") {
+            // Let the controller use the selected year's current term.
+            targetUrl.searchParams.delete("term");
+        } else if (term) {
+            // Apply the selected term.
             targetUrl.searchParams.set("term", term);
+        }
 
-            link.href = `${targetUrl.pathname}${targetUrl.search}`;
-        });
+        window.location.href = targetUrl.toString();
     }
 
-    if (schoolYearSelect) {
-        schoolYearSelect.addEventListener("change", updateSubjectLinks);
-    }
+    /**
+     * Reload page when School Year changes.
+     */
+    schoolYearSelect?.addEventListener("change", () => {
+        updateSubjectFilters("school_year");
+    });
 
-    if (termSelect) {
-        termSelect.addEventListener("change", updateSubjectLinks);
-    }
-
-    updateSubjectLinks();
+    /**
+     * Reload page when Term changes.
+     */
+    termSelect?.addEventListener("change", () => {
+        updateSubjectFilters("term");
+    });
 });

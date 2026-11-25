@@ -102,7 +102,7 @@
             <div class="user-toolbar">
                 <div class="user-search">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search name, username, or email...">
+                    <input type="text" id="searchInput" placeholder="Search name, or email...">
                 </div>
 
                 <div class="user-filters">
@@ -575,7 +575,13 @@
 
 
 @section('page-js')
+    @php
+        $activeSchoolYear = \App\Models\SchoolYear::active()?->year_name ?? '';
+    @endphp
+
     <script>
+        window.currentSchoolYear = @json($activeSchoolYear);
+
         window.userManagementRoutes = {
             data: @json(route('admin.users.data')),
             store: @json(route('admin.users.store')),
@@ -585,5 +591,5 @@
         };
     </script>
 
-    <script src="{{ asset('js/admin/user-management.js') }}"></script>
+    <script src="{{ asset('js/admin/user-management.js') }}" defer></script>
 @endsection

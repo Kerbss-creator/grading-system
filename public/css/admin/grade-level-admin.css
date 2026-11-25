@@ -143,6 +143,70 @@
 }
 
 /* ==========================================
+   GRADE CARD - TEACHERS AND ADVISER
+========================================== */
+
+.grade-card-assignment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.grade-card-metric,
+.grade-card-adviser {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.grade-card-metric > div,
+.grade-card-adviser > div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 3px;
+}
+
+.grade-card-metric strong {
+    font-size: 17px;
+    font-weight: 700;
+    color: #222;
+}
+
+.grade-card-metric span:not(.student-icon),
+.grade-card-adviser span:not(.student-icon) {
+    font-size: 12px;
+    color: #777;
+}
+
+.grade-card-adviser strong {
+    font-size: 11px;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.grade-card-adviser span:not(.student-icon) {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    overflow-wrap: anywhere;
+}
+
+.grade-card-bottom {
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.grade-view-link {
+    flex-shrink: 0;
+}
+
+/* ==========================================
    SECTION HEADER
 ========================================== */
 
@@ -393,35 +457,50 @@
     margin-bottom: 25px;
 }
 
+/* BACK TO GRADES BUTTON */
 .back-to-grades {
     display: inline-flex;
     align-items: center;
     gap: 9px;
     margin-bottom: 25px;
-    padding: 10px 14px;
-    color: #536258;
+    padding: 10px 16px;
+
+    color: #ffffff !important;
     font-family: "Poppins", sans-serif;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
-    background: #ffffff;
-    border: 1px solid var(--grade-border);
+
+    background-color: #036f35;
+    border: 1px solid #036f35;
     border-radius: 9px;
+
     cursor: pointer;
+    text-decoration: none;
+
     transition:
         color 0.2s ease,
+        background-color 0.2s ease,
         border-color 0.2s ease,
-        background 0.2s ease,
-        transform 0.2s ease;
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .back-to-grades:hover {
-    color: var(--grade-primary);
-    background: #f0f8f2;
-    border-color: #c9e1cf;
+    color: #ffffff !important;
+    background-color: #025a2b;
+    border-color: #025a2b;
+    text-decoration: none;
+    transform: translateX(-2px);
+    box-shadow: 0 4px 10px rgba(3, 111, 53, 0.18);
 }
 
 .back-to-grades:active {
-    transform: translateX(-2px);
+    transform: translateX(-1px);
+}
+
+.back-to-grades:focus-visible {
+    outline: 2px solid #036f35;
+    outline-offset: 3px;
 }
 
 .details-heading {
@@ -967,4 +1046,324 @@
         animation: none;
         transition: none;
     }
+}
+
+/* ==========================================
+   ASSIGNED ADVISER
+========================================== */
+
+.adviser-info {
+    display: flex;
+    align-items: center;
+    min-height: 90px;
+    padding: 20px 24px;
+    background: #fbfdfb;
+}
+
+.adviser-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.adviser-details .empty-state-icon {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    color: var(--grade-primary);
+    font-size: 19px;
+    background: var(--grade-primary-light);
+    border: 1px solid #dcefe2;
+    border-radius: 13px;
+}
+
+.adviser-details h4 {
+    margin: 0 0 5px;
+    color: var(--grade-text);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.adviser-details p {
+    margin: 0;
+    color: var(--grade-muted);
+    font-size: 10px;
+}
+
+/* ==========================================
+   SUBJECT ASSIGNMENTS
+========================================== */
+
+.subject-assignments-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    padding: 20px 24px;
+}
+
+.subject-assignment-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    padding: 17px;
+    background: #ffffff;
+    border: 1px solid var(--grade-border);
+    border-radius: 12px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.subject-assignment-card:hover {
+    border-color: #c6dfcd;
+    box-shadow: 0 5px 15px rgba(25, 65, 39, 0.07);
+    transform: translateY(-2px);
+}
+
+.subject-assignment-info {
+    min-width: 0;
+}
+
+.subject-assignment-info h4 {
+    margin: 0 0 6px;
+    color: var(--grade-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subject-assignment-info p {
+    margin: 0;
+    color: var(--grade-muted);
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.subject-gradebook-link {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    color: var(--grade-primary);
+    font-family: "Poppins", sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    background: var(--grade-primary-light);
+    border: 1px solid #dcefe2;
+    border-radius: 8px;
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.subject-gradebook-link:hover {
+    color: #ffffff;
+    background: var(--grade-primary);
+    border-color: var(--grade-primary);
+}
+
+/* ==========================================
+   SUBJECT ASSIGNMENTS EMPTY STATE
+========================================== */
+
+.subject-assignments-list .compact-empty-state {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 195px;
+    padding: 30px 20px;
+    background: #fbfdfb;
+    border: 1px dashed var(--grade-border);
+    border-radius: 11px;
+}
+
+/* ==========================================
+   SUBJECT ASSIGNMENTS RESPONSIVE
+========================================== */
+
+@media (max-width: 900px) {
+    .subject-assignments-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .subject-assignments-list {
+        padding: 15px;
+    }
+
+    .subject-assignment-card {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .subject-gradebook-link {
+        width: 100%;
+    }
+
+    .adviser-info {
+        padding: 17px;
+    }
+}
+
+/* ==========================================
+   GRADE CARD - TEACHERS AND ADVISER
+========================================== */
+
+.grade-card-assignment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.grade-card-metric,
+.grade-card-adviser {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.grade-card-metric > div,
+.grade-card-adviser > div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 3px;
+}
+
+.grade-card-metric strong {
+    font-size: 17px;
+    font-weight: 700;
+    color: #222;
+}
+
+.grade-card-metric span:not(.student-icon),
+.grade-card-adviser span:not(.student-icon) {
+    font-size: 12px;
+    color: #777;
+}
+
+.grade-card-adviser strong {
+    font-size: 11px;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.grade-card-adviser span:not(.student-icon) {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    overflow-wrap: anywhere;
+}
+
+.grade-card-bottom {
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.grade-view-link {
+    flex-shrink: 0;
+}
+
+/* ==========================================
+   TYPOGRAPHY STANDARDIZATION - 12PX
+========================================== */
+
+/* Grade card - Teachers and Adviser */
+.grade-card-metric strong {
+    font-size: 12px;
+}
+
+.grade-card-metric span:not(.student-icon),
+.grade-card-adviser span:not(.student-icon) {
+    font-size: 12px;
+}
+
+.grade-card-adviser strong {
+    font-size: 12px;
+}
+
+/* Section descriptions and badges */
+.section-header p,
+.grade-level-badge,
+.grade-info p,
+.grade-status,
+.grade-eyebrow {
+    font-size: 12px;
+}
+
+/* Grade card information */
+.grade-student-info div > span,
+.grade-view-link {
+    font-size: 12px;
+}
+
+/* Details header */
+.back-to-grades {
+    font-size: 12px;
+}
+
+.details-heading .grade-eyebrow,
+.details-heading p {
+    font-size: 12px;
+}
+
+/* Details summary */
+.details-summary-card span,
+.details-summary-card .summary-placeholder {
+    font-size: 12px;
+}
+
+/* Panel headings */
+.panel-heading p,
+.panel-heading h3 {
+    font-size: 12px;
+}
+
+/* Empty states */
+.empty-state h4,
+.table-empty-state h4,
+.empty-state p,
+.table-empty-state p {
+    font-size: 12px;
+}
+
+/* Academic records toolbar */
+.records-filter-group label,
+.records-filter-select {
+    font-size: 12px;
+}
+
+/* Academic records tables */
+.academic-records-table th,
+.records-table th,
+.academic-records-table td,
+.records-table td {
+    font-size: 12px;
+}
+
+/* Adviser section */
+.adviser-details h4,
+.adviser-details p {
+    font-size: 12px;
+}
+
+/* Subject assignments */
+.subject-assignment-info h4,
+.subject-assignment-info p,
+.subject-gradebook-link {
+    font-size: 12px;
 }

@@ -11,8 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const detailsGradeTitle = document.getElementById("detailsGradeTitle");
     const detailsStudentCount = document.getElementById("detailsStudentCount");
-    const academicRecordsGradeLabel = document.getElementById(
-        "academicRecordsGradeLabel",
+    const detailsAdviserSummary = document.getElementById(
+        "detailsAdviserSummary",
+    );
+    const detailsSchoolYear = document.getElementById("detailsSchoolYear");
+
+    const subjectAssignmentsList = document.getElementById(
+        "subjectAssignmentsList",
     );
 
     /* ==========================================
@@ -39,9 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
        INITIALIZE DIRECTORY HISTORY STATE
     ========================================== */
 
-    // Set the current page as the Grade Level Directory.
-    // This prevents an old or unexpected history state
-    // from interfering with the Back button.
     if (!window.history.state?.gradeDetailsOpen) {
         window.history.replaceState(
             { gradeDetailsOpen: false },
@@ -70,22 +72,110 @@ document.addEventListener("DOMContentLoaded", () => {
     const showGradeDetails = (gradeCard, updateHistory = true) => {
         const selectedGrade = gradeCard.dataset.grade;
         const studentCount = gradeCard.dataset.students;
+        const adviser = gradeCard.dataset.adviser || "Not assigned";
+        const schoolYear = gradeCard.dataset.schoolYear || "Not Set";
+
+        let subjects = [];
+
+        try {
+            subjects = JSON.parse(gradeCard.dataset.subjects || "[]");
+        } catch (error) {
+            console.error("Unable to read subject assignments:", error);
+        }
 
         if (!selectedGrade) {
             return;
         }
 
         detailsGradeTitle.textContent = selectedGrade;
-        detailsStudentCount.textContent = studentCount || "—";
+        detailsStudentCount.textContent = studentCount || "0";
 
-        if (academicRecordsGradeLabel) {
-            academicRecordsGradeLabel.textContent = selectedGrade;
+        // Assigned Adviser
+        if (detailsAdviserSummary) {
+            detailsAdviserSummary.textContent =
+                adviser.trim() || "Not assigned";
         }
+
+        // School year
+        if (detailsSchoolYear) {
+            detailsSchoolYear.textContent = schoolYear;
+        }
+
+        /* ==========================================
+           SUBJECT ASSIGNMENTS
+        ========================================== */
+
+        if (subjectAssignmentsList) {
+            subjectAssignmentsList.replaceChildren();
+
+            if (subjects.length === 0) {
+                subjectAssignmentsList.innerHTML = `
+                    <div class="empty-state compact-empty-state">
+                        <span class="empty-state-icon">
+                            <i class="fa-regular fa-folder-open"></i>
+                        </span>
+
+                        <h4>No Subject Assignments Yet</h4>
+
+                        <p>
+                            Subject and teacher assignments will appear here
+                            once the records are available.
+                        </p>
+                    </div>
+                `;
+            } else {
+                subjects.forEach((subject) => {
+                    const subjectCard = document.createElement("div");
+                    subjectCard.className = "subject-assignment-card";
+
+                    const subjectInfo = document.createElement("div");
+                    subjectInfo.className = "subject-assignment-info";
+
+                    const subjectTitle = document.createElement("h4");
+                    const subjectName =
+                        subject.subject_name || "Unnamed Subject";
+
+                    subjectTitle.textContent =
+                        subject.component && subject.component !== "General"
+                            ? `${subjectName} - ${subject.component}`
+                            : subjectName;
+
+                    const teacherName = document.createElement("p");
+                    teacherName.textContent =
+                        subject.teacher || "A subject teacher has not yet been assigned to this class.";
+
+                    const viewLink = document.createElement("a");
+                    viewLink.className = "subject-gradebook-link";
+                    viewLink.href = subject.gradebook_url || "#";
+                    viewLink.textContent = "View Gradebook";
+
+                    if (!subject.gradebook_url) {
+                        viewLink.setAttribute("aria-disabled", "true");
+                        viewLink.addEventListener("click", (event) => {
+                            event.preventDefault();
+                        });
+                    }
+
+                    subjectInfo.append(subjectTitle, teacherName);
+                    subjectCard.append(subjectInfo, viewLink);
+
+                    subjectAssignmentsList.appendChild(subjectCard);
+                });
+            }
+        }
+
+        /* ==========================================
+           SWITCH TO GRADE DETAILS
+        ========================================== */
 
         gradeDirectory.hidden = true;
         gradeDetailsView.hidden = false;
 
         animateGradeDetails();
+
+        /* ==========================================
+           BROWSER HISTORY
+        ========================================== */
 
         if (updateHistory) {
             const currentState = window.history.state;
@@ -95,8 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 selectedGrade: selectedGrade,
             };
 
-            // Update the existing details entry when already
-            // viewing details. Avoid duplicate history entries.
             if (currentState?.gradeDetailsOpen) {
                 window.history.replaceState(nextState, "", "#grade-details");
             } else {
@@ -205,6 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const shouldShow = selectedTerm === "overall" || isSelected;
 
                 column.hidden = !shouldShow;
+
                 column.classList.toggle(
                     "active-term-column",
                     selectedTerm !== "overall" && isSelected,

@@ -38,11 +38,11 @@
         All
       </button>
 
-      <button type="button" class="filter-btn" data-filter="adviser">
+      <button type="button" class="filter-btn" data-filter="advisers">
         Advisers
       </button>
 
-      <button type="button" class="filter-btn" data-filter="teacher">
+      <button type="button" class="filter-btn" data-filter="teachers">
         Teachers
       </button>
 
@@ -50,6 +50,23 @@
         Students
       </button>
 
+    </div>
+
+    <!-- ANNOUNCEMENT TOOLBAR -->
+    <div class="announcement-toolbar">
+      <label class="select-all-label">
+        <input type="checkbox" id="selectAllAnnouncements">
+        <span>Select All</span>
+      </label>
+
+      <div class="bulk-actions">
+        <span id="selectedAnnouncementCount">0 selected</span>
+
+        <button type="button" id="deleteSelectedAnnouncements" disabled>
+          <i class="fa-solid fa-trash"></i>
+          Delete Selected
+        </button>
+      </div>
     </div>
 
     {{-- ANNOUNCEMENT LIST --}}
@@ -267,6 +284,45 @@
     </div>
 
   </div>
+
+
+  <!-- BULK DELETE CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="bulkDeleteModal">
+
+    <div class="modal-container bulk-delete-modal">
+
+      <div class="modal-icon delete-icon">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+
+      <div class="modal-content">
+        <h2>Delete Selected Announcements?</h2>
+
+        <p id="bulkDeleteMessage">
+          Are you sure you want to delete the selected announcements?
+        </p>
+
+        <span class="delete-warning">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          This action cannot be undone.
+        </span>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" id="cancelBulkDelete" class="cancel-btn">
+          Cancel
+        </button>
+
+        <button type="button" id="confirmBulkDelete" class="delete-confirm-btn">
+          <i class="fa-solid fa-trash"></i>
+          Delete Selected
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
 
 
   {{-- SUCCESS MODAL --}}

@@ -10,7 +10,6 @@ class AdvisoryAssignment extends Model
     protected $fillable = [
         'faculty_id',
         'grade_level',
-        'section',
         'school_year',
     ];
 
